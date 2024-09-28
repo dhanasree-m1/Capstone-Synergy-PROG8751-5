@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "apollo-server-express": "^3.13.0",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "graphql": "^16.9.0",
+    "mongoose": "^8.7.0"
+  },
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "nodemon indexQL.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
