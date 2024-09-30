@@ -19,8 +19,8 @@ app.use(express.json()); // Parse JSON payloads
 
 // Your other routes and logic will go here...
 
-// Connect to MongoDB
-mongoose.connect('mongodb+srv://jayalekshmivj08:Harmony2024@cluster0.rifewjx.mongodb.net/UniTradeHorizons', {
+// Connect to MongoDB  
+mongoose.connect('mongodb+srv://dhanasree01:Mongo123@cluster0.umw1frd.mongodb.net/HomeBite?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
