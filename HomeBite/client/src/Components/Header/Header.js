@@ -7,7 +7,7 @@ import { FaSearch } from "react-icons/fa";
 import Button from "react-bootstrap/esm/Button";
 import "./Header.scss";
 import { useNavigate } from "react-router-dom";
-import Logo from "../../assets/images/logo.webp";
+import Logo from "../../assets/images/logo.png";
 
 export default function Header() {
   const navigate = useNavigate();
