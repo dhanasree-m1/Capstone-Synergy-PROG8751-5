@@ -1,0 +1,326 @@
+//client/src/app.scss
+// Variables
+$font-family: "Comfortaa", sans-serif;
+$background-color: #282c34;
+$primary-color: #FF8A00;
+$secondary-color: #4A4A4A;
+$text-color: white;
+$font-size-base: calc(10px + 2vmin);
+$logo-size: 40vmin;
+$overlay-color: rgba(0, 0, 0, 0.5);
+$slider-icon-size: 3em;
+$btn-primary-bg-color: #ff8a00;
+$btn-primary-font-size: 16px;
+$btn-link-color: #ff8a00;
+$btn-link-font-size: 14px;
+$link-color: #ff8a00;
+$text-size: 14px;
+
+
+// Styles
+.App {
+  text-align: center;
+}
+
+html {
+  font-family: $font-family;
+}
+
+.App-logo {
+  height: $logo-size;
+  pointer-events: none;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: $background-color;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-base;
+  color: $text-color;
+}
+
+.App-link {
+  color: $primary-color;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+p {
+  font-size: $text-size;
+}
+
+.login-bg {
+  min-height: 100%;
+  max-height: 100vh;
+  object-fit: cover;
+}
+
+.overlay {
+  background-color: $overlay-color;
+  z-index: 1;
+}
+
+.carousel {
+  z-index: 2;
+  bottom: 10%;
+  left: 10%;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  opacity: 1 !important;
+
+  .material-icons {
+    font-size: $slider-icon-size;
+  }
+}
+
+// btn-primary style
+.btn-primary {
+  background-color: $btn-primary-bg-color;
+  font-size: $btn-primary-font-size;
+  color: $text-color;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($btn-primary-bg-color, 10%);
+  }
+}
+
+// btn-link style
+.btn-link {
+  background: none;
+  border: none;
+  color: $btn-link-color;
+  font-size: $btn-link-font-size;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    text-decoration: none;
+    color: darken($btn-link-color, 10%);
+  }
+}
+
+footer {
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-container {
+  width: 75%;
+}
+
+.link-color {
+  color: $link-color;
+}
+
+// General styling for the container
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+// Styling for the login/register box
+.login-box {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 80%;
+}
+
+// Title for the form
+.form-title {
+  font-size: 30px;
+  color: #000;
+}
+
+.form-sub-title {
+  font-size: 16px;
+  color: #475467;
+}
+
+// Input group wrapper
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+// Submit button
+.submit-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: $primary-color;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}
+
+input:-internal-autofill-selected {
+  background-color: #fff !important;
+}
+
+// Message after form submission
+.form-message {
+  margin-top: 15px;
+  color: red;
+  font-size: 14px;
+}
+
+// Toggle between login/register form
+.toggle-text {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #666;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: $primary-color;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: #0056b3;
+  }
+}
+
+// Container for the role options
+.fat-options {
+  display: flex;
+  justify-content: space-between;
+}
+
+// Style for each option (role card)
+.option {
+  flex: 1;
+  padding: 14px 20px;
+  border: 1px solid #d8e6dc;
+  border-radius: 8px;
+  background-color: #fff;
+  text-align: left;
+  position: relative;
+  margin-right: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  p {
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+    margin-left: 1em;
+  }
+
+  // Hide native checkbox
+  input[type="checkbox"] {
+    display: none;
+  }
+
+  // Custom checkmark styling
+  input[type="checkbox"]+p:before {
+    content: "check_box_outline_blank";
+    color: $primary-color;
+    font-family: 'Material Icons';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  // Highlight the card when checkbox is checked
+  input[type="checkbox"]:checked+p:before {
+    color: $primary-color;
+    content: 'check_box';
+    font-family: 'Material Icons';
+  }
+
+  &:hover {
+    border-color: $primary-color;
+  }
+
+  &.checked {
+    background-color: #f3faf3;
+    border-color: #B2B2B2;
+  }
+}
+
+
+
+.form-check {
+  align-items: center;
+  margin-bottom: 15px;
+
+  .form-check-input {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    appearance: none;
+    border: 1px solid #B2B2B2; // default unchecked border color
+    border-radius: 50%;
+    position: relative;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+
+    &:checked {
+      background-color: #fff; // background for checked state
+      border: 1px solid #FF8A00; // orange border for checked state
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 10px;
+        height: 10px;
+        background-color: #FF8A00; // orange dot in the center for checked state
+        border-radius: 50%;
+      }
+    }
+  }
+
+  .form-check-label {
+    font-size: 16px;
+    color: #3A445D; // text color
+    cursor: pointer;
+    vertical-align: text-top;
+  }
+}

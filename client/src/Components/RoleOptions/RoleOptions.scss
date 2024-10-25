@@ -1,0 +1,55 @@
+//client/src/Components/RadioButton/roleoptions.scss
+.option {
+    flex: 1;
+    padding: 14px 20px;
+    border: 1px solid #d8e6dc;
+    border-radius: 8px;
+    background-color: #fff;
+    text-align: left;
+    position: relative;
+    margin-right: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  
+    &:last-child {
+      margin-right: 0;
+    }
+  
+    p {
+      font-size: 16px;
+      color: #333;
+      margin: 0;
+      margin-left: 1em;
+    }
+  
+    input[type="checkbox"] {
+      display: none;
+    }
+  
+    input[type="checkbox"] + p:before {
+      content: "check_box_outline_blank";
+      color: #ff8a00;
+      font-family: 'Material Icons';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 20px;
+      transition: opacity 0.2s ease-in-out;
+    }
+  
+    input[type="checkbox"]:checked + p:before {
+      color: #ff8a00;
+      content: 'check_box';
+      font-family: 'Material Icons';
+    }
+  
+    &:hover {
+      border-color: #ff8a00;
+    }
+  
+    &.checked {
+      background-color: #f3faf3;
+      border-color: #B2B2B2;
+    }
+  }
+  

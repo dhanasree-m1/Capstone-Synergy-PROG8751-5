@@ -1,0 +1,14 @@
+// src/components/carousel/carousel.scss
+.carousel-inner {
+    max-height: 600px !important;
+    height: 100% !important;
+    background-position: center center; /* Ensure both horizontal and vertical centering */
+    background-size: cover; /* Ensures the image covers the entire area */
+    background-repeat: no-repeat; /* Prevents repeating */
+}
+.carousel-inner img {
+    max-height: 600px;
+    width: 100%; /* Makes the image fill the width of the carousel */
+    object-fit: cover; /* Ensures the image covers the entire container */
+    object-position: center; /* Centers the image */
+}
