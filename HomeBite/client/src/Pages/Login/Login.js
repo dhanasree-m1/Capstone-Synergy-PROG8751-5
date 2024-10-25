@@ -1,105 +1,132 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'; 
+import './Login.scss';
+import loginbg from "../../assets/images/login-bg.jpg";
+import Logo from "../../assets/images/logo.svg";
 
 const Login = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
-  const [registerData, setRegisterData] = useState({ username: '', password: '' });
-  const [message, setMessage] = useState('');
-  const navigate = useNavigate();
+    const [loginData, setLoginData] = useState({ username: '', password: '' });
+    const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
-  const toggleForm = () => {
-    setIsLogin(!isLogin);
-    setMessage('');
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setLoginData({ ...loginData, [name]: value });
+    };
 
-  const handleChange = (e, formType) => {
-    if (formType === 'login') {
-      setLoginData({ ...loginData, [e.target.name]: e.target.value });
-    } else {
-      setRegisterData({ ...registerData, [e.target.name]: e.target.value });
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch('http://localhost:8000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData),
+            });
 
-  const handleSubmit = async (e, formType) => {
-    e.preventDefault();
-    const formData = formType === 'login' ? loginData : registerData;
-    const endpoint = formType === 'login' ? 'login' : 'register';
-
-    try {
-      const response = await fetch(`http://localhost:8000/${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        if (formType === 'login') {
-          localStorage.setItem('token', data.token);
-          navigate('/Home');
-        } else {
-          setMessage(data.message || 'User registered successfully');
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('token', data.token);
+                navigate('/home');
+            } else {
+                setMessage(data.message || 'Error logging in');
+            }
+        } catch (error) {
+            setMessage('Error logging in');
         }
-      } else {
-        setMessage(data.message || `Error in ${formType}`);
-      }
-    } catch (error) {
-      setMessage(`Error in ${formType}`);
-    }
-  };
+    };
 
-  return (
-    <div className="login-container"> 
-      <div className="login-box">
-        <h2 className="form-title">{isLogin ? 'Login' : 'Register'}</h2>
+    return (
+        <div className='container-fluid'>
+            <div className='row'>
+                <div className='col-md-7 p-0'>
+                    <div className="login-container">
+                        <div className="login-box">
+                            <img src={Logo} className="logo" alt="Logo" />
+                            <h2 className="form-title mt-5 mb-2">Sign In to HomeBite</h2>
+                            <h4 className="form-sub-title mb-3">Sign in to enjoy the best home-cooked meals made with care!</h4>
+                            <form onSubmit={handleSubmit}>
+                                <div className="input-group mb-0">
+                                    <label htmlFor="username" className="input-label">Your Email Address</label>
+                                    <input
+                                        type="text"
+                                        id="username"
+                                        name="username"
+                                        className="input-field"
+                                        value={loginData.username}
+                                        onChange={handleChange}
+                                        placeholder="Your Email Address"
+                                        required
+                                    />
+                                    <p className="form-text">Please enter the email associated with your account.</p>
+                                </div>
 
-        <form onSubmit={(e) => handleSubmit(e, isLogin ? 'login' : 'register')}>
-          <div className="input-group">
-            <label htmlFor="username" className="input-label">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              className="input-field"
-              value={isLogin ? loginData.username : registerData.username}
-              onChange={(e) => handleChange(e, isLogin ? 'login' : 'register')}
-              required
-            />
-          </div>
+                                <div className="input-group">
+                                    <label htmlFor="password" className="input-label">Your Password</label>
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        className="input-field"
+                                        value={loginData.password}
+                                        onChange={handleChange}
+                                        placeholder="Your Password"
+                                        required
+                                    />
+                                </div>
 
-          <div className="input-group">
-            <label htmlFor="password" className="input-label">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="input-field"
-              value={isLogin ? loginData.password : registerData.password}
-              onChange={(e) => handleChange(e, isLogin ? 'login' : 'register')}
-              required
-            />
-          </div>
+                                <button type="submit" className="btn btn-primary w-100 mb-3">Let's Go!</button>
 
-          <button type="submit" className="submit-btn">
-            {isLogin ? 'Login' : 'Register'}
-          </button>
-        </form>
+                                {message && <p className="form-message">{message}</p>}
 
-        {message && <p className="form-message">{message}</p>}
+                                <div className="auth-links d-flex justify-content-between">
+                                    <p>
+                                        New to HomeBite? <a href="/register" className="btn btn-link">Create an account</a>
+                                    </p>
+                                    <a href="/forgot-password" className="btn btn-link">Forgot Password?</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <footer>
+                        <div className='d-flex justify-content-between footer-container'>
+                            <p>HomeBite © All Rights Reserved</p>
+                            <div className='d-flex link-color'><i className='material-icons mx-2'>email</i><p className='align-middle'>help@homebite.com</p></div>
+                        </div>
+                    </footer>
+                </div>
 
-        <p className="toggle-text">
-          {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-          <button onClick={toggleForm} className="toggle-btn">
-            {isLogin ? 'Register here' : 'Login here'}
-          </button>
-        </p>
-      </div>
-    </div>
-  );
+                <div className='col-md-5 d-flex align-items-center justify-content-center p-0 position-relative'>
+                    <div className="overlay position-absolute w-100 h-100"></div>
+                    <img src={loginbg} className="img-fluid login-bg w-100 h-100" alt="Background" />
+                    <div id="textCarousel" className="carousel slide position-absolute mb-3" data-bs-ride="carousel">
+                        <div className="carousel-inner w-50">
+                            <div className="carousel-item active">
+                                <div className="d-block p-3 text-white h3 text-carousel">“Home-cooked meals, made by the community, for the community.”</div>
+                            </div>
+                            <div className="carousel-item">
+                                <div className="d-block p-3 text-white h3 text-carousel">Second Text Slide</div>
+                            </div>
+                            <div className="carousel-item">
+                                <div className="d-block p-3 text-white h3 text-carousel">Third Text Slide</div>
+                            </div>
+                        </div>
+                        <div className='position-relative w-50 mx-3 d-flex'>
+                            <button className="carousel-control-prev position-relative w-auto" type="button" data-bs-target="#textCarousel" data-bs-slide="prev">
+                                <i className="material-icons">arrow_circle_left</i>
+                                <span className="visually-hidden">Previous</span>
+                            </button>
+                            <button className="carousel-control-next position-relative w-auto mx-3" type="button" data-bs-target="#textCarousel" data-bs-slide="next">
+                                <i className="material-icons">arrow_circle_right</i>
+                                <span className="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default Login;
