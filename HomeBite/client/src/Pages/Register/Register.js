@@ -29,6 +29,26 @@ const Register = () => {
       chef: false,
       rider: false,
     },
+    // Rider-specific fields (NEW FIELDS ADDED)
+    vehicleType: "",
+    vehicleRegNumber: "",
+    vehicleInsuranceNumber: "",
+    insuranceExpiryDate: "",
+    driverLicenseNumber: "",
+    licenseExpiryDate: "",
+    preferredDeliveryRadius: "",
+    preferredWorkingDays: [],
+    preferredStartTime: "",
+    preferredEndTime: "",
+    longDistancePreference: false,
+    emergencyContactName: "",
+    emergencyContactNumber: "",
+    relationship: "",
+    profilePicture: null,
+    // Payment information
+    bankAccountNumber: "",
+    transitNumber: "",
+ 
   });
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -62,7 +82,9 @@ const Register = () => {
         return;
       }
       setStep(2);
-    } else {
+    } else if (step === 2 && registerData.roles.rider) {
+      setStep(3); // NEW: Move to Step 3 if Rider role is selected
+    }  else {
       console.log("Registration Data:", registerData);
       navigate("/home"); // Navigate to home after successful registration
     }
@@ -177,7 +199,7 @@ const Register = () => {
                   </>
                 )}
 
-                {step === 2 && (
+                {step === 2 &&  (
                   <>
                     <Col md={12}>
                       <div className="additional-details">
@@ -247,24 +269,24 @@ const Register = () => {
                     </Col>
                     <Col md={6}>
                       <Button type="submit" className="btn-primary w-100">
-                        Submit
+                        Proceed
                       </Button>
                     </Col>
                   </>
                 )}
 
                 {step === 3 && registerData.roles.rider && (
-                  <div className="additional-details">
-                    <h2 className="form-title">Additional Information</h2>
-                    <hr />
-                    <h3 className="form-sub-title">Step 2 of 3</h3>
-                    <h4>For Rider</h4>
-                    <hr />
-                    <h5 className="form-sub-title">Vehicle Information</h5>
+                  <>
+                  <Col md={12}>
+                    <h5>Vehicle Information</h5>
+                  </Col>
+                  <Col md={6}>
                     <InputField
                       label="Vehicle Type"
                       name="vehicleType"
+                      placeholder="Select Vehicle Type"
                       as="select"
+                      onChange={handleChange}
                     >
                       <option value="">Select Vehicle Type</option>
                       <option value="Bike">Bike</option>
@@ -273,32 +295,137 @@ const Register = () => {
                       <option value="Car">Car</option>
                       <option value="Other">Other</option>
                     </InputField>
+                  </Col>
+                  <Col md={6}>
                     <InputField
                       label="Vehicle Registration Number"
                       name="vehicleRegNumber"
                       placeholder="Vehicle Registration Number"
+                      onChange={handleChange}
                     />
-                    {/* Additional fields for insurance and driver info */}
-                    <div className="d-flex justify-content-between mb-3">
-                      <Button type="button" className="btn-secondary">
-                        Back
-                      </Button>
-                      <Button type="submit" className="btn-primary">
-                        Proceed
-                      </Button>
-                    </div>
-                    <div className="auth-links d-flex justify-content-between">
-                      <p>
-                        New to HomeBite?{" "}
-                        <a href="/register" className="btn btn-link">
-                          Create an account
-                        </a>
-                      </p>
-                      <a href="/forgot-password" className="btn btn-link">
-                        Forgot Password?
-                      </a>
-                    </div>
-                  </div>
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="Vehicle Insurance Number"
+                      name="vehicleInsuranceNumber"
+                      placeholder="Vehicle Insurance Number"
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="Insurance Expiry Date"
+                      type="date"
+                      name="insuranceExpiryDate"
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="Driver's License Number"
+                      name="driverLicenseNumber"
+                      placeholder="Driver's License Number"
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="License Expiry Date"
+                      type="date"
+                      name="licenseExpiryDate"
+                      onChange={handleChange}
+                    />
+                  </Col>
+
+                  {/* Availability Section */}
+                  <Col md={12}>
+                    <h5>Availability</h5>
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="Preferred Delivery Radius"
+                      name="preferredDeliveryRadius"
+                      placeholder="Select Radius"
+                      as="select"
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Radius</option>
+                      <option value="5 km">5 km</option>
+                      <option value="10 km">10 km</option>
+                      <option value="15 km">15 km</option>
+                      <option value="20+ km">20+ km</option>
+                    </InputField>
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="Preferred Working Days"
+                      name="preferredWorkingDays"
+                      placeholder="Select Days"
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="Start Time"
+                      name="preferredStartTime"
+                      type="time"
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="End Time"
+                      name="preferredEndTime"
+                      type="time"
+                      onChange={handleChange}
+                    />
+                  </Col>
+
+
+                  {/* Payment Information */}
+                  <Col md={12}>
+                    <h5>Payment Information</h5>
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="Bank Account Number"
+                      name="bankAccountNumber"
+                      placeholder="Bank Account Number"
+                      onChange={handleChange}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <InputField
+                      label="Transit Number"
+                      name="transitNumber"
+                      placeholder="Transit Number"
+                      onChange={handleChange}
+                    />
+                  </Col>
+
+                  {/* Profile Verification */}
+                  <Col md={12}>
+                    <h5>Profile Verification</h5>
+                    <InputField
+                      label="Upload Profile Picture"
+                      type="file"
+                      name="profilePicture"
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          profilePicture: e.target.files[0],
+                        })
+                      }
+                    />
+                  </Col>
+
+                  {/* Submit Button */}
+                  <Col md={12}>
+                    <Button type="submit" className="btn-primary w-100">
+                      Submit
+                    </Button>
+                  </Col>
+                </>
                 )}
               </form>
             </div>
