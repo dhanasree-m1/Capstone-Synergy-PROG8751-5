@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
 
 const ChefSchema = new mongoose.Schema({
-  chef_id: { type: Number, required: true, unique: true },
-  user_id: { type: Number, ref: 'User', required: true },
-  bio: { type: String },
-  rating: { type: Number, default: 0 },
-  reviews_count: { type: Number, default: 0 },
-  earnings: { type: Number, default: 0.0 },
-  location: { type: String }
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true, required: true },
+  specialty_cuisines: [{ type: String, enum: ['Indian', 'Italian', 'Mexican', 'Chinese', 'Other'] }],
+  type_of_meals: [{ type: String, enum: ['Breakfast', 'Lunch', 'Dinner', 'Snacks'] }],
+  cooking_experience: { type: String, enum: ['Less than 1 year', '1-3 years', '3-5 years', '5+ years'] },
+  max_orders_per_day: { type: Number },
+  preferred_working_days: [{ type: String, enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] }],
+  preferred_start_time: { type: String },
+  preferred_end_time: { type: String },
+  created_at: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Chef', ChefSchema);

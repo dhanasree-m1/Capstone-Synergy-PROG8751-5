@@ -1,13 +1,22 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-  user_id: { type: Number, required: true, unique: true },
-  username: { type: String, required: true, unique: true },
-  password_hash: { type: String, required: true },
+  first_name: { type: String, required: true },
+  last_name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  role: { type: String, enum: ['superadmin', 'admin', 'chef', 'customer', 'rider'], required: true },
+  mobile_number: { type: String, required: true },
+  password_hash: { type: String, required: true },
+  role: { type: String, enum: ['chef', 'rider', 'customer'], required: true },
+  gender: { type: String, enum: ['Male', 'Female', 'Other'] },
   profile_image: { type: String },
-  status: { type: String, enum: ['active', 'inactive'], required: true },
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+  address_line_1: { type: String },
+  address_line_2: { type: String },
+  city: { type: String },
+  province: { type: String },
+  postal_code: { type: String },
+  country: { type: String },
+  nearby_landmark: { type: String },
   created_at: { type: Date, default: Date.now }
 });
 

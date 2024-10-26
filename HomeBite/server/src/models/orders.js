@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
 
 const OrderSchema = new mongoose.Schema({
-  order_id: { type: Number, required: true, unique: true },
-  customer_id: { type: Number, ref: 'User', required: true },
-  chef_id: { type: Number, ref: 'Chef', required: true },
-  rider_id: { type: Number, ref: 'User' },
+  customer_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  chef_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Chef', required: true },
+  rider_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   total_amount: { type: Number, required: true },
-  status: { type: String, enum: ['preparing', 'ready', 'on_the_way', 'delivered', 'cancelled'], required: true },
+  status: { type: String, enum: ['preparing', 'ready', 'on_the_way', 'delivered', 'cancelled'], default: 'preparing' },
   created_at: { type: Date, default: Date.now }
 });
 

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Register.scss";
-import axios from "axios";
 import loginbg from "../../assets/images/login-bg.jpg";
 import Logo from "../../assets/images/logo.svg";
 import InputField from "../../Components/InputField/InputField";
