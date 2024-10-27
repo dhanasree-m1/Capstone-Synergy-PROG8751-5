@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const RiderSchema = new mongoose.Schema({
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true, required: true },
@@ -16,4 +16,4 @@ const RiderSchema = new mongoose.Schema({
   long_distance_preference: { type: Boolean, default: false }
 });
 
-module.exports = mongoose.model('Rider', RiderSchema);
+export const Rider = mongoose.model('Rider', RiderSchema);

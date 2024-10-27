@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const RatingSchema = new mongoose.Schema({
   chef_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Chef', required: true },
@@ -8,4 +8,4 @@ const RatingSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Rating', RatingSchema);
+export const Rating = mongoose.model('Rating', RatingSchema);

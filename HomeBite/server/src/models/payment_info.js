@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const PaymentInfoSchema = new mongoose.Schema({
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true, required: true },
@@ -8,4 +8,4 @@ const PaymentInfoSchema = new mongoose.Schema({
   payment_account_verification: { type: Boolean, default: false }
 });
 
-module.exports = mongoose.model('PaymentInfo', PaymentInfoSchema);
+export const PaymentInfo = mongoose.model('PaymentInfo', PaymentInfoSchema);

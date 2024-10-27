@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const PlatformAnalyticsSchema = new mongoose.Schema({
   analytics_id: { type: Number, required: true, unique: true },
@@ -8,4 +8,4 @@ const PlatformAnalyticsSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('PlatformAnalytics', PlatformAnalyticsSchema);
+export const PlatformAnalytics = mongoose.model('PlatformAnalytics', PlatformAnalyticsSchema);
