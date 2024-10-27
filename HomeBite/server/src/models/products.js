@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const ProductSchema = new mongoose.Schema({
   chef_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Chef', required: true },
@@ -13,4 +13,4 @@ const ProductSchema = new mongoose.Schema({
   is_available: { type: Boolean, default: true }
 });
 
-module.exports = mongoose.model('Product', ProductSchema);
+export const Product = mongoose.model('Product', ProductSchema);

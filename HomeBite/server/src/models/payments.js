@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const PaymentSchema = new mongoose.Schema({
   order_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
@@ -9,4 +9,4 @@ const PaymentSchema = new mongoose.Schema({
   payment_date: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Payment', PaymentSchema);
+export const Payment = mongoose.model('Payment', PaymentSchema);

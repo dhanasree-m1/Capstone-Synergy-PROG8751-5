@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from "mongoose";
 const DisputeSchema = new mongoose.Schema({
   dispute_id: { type: Number, required: true, unique: true },
   order_id: { type: Number, ref: 'Order', required: true },

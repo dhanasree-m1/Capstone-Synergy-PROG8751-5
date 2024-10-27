@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const RiderOrderSchema = new mongoose.Schema({
   rider_order_id: { type: Number, required: true, unique: true },
@@ -10,4 +10,4 @@ const RiderOrderSchema = new mongoose.Schema({
   earnings: { type: Number }
 });
 
-module.exports = mongoose.model('RiderOrder', RiderOrderSchema);
+export const RiderOrder = mongoose.model('RiderOrder', RiderOrderSchema);
