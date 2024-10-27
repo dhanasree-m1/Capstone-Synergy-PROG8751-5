@@ -36,6 +36,7 @@ const Register = () => {
     insuranceExpiryDate: "",
     driverLicenseNumber: "",
     licenseExpiryDate: "",
+    document_upload_path:"",
     preferredDeliveryRadius: "",
     preferredWorkingDays: [],
     preferredStartTime: "",
@@ -334,6 +335,20 @@ const Register = () => {
                       type="date"
                       name="licenseExpiryDate"
                       onChange={handleChange}
+                    />
+                  </Col>
+                  <Col md={12}>
+                    <h5>Upload Driver License/Insurance</h5>
+                    <InputField
+                      label="Upload Driver License"
+                      type="file"
+                      name="document_upload_path"
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          document_upload_path: e.target.files[0],
+                        })
+                      }
                     />
                   </Col>
 
