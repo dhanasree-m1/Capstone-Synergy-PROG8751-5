@@ -9,6 +9,8 @@ import RadioButton from "../../Components/RadioButton/RadioButton";
 import Button from "../../Components/Button/Button";
 import RoleOptions from "../../Components/RoleOptions/RoleOptions";
 import { Container, Row, Col, Alert } from "react-bootstrap";
+import { useMutation } from '@apollo/client';
+import { CREATE_USER, UPDATE_USER, CREATE_RIDER, UPDATE_RIDER } from '../../queries';
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -53,7 +55,8 @@ const Register = () => {
   });
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-
+  const [createUser] = useMutation(CREATE_USER);
+  const [createRider] = useMutation(CREATE_RIDER);
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(`Changed field: ${name}, New value: ${value}`); // Debugging line
@@ -76,6 +79,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (step === 1) {
       const { roles } = registerData;
       if (!roles.customer && !roles.chef && !roles.rider) {
@@ -83,11 +87,65 @@ const Register = () => {
         return;
       }
       setStep(2);
-    } else if (step === 2 && registerData.roles.rider) {
-      setStep(3); // NEW: Move to Step 3 if Rider role is selected
-    }  else {
-      console.log("Registration Data:", registerData);
-      navigate("/home"); // Navigate to home after successful registration
+    } else if (step === 2 && !registerData.roles.rider) {
+      // Step 2: Register User data
+      try {
+        const userInput = {
+          first_name: registerData.firstName,
+          last_name: registerData.lastName,
+          email: registerData.email,
+          password_hash: registerData.password, // Ensure this is hashed if necessary
+          mobile_number: registerData.mobile,
+          role: Object.keys(registerData.roles).find((role) => registerData.roles[role]),
+          address_line_1: registerData.address,
+          city: registerData.city,
+          province: registerData.province,
+          postal_code: registerData.postalCode,
+          country: registerData.country,
+          gender: registerData.gender,
+        };
+  
+        const { data } = await createUser({ variables: { input: userInput } });
+        console.log("User registered successfully:", data);
+        if (data && data.createUser) {
+          setRegisterData((prevData) => ({ ...prevData, user_id: data.createUser.id }));
+          navigate("/home");
+        } else {
+          setMessage("Failed to register user. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error registering user:", error);
+        setMessage("Failed to register user.");
+      }
+    } else if (step === 3 && registerData.roles.rider) {
+      // Step 3: Register Rider-specific data
+      try {
+        const riderInput = {
+          user_id: registerData.user_id,
+          vehicle_type: registerData.vehicleType,
+          vehicle_registration_number: registerData.vehicleRegNumber,
+          vehicle_insurance_number: registerData.vehicleInsuranceNumber,
+          insurance_expiry_date: registerData.insuranceExpiryDate,
+          driver_license_number: registerData.driverLicenseNumber,
+          license_expiry_date: registerData.licenseExpiryDate,
+          preferred_delivery_radius: registerData.preferredDeliveryRadius,
+          preferred_working_days: registerData.preferredWorkingDays,
+          preferred_start_time: registerData.preferredStartTime,
+          preferred_end_time: registerData.preferredEndTime,
+          long_distance_preference: registerData.longDistancePreference,
+        };
+  
+        const { data } = await createRider({ variables: { input: riderInput } });
+        console.log("Rider registered successfully:", data);
+        if (data && data.createRider) {
+          navigate("/home");
+        } else {
+          setMessage("Failed to register rider. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error registering rider:", error);
+        setMessage("Failed to register rider.");
+      }
     }
   };
 
