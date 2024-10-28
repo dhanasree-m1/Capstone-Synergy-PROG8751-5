@@ -19,6 +19,7 @@ const Register = () => {
     lastName: "",
     email: "",
     password: "",
+    confirmpassword:"",
     mobile: "",
     address: "",
     address2: "",
@@ -85,7 +86,54 @@ const Register = () => {
     { label: "Saturday", value: "Saturday" },
     { label: "Sunday", value: "Sunday" },
   ];
+ // Validation helper functions
+ const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
+ const validatePhoneNumber = (number) => /^\d{10}$/.test(number);
+ const validatePostalCode = (postalCode) => /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postalCode); // Canadian format
+ const validateFutureDate = (date) => new Date(date) >= new Date();
 
+ const validateCustomer = () => {
+   const { firstName, lastName, email, password, confirmPassword, mobile, address, city, province, postalCode, country } = registerData;
+
+   if (!firstName || !lastName || !email || !password || !mobile ) {
+     setMessage("Please fill in all required fields for Customer.");
+     return false;
+   }
+   if (!validateEmail(email)) {
+     setMessage("Please enter a valid email address.");
+     return false;
+   }
+   if (!validatePhoneNumber(mobile)) {
+     setMessage("Please enter a valid 10-digit phone number.");
+     return false;
+   }
+//    if (password !== confirmPassword) {
+//     setMessage("Passwords do not match.");
+//     return false;
+//   }
+//    if (!validatePostalCode(postalCode)) {
+//      setMessage("Please enter a valid postal code.");
+//      return false;
+//    }
+   return true;
+ };
+ const validateRider = () => {
+    const { vehicleType, vehicleRegNumber, driverLicenseNumber, preferredDeliveryRadius, preferredWorkingDays, preferredStartTime, preferredEndTime, insuranceExpiryDate, licenseExpiryDate } = registerData;
+
+    if (!vehicleType || !vehicleRegNumber || !driverLicenseNumber || !preferredDeliveryRadius || preferredWorkingDays.length === 0 || !preferredStartTime || !preferredEndTime) {
+      setMessage("Please fill in all required fields for Rider.");
+      return false;
+    }
+    if (insuranceExpiryDate && !validateFutureDate(insuranceExpiryDate)) {
+      setMessage("Insurance expiry date cannot be in the past.");
+      return false;
+    }
+    if (licenseExpiryDate && !validateFutureDate(licenseExpiryDate)) {
+      setMessage("License expiry date cannot be in the past.");
+      return false;
+    }
+    return true;
+  };
   const handleRoleChange = (e) => {
     const { name, checked } = e.target;
     setRegisterData((prevData) => ({
@@ -98,7 +146,6 @@ const Register = () => {
   };
 
   const createUserAccount = async () => {
-    
     const userInput = {
         first_name: registerData.firstName || "",
         last_name: registerData.lastName || "",
@@ -117,6 +164,7 @@ const Register = () => {
           country: registerData.country || "",
           nearby_landmark: registerData.nearby_landmark || ""
     };
+    console.log("User input for mutation:", userInput);
     const { data } = await createUser({ variables: { input: userInput } });
     if (data && data.createUser) {
       setRegisterData((prevData) => ({ ...prevData, user_id: data.createUser.id }));
@@ -163,7 +211,8 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { customer, chef, rider } = registerData.roles;
-
+    
+    
     if (step === 1) {
       if (!customer && !chef && !rider) {
         setMessage("Please select at least one role to proceed.");
@@ -172,6 +221,8 @@ const Register = () => {
       setStep(customer || chef ? 2 : 3); // Skip to step 3 if only Rider is selected
     } else if (step === 2) {
       // Create User Account
+      if (customer && !validateCustomer()) return;
+    
       await createUserAccount();
 
       // Go to Rider information if Rider role selected
@@ -180,13 +231,15 @@ const Register = () => {
       } else {
         // Submit and navigate directly if only Customer or Chef roles are selected
         if (chef) await createChefAccount();
-        navigate("/home");
+        navigate("/");
       }
     } else if (step === 3) {
       // Register Rider-specific information
       if (rider) {
+       // if (customer && !validateCustomer()) return;
+    if (rider && !validateRider()) return;
         await createRiderAccount();
-        navigate("/home");
+        navigate("/");
       }
     }
   };
@@ -245,6 +298,8 @@ const Register = () => {
                         type="password"
                         name="confirmpassword"
                         placeholder="Re-enter your password to confirm"
+                        value={registerData.confirmPassword}
+    onChange={handleChange}
                       />
                     </Col>
                     <Col md={12}>
