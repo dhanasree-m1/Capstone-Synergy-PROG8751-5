@@ -99,30 +99,32 @@ const Register = () => {
   };
 
   const createUserAccount = async () => {
-    
     const userInput = {
-        first_name: registerData.firstName || "",
-        last_name: registerData.lastName || "",
-        email: registerData.email || "",
-        mobile_number: registerData.mobile || "",
-        password_hash: registerData.password || "",
+      first_name: registerData.firstName || "",
+      last_name: registerData.lastName || "",
+      email: registerData.email || "",
+      mobile_number: registerData.mobile || "",
+      password_hash: registerData.password || "",
       role: "customer",
       gender: registerData.gender || "Other", // Set a default gender value if none selected
-          profile_image: registerData.profilePicture || "",
-          status: "active",
-          address_line_1: registerData.address || "",
-          address_line_2: registerData.address2 || "",
-          city: registerData.city || "",
-          province: registerData.province || "",
-          postal_code: registerData.postalCode || "",
-          country: registerData.country || "",
-          nearby_landmark: registerData.nearby_landmark || ""
+      profile_image: registerData.profilePicture || "",
+      status: "active",
+      address_line_1: registerData.address || "",
+      address_line_2: registerData.address2 || "",
+      city: registerData.city || "",
+      province: registerData.province || "",
+      postal_code: registerData.postalCode || "",
+      country: registerData.country || "",
+      nearby_landmark: registerData.nearby_landmark || "",
     };
     const { data } = await createUser({ variables: { input: userInput } });
     if (data && data.createUser) {
-      setRegisterData((prevData) => ({ ...prevData, user_id: data.createUser.id }));
+      setRegisterData((prevData) => ({
+        ...prevData,
+        user_id: data.createUser.id,
+      }));
       console.log("User ID for Rider:", data.createUser.id);
-      console.log("User created successfully!!")
+      console.log("User created successfully!!");
     } else {
       setMessage("Failed to register user. Please try again.");
     }
@@ -130,18 +132,18 @@ const Register = () => {
 
   const createRiderAccount = async () => {
     const riderInput = {
-        user_id: registerData.user_id || "", // Ensure user_id is set
-        vehicle_type: registerData.vehicleType || "",
-        vehicle_registration_number: registerData.vehicleRegNumber || "",
-        vehicle_insurance_number: registerData.vehicleInsuranceNumber || "",
-        insurance_expiry_date: registerData.insuranceExpiryDate || "",
-        driver_license_number: registerData.driverLicenseNumber || "",
-        license_expiry_date: registerData.licenseExpiryDate || "",
-        preferred_delivery_radius: registerData.preferredDeliveryRadius || "",
-        preferred_working_days: registerData.preferredWorkingDays || [],
-        preferred_start_time: registerData.preferredStartTime || "",
-        preferred_end_time: registerData.preferredEndTime || "",
-        long_distance_preference: registerData.longDistancePreference || false,
+      user_id: registerData.user_id || "", // Ensure user_id is set
+      vehicle_type: registerData.vehicleType || "",
+      vehicle_registration_number: registerData.vehicleRegNumber || "",
+      vehicle_insurance_number: registerData.vehicleInsuranceNumber || "",
+      insurance_expiry_date: registerData.insuranceExpiryDate || "",
+      driver_license_number: registerData.driverLicenseNumber || "",
+      license_expiry_date: registerData.licenseExpiryDate || "",
+      preferred_delivery_radius: registerData.preferredDeliveryRadius || "",
+      preferred_working_days: registerData.preferredWorkingDays || [],
+      preferred_start_time: registerData.preferredStartTime || "",
+      preferred_end_time: registerData.preferredEndTime || "",
+      long_distance_preference: registerData.longDistancePreference || false,
     };
     console.log("Rider input for mutation:", riderInput);
     const { data } = await createRider({ variables: { input: riderInput } });
@@ -155,10 +157,10 @@ const Register = () => {
       user_id: registerData.user_id,
       // Add any additional chef-specific fields here
     };
-  //  const { data } = await createChef({ variables: { input: chefInput } });
-   // if (!data || !data.createChef) {
-   //   setMessage("Failed to register chef. Please try again.");
-   // }
+    //  const { data } = await createChef({ variables: { input: chefInput } });
+    // if (!data || !data.createChef) {
+    //   setMessage("Failed to register chef. Please try again.");
+    // }
   };
 
   const handleSubmit = async (e) => {
@@ -181,18 +183,20 @@ const Register = () => {
       } else {
         // Submit and navigate directly if only Customer or Chef roles are selected
         if (chef) await createChefAccount();
-        navigate("/home");
+        navigate("/");
       }
     } else if (step === 3) {
       // Register Rider-specific information
       if (rider) {
         await createRiderAccount();
-        navigate("/home");
+        navigate("/");
       }
     }
   };
 
-  const selectedRolesCount = Object.values(registerData.roles).filter(Boolean).length;
+  const selectedRolesCount = Object.values(registerData.roles).filter(
+    Boolean
+  ).length;
 
   return (
     <Container fluid>
@@ -203,8 +207,12 @@ const Register = () => {
               <img src={Logo} className="logo" alt="Logo" />
               {step === 1 && (
                 <>
-                  <h2 className="form-title mt-5 mb-2">Get Started with HomeBite</h2>
-                  <p className="mb-4">Enjoy the best home-cooked meals delivered to your doorstep.</p>
+                  <h2 className="form-title mt-5 mb-2">
+                    Get Started with HomeBite
+                  </h2>
+                  <p className="mb-4">
+                    Enjoy the best home-cooked meals delivered to your doorstep.
+                  </p>
                 </>
               )}
               {message && <Alert variant="danger">{message}</Alert>}
@@ -251,28 +259,28 @@ const Register = () => {
                     <Col md={12}>
                       <h5 className="form-sub-title">Select your Gender</h5>
                       <div className="gender-options">
-  <RadioButton
-    label="Male"
-    name="gender"
-    value="male"
-    checked={registerData.gender === "male"}
-    onChange={handleChange}
-  />
-  <RadioButton
-    label="Female"
-    name="gender"
-    value="female"
-    checked={registerData.gender === "female"}
-    onChange={handleChange}
-  />
-  <RadioButton
-    label="Other"
-    name="gender"
-    value="other"
-    checked={registerData.gender === "other"}
-    onChange={handleChange}
-  />
-</div>
+                        <RadioButton
+                          label="Male"
+                          name="gender"
+                          value="male"
+                          checked={registerData.gender === "male"}
+                          onChange={handleChange}
+                        />
+                        <RadioButton
+                          label="Female"
+                          name="gender"
+                          value="female"
+                          checked={registerData.gender === "female"}
+                          onChange={handleChange}
+                        />
+                        <RadioButton
+                          label="Other"
+                          name="gender"
+                          value="other"
+                          checked={registerData.gender === "other"}
+                          onChange={handleChange}
+                        />
+                      </div>
                     </Col>
                     <Col md={6}>
                       <InputField
@@ -294,7 +302,10 @@ const Register = () => {
                       />
                     </Col>
                     <Col md={12}>
-                      <RoleOptions roles={registerData.roles} onRoleChange={handleRoleChange} />
+                      <RoleOptions
+                        roles={registerData.roles}
+                        onRoleChange={handleRoleChange}
+                      />
                     </Col>
                     <Col md={12}>
                       <Button type="submit" className="btn-primary w-100 mb-3">
@@ -319,7 +330,8 @@ const Register = () => {
                       <hr />
                       <h3>Step 1 of {selectedRolesCount}</h3>
                       <h4 className="form-sub-title">
-                        For {selectedRolesCount > 1 ? "Multiple Roles" : "Customer"}
+                        For{" "}
+                        {selectedRolesCount > 1 ? "Multiple Roles" : "Customer"}
                       </h4>
                       <InputField
                         label="Address"
@@ -336,7 +348,7 @@ const Register = () => {
                         name="address2"
                         placeholder="Flat / House Number"
                         value={registerData.address2}
-  onChange={handleChange}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -348,7 +360,7 @@ const Register = () => {
                         name="province"
                         placeholder="Province"
                         value={registerData.province}
-  onChange={handleChange}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -357,7 +369,7 @@ const Register = () => {
                         name="postalCode"
                         placeholder="Postal Code"
                         value={registerData.postalCode}
-  onChange={handleChange}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -366,7 +378,7 @@ const Register = () => {
                         name="country"
                         placeholder="Country"
                         value={registerData.country}
-  onChange={handleChange}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -375,11 +387,11 @@ const Register = () => {
                         name="landmark"
                         placeholder="Nearby Landmark (optional)"
                         value={registerData.nearby_landmark}
-  onChange={handleChange}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
-                      <div className="d-flex justify-content-between mb-3">
+                      <div className="d-flex justify-content-between mb-3 mt-3">
                         <Button
                           type="button"
                           className="btn-secondary w-100"
@@ -389,35 +401,36 @@ const Register = () => {
                         </Button>
                       </div>
                     </Col>
-                    
+
                     <Col md={6}>
                       <Button type="submit" className="btn-primary w-100 mt-3">
                         Submit
                       </Button>
                     </Col>
                   </>
-                )}{step === 3 && registerData.roles.rider && (
-                    <>
+                )}
+                {step === 3 && registerData.roles.rider && (
+                  <>
                     <Col md={12}>
                       <h5>Vehicle Information</h5>
                     </Col>
                     <Col md={6}>
-  <InputField
-    label="Vehicle Type"
-    name="vehicleType"
-    type="select" // Assuming InputField can handle a select type
-    value={registerData.vehicleType}
-    onChange={handleChange}
-    options={[
-      { value: "", label: "Select Vehicle Type" },
-      { value: "Bike", label: "Bike" },
-      { value: "Scooter", label: "Scooter" },
-      { value: "Motorcycle", label: "Motorcycle" },
-      { value: "Car", label: "Car" },
-      { value: "Other", label: "Other" },
-    ]}
-  />
-</Col>
+                      <InputField
+                        label="Vehicle Type"
+                        name="vehicleType"
+                        type="select" // Assuming InputField can handle a select type
+                        value={registerData.vehicleType}
+                        onChange={handleChange}
+                        options={[
+                          { value: "", label: "Select Vehicle Type" },
+                          { value: "Bike", label: "Bike" },
+                          { value: "Scooter", label: "Scooter" },
+                          { value: "Motorcycle", label: "Motorcycle" },
+                          { value: "Car", label: "Car" },
+                          { value: "Other", label: "Other" },
+                        ]}
+                      />
+                    </Col>
                     <Col md={6}>
                       <InputField
                         label="Vehicle Registration Number"
@@ -472,7 +485,7 @@ const Register = () => {
                         }
                       />
                     </Col>
-  
+
                     {/* Availability Section */}
                     <Col md={12}>
                       <h5>Availability</h5>
@@ -487,7 +500,9 @@ const Register = () => {
                               label={option.label}
                               name="preferredWorkingDays"
                               value={option.value}
-                              checked={registerData.preferredWorkingDays.includes(option.value)}
+                              checked={registerData.preferredWorkingDays.includes(
+                                option.value
+                              )}
                               onChange={handleCheckboxChange}
                             />
                           ))}
@@ -495,22 +510,22 @@ const Register = () => {
                       </div>
                     </Col>
                     <Col md={6}>
-  <InputField
-    label="Preferred Delivery Radius"
-    name="preferredDeliveryRadius"
-    type="select"
-    value={registerData.preferredDeliveryRadius}
-    onChange={handleChange}
-    options={[
-      { value: "", label: "Select Radius" },
-      { value: "5 km", label: "5 km" },
-      { value: "10 km", label: "10 km" },
-      { value: "15 km", label: "15 km" },
-      { value: "20+ km", label: "20+ km" },
-    ]}
-  />
-</Col>
-                   
+                      <InputField
+                        label="Preferred Delivery Radius"
+                        name="preferredDeliveryRadius"
+                        type="select"
+                        value={registerData.preferredDeliveryRadius}
+                        onChange={handleChange}
+                        options={[
+                          { value: "", label: "Select Radius" },
+                          { value: "5 km", label: "5 km" },
+                          { value: "10 km", label: "10 km" },
+                          { value: "15 km", label: "15 km" },
+                          { value: "20+ km", label: "20+ km" },
+                        ]}
+                      />
+                    </Col>
+
                     <Col md={6}>
                       <InputField
                         label="Start Time"
@@ -527,8 +542,7 @@ const Register = () => {
                         onChange={handleChange}
                       />
                     </Col>
-  
-  
+
                     {/* Payment Information */}
                     <Col md={12}>
                       <h5>Payment Information</h5>
@@ -549,7 +563,7 @@ const Register = () => {
                         onChange={handleChange}
                       />
                     </Col>
-  
+
                     {/* Profile Verification */}
                     <Col md={12}>
                       <h5>Profile Verification</h5>
@@ -565,7 +579,7 @@ const Register = () => {
                         }
                       />
                     </Col>
-  
+
                     {/* Submit Button */}
                     <Col md={12}>
                       <Button type="submit" className="btn-primary w-100">
@@ -573,7 +587,7 @@ const Register = () => {
                       </Button>
                     </Col>
                   </>
-                  )}
+                )}
               </form>
             </div>
           </div>
