@@ -24,6 +24,7 @@ const Register = () => {
     postalCode: "",
     country: "",
     gender: "",
+    workingDays: [],
     roles: {
       customer: false,
       chef: false,
@@ -33,14 +34,25 @@ const Register = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    console.log(`Changed field: ${name}, New value: ${value}`); // Debugging line
-    setRegisterData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const { name, value, type, checked } = e.target;
+
+    if (type === "checkbox" && name === "workingDays") {
+      setRegisterData((prevData) => {
+        const updatedDays = checked
+          ? [...(prevData.workingDays || []), value]
+          : (prevData.workingDays || []).filter((day) => day !== value);
+        return { ...prevData, workingDays: updatedDays };
+      });
+    } else {
+      setRegisterData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
+
 
   const handleRoleChange = (e) => {
     const { name, checked } = e.target;
@@ -62,6 +74,8 @@ const Register = () => {
         return;
       }
       setStep(2);
+    } else if (step === 2 && registerData.roles.chef) {
+      setStep(3); // Proceed to Chef-specific step if Chef is selected
     } else {
       console.log("Registration Data:", registerData);
       navigate("/home"); // Navigate to home after successful registration
@@ -300,6 +314,140 @@ const Register = () => {
                     </div>
                   </div>
                 )}
+                
+                {step === 3 && registerData.roles.chef && (
+                <>
+                  <h2 className="form-title">Additional Information</h2>
+                  <p>Step 3 of 3</p>
+                  <p>For Chef</p>
+                  <hr />
+                  <form onSubmit={handleSubmit} className="row p-0">
+                    <h4 className="form-sub-title">Profile Verification</h4>
+                    <Col md={12} className="mb-4">
+                      <div className="file-upload-box">
+                        <i className="material-icons">upload</i>
+                        <p className="text-muted">Click to upload <span className="text-orange">or drag and drop</span></p>
+                        <p className="text-muted">(SVG, PNG, JPG or GIF - max 800x400px)</p>
+                        <input type="file" className="file-input" name="profilePicture" />
+                      </div>
+                    </Col>
+
+                    <h4 className="form-sub-title">Culinary Information</h4>
+                    <Col md={6}>
+                      <label>Specialty Cuisines</label>
+                      <select name="specialtyCuisines" className="form-control" onChange={handleChange}>
+                        <option value="Indian">Indian</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Mexican">Mexican</option>
+                      </select>
+                    </Col>
+                    <Col md={6}>
+                      <label>Type of Meals</label>
+                      <select name="typeOfMeals" className="form-control" onChange={handleChange}>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Snacks">Snacks</option>
+                      </select>
+                    </Col>
+                    <Col md={6}>
+                      <label>Experience in Cooking</label>
+                      <select name="experience" className="form-control" onChange={handleChange}>
+                        <option value="Less than 1 year">Less than 1 year</option>
+                        <option value="1-3 years">1-3 years</option>
+                        <option value="3-5 years">3-5 years</option>
+                        <option value="5+ years">5+ years</option>
+                      </select>
+                    </Col>
+
+                    <h4 className="form-sub-title">Availability</h4>
+                    <Col md={6}>
+                      <label>Preferred Delivery Radius</label>
+                      <select name="deliveryRadius" className="form-control" onChange={handleChange}>
+                        <option value="5km">5 km</option>
+                        <option value="10km">10 km</option>
+                        <option value="15km">15 km</option>
+                        <option value="20+km">20+ km</option>
+                      </select>
+                    </Col>
+                    <Col md={12}>
+                    <h5>Preferred Working Days</h5>
+                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                        <Checkbox
+                          key={day}
+                          label={day}
+                          name="workingDays"
+                          value={day}
+                          checked={registerData.workingDays.includes(day)}
+                          onChange={handleChange}
+                        />
+                      ))}
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Start Time" name="startTime" type="time" />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="End Time" name="endTime" type="time" />
+                    </Col>
+                    <Col md={12}>
+                      <InputField label="Maximum Orders per Day" name="maxOrders" placeholder="Enter the number" />
+                    </Col>
+
+                    <h4 className="form-sub-title">Payment Information</h4>
+                    <Col md={6}>
+                      <label>Preferred Payment Method</label>
+                      <select name="paymentMethod" className="form-control" onChange={handleChange}>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="PayPal">PayPal</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Bank Account Number" name="bankAccountNumber" placeholder="Bank Account Number" />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Transit Number" name="transitNumber" placeholder="Transit Number" />
+                    </Col>
+
+                    <h4 className="form-sub-title">Location and GPS</h4>
+                    <p>Please enter your location or use current location and enjoy the custom experience in any of your restaurants.</p>
+                    <Col md={12}>
+                      <InputField label="Address Line 1" name="address" placeholder="Address Line 1" />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Flat / House Number" name="flat" placeholder="Flat / House Number" />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="City" name="city" placeholder="City" />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Province" name="province" placeholder="Province" />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Postal Code" name="postalCode" placeholder="Postal Code" />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Country" name="country" placeholder="Country" />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Nearby Landmark (optional)" name="landmark" placeholder="Postal Code" />
+                    </Col>
+
+                    <h4 className="form-sub-title">Legal Terms & Agreements</h4>
+                    <Col md={12}>
+                      <Checkbox label="Agree to Terms and Conditions" name="terms" />
+                      <Checkbox label="Agreement to Safety Guidelines" name="safetyGuidelines" />
+                    </Col>
+                    <Col md={6}>
+                      <Button type="button" className="btn-secondary w-100" onClick={() => setStep(2)}>Cancel</Button>
+                    </Col>
+                    <Col md={6}>
+                      <Button type="submit" className="btn-primary w-100">Complete Registration</Button>
+                    </Col>
+                  </form>
+                </>
+              )}
+
               </form>
             </div>
           </div>
