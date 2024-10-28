@@ -10,7 +10,7 @@ import Button from "../../Components/Button/Button";
 import RoleOptions from "../../Components/RoleOptions/RoleOptions";
 import { Container, Row, Col, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
-import { CREATE_USER, CREATE_RIDER } from "../../queries";
+import { CREATE_USER, CREATE_RIDER, CREATE_CHEF } from "../../queries";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -46,7 +46,12 @@ const Register = () => {
     preferredStartTime: "",
     preferredEndTime: "",
     longDistancePreference: false,
-    // Chef-specific fields (you can add specific chef fields if necessary)
+    // Chef-specific fields
+    profilePicture: null,
+    specialtyCuisines: [],
+    typeOfMeals: [],
+    experienceInCooking: "",
+    maxOrdersPerDay: "",
     profilePicture: null,
     // Payment information
     bankAccountNumber: "",
@@ -58,7 +63,7 @@ const Register = () => {
 
   const [createUser] = useMutation(CREATE_USER);
   const [createRider] = useMutation(CREATE_RIDER);
-  //const [createChef] = useMutation(CREATE_CHEF);
+  const [createChef] = useMutation(CREATE_CHEF);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -155,12 +160,15 @@ const Register = () => {
   const createChefAccount = async () => {
     const chefInput = {
       user_id: registerData.user_id,
-      // Add any additional chef-specific fields here
+      specialty_cuisines: registerData.specialtyCuisines,
+      type_of_meals: registerData.typeOfMeals,
+      experience_in_cooking: registerData.experienceInCooking,
+      max_orders_per_day: registerData.maxOrdersPerDay,
     };
-    //  const { data } = await createChef({ variables: { input: chefInput } });
-    // if (!data || !data.createChef) {
-    //   setMessage("Failed to register chef. Please try again.");
-    // }
+    const { data } = await createChef({ variables: { input: chefInput } });
+    if (!data || !data.createChef) {
+      setMessage("Failed to register chef. Please try again.");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -585,6 +593,62 @@ const Register = () => {
                       <Button type="submit" className="btn-primary w-100">
                         Submit
                       </Button>
+                    </Col>
+                  </>
+                )}
+                {/* Step 2 - Chef-Specific Fields */}
+                {step === 3 && registerData.roles.chef && (
+                  <>
+                  <h2 className="form-title">Additional Information</h2>
+                  <p>Step 3 of 3 - For Chef</p>
+                  <hr />
+                    <Col md={12}><h5>Profile Verification</h5></Col>
+                    <Col md={12}>
+                      <InputField label="Upload Profile Picture" type="file" name="profilePicture" onChange={(e) => setRegisterData({ ...registerData, profilePicture: e.target.files[0] })} />
+                    </Col>
+
+                    <Col md={12}><h5>Culinary Information</h5></Col>
+                    <Col md={6}>
+                      <InputField label="Specialty Cuisines" type="select" name="specialtyCuisines" options={[{ label: "Indian", value: "Indian" }, { label: "Italian", value: "Italian" }, { label: "Mexican", value: "Mexican" }]} multiple onChange={(e) => handleChange(e)} />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Type of Meals" type="select" name="typeOfMeals" options={[{ label: "Breakfast", value: "Breakfast" }, { label: "Lunch", value: "Lunch" }, { label: "Dinner", value: "Dinner" }, { label: "Snacks", value: "Snacks" }]} multiple onChange={(e) => handleChange(e)} />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Experience in Cooking" name="experienceInCooking" type="select" options={[{ label: "Less than 1 year", value: "Less than 1 year" }, { label: "1-3 years", value: "1-3 years" }, { label: "3-5 years", value: "3-5 years" }, { label: "5+ years", value: "5+ years" }]} onChange={handleChange} />
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Max Orders Per Day" name="maxOrdersPerDay" placeholder="Enter maximum orders per day" value={registerData.maxOrdersPerDay} onChange={handleChange} />
+                    </Col>
+
+                    <Col md={12}><h5>Availability</h5></Col>
+                    <Col md={12}>
+                      <label>Preferred Working Days</label>
+                      <div className="d-flex flex-wrap">
+                        {workingDaysOptions.map((option) => (
+                          <Checkbox key={option.value} label={option.label} name="preferredWorkingDays" value={option.value} checked={registerData.preferredWorkingDays.includes(option.value)} onChange={handleCheckboxChange} />
+                        ))}
+                      </div>
+                    </Col>
+                    <Col md={6}>
+                      <InputField label="Preferred Delivery Radius" name="preferredDeliveryRadius" type="select" value={registerData.preferredDeliveryRadius} onChange={handleChange} options={[{ value: "5 km", label: "5 km" }, { value: "10 km", label: "10 km" }, { value: "15 km", label: "15 km" }, { value: "20+ km", label: "20+ km" }]} />
+                    </Col>
+                    <Col md={6}><InputField label="Start Time" name="preferredStartTime" type="time" onChange={handleChange} /></Col>
+                    <Col md={6}><InputField label="End Time" name="preferredEndTime" type="time" onChange={handleChange} /></Col>
+
+                    <Col md={12}><h5>Payment Information</h5></Col>
+                    <Col md={6}><InputField label="Bank Account Number" name="bankAccountNumber" placeholder="Bank Account Number" onChange={handleChange} /></Col>
+                    <Col md={6}><InputField label="Transit Number" name="transitNumber" placeholder="Transit Number" onChange={handleChange} /></Col>
+                    <Col md={12}>
+                      <Checkbox label="Agree to Terms and Conditions" name="terms" />
+                      <Checkbox label="Agreement to Safety Guidelines" name="safetyGuidelines" />
+                    </Col>
+                    <Col md={6}>
+                      <Button type="button" className="btn-secondary w-100" onClick={() => setStep(2)}>Back</Button>
+                    </Col>
+
+                    <Col md={12}>
+                      <Button type="submit" className="btn-primary w-100">Complete Registration</Button>
                     </Col>
                   </>
                 )}

@@ -88,3 +88,17 @@ export const UPDATE_RIDER = gql`
     }
   }
 `;
+
+// Mutation for creating a Chef
+export const CREATE_CHEF = gql`
+mutation CreateChef($input: ChefInput!) {
+    createChef(input: $input) {
+      id
+      specialty_cuisines
+      type_of_meals
+      experience_in_cooking
+      max_orders_per_day
+    }
+  }
+`;
+
