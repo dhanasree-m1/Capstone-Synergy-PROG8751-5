@@ -9,8 +9,8 @@ import RadioButton from "../../Components/RadioButton/RadioButton";
 import Button from "../../Components/Button/Button";
 import RoleOptions from "../../Components/RoleOptions/RoleOptions";
 import { Container, Row, Col, Alert } from "react-bootstrap";
-import { useMutation } from '@apollo/client';
-import { CREATE_USER, UPDATE_USER, CREATE_RIDER, UPDATE_RIDER } from '../../queries';
+import { useMutation } from "@apollo/client";
+import { CREATE_USER, CREATE_RIDER } from "../../queries";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -21,50 +21,70 @@ const Register = () => {
     password: "",
     mobile: "",
     address: "",
+    address2: "",
     city: "",
     province: "",
     postalCode: "",
     country: "",
-    gender: "",
+    gender: "Other",
     roles: {
       customer: false,
       chef: false,
       rider: false,
     },
-    // Rider-specific fields (NEW FIELDS ADDED)
+    nearby_landmark: "",
+    // Rider-specific fields
     vehicleType: "",
     vehicleRegNumber: "",
     vehicleInsuranceNumber: "",
     insuranceExpiryDate: "",
     driverLicenseNumber: "",
     licenseExpiryDate: "",
-    document_upload_path:"",
+    document_upload_path: "",
     preferredDeliveryRadius: "",
     preferredWorkingDays: [],
     preferredStartTime: "",
     preferredEndTime: "",
     longDistancePreference: false,
-    emergencyContactName: "",
-    emergencyContactNumber: "",
-    relationship: "",
+    // Chef-specific fields (you can add specific chef fields if necessary)
     profilePicture: null,
     // Payment information
     bankAccountNumber: "",
     transitNumber: "",
- 
   });
+
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+
   const [createUser] = useMutation(CREATE_USER);
   const [createRider] = useMutation(CREATE_RIDER);
+  //const [createChef] = useMutation(CREATE_CHEF);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Changed field: ${name}, New value: ${value}`); // Debugging line
     setRegisterData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    setRegisterData((prevData) => {
+      const updatedDays = checked
+        ? [...prevData.preferredWorkingDays, value]
+        : prevData.preferredWorkingDays.filter((day) => day !== value);
+      return { ...prevData, preferredWorkingDays: updatedDays };
+    });
+  };
+  const workingDaysOptions = [
+    { label: "Monday", value: "Monday" },
+    { label: "Tuesday", value: "Tuesday" },
+    { label: "Wednesday", value: "Wednesday" },
+    { label: "Thursday", value: "Thursday" },
+    { label: "Friday", value: "Friday" },
+    { label: "Saturday", value: "Saturday" },
+    { label: "Sunday", value: "Sunday" },
+  ];
 
   const handleRoleChange = (e) => {
     const { name, checked } = e.target;
@@ -77,81 +97,100 @@ const Register = () => {
     }));
   };
 
+  const createUserAccount = async () => {
+    const userInput = {
+        first_name: registerData.firstName || "",
+        last_name: registerData.lastName || "",
+        email: registerData.email || "",
+        mobile_number: registerData.mobile || "",
+        password_hash: registerData.password || "",
+      role: "customer",
+      gender: registerData.gender || "Other", // Set a default gender value if none selected
+          profile_image: registerData.profilePicture || "",
+          status: "active",
+          address_line_1: registerData.address || "",
+          address_line_2: registerData.address2 || "",
+          city: registerData.city || "",
+          province: registerData.province || "",
+          postal_code: registerData.postalCode || "",
+          country: registerData.country || "",
+          nearby_landmark: registerData.nearby_landmark || ""
+    };
+    const { data } = await createUser({ variables: { input: userInput } });
+    if (data && data.createUser) {
+      setRegisterData((prevData) => ({ ...prevData, user_id: data.createUser.id }));
+      console.log("User ID for Rider:", data.createUser.id);
+      console.log("User created successfully!!")
+    } else {
+      setMessage("Failed to register user. Please try again.");
+    }
+  };
+
+  const createRiderAccount = async () => {
+    const riderInput = {
+        user_id: registerData.user_id || "", // Ensure user_id is set
+        vehicle_type: registerData.vehicleType || "",
+        vehicle_registration_number: registerData.vehicleRegNumber || "",
+        vehicle_insurance_number: registerData.vehicleInsuranceNumber || "",
+        insurance_expiry_date: registerData.insuranceExpiryDate || "",
+        driver_license_number: registerData.driverLicenseNumber || "",
+        license_expiry_date: registerData.licenseExpiryDate || "",
+        preferred_delivery_radius: registerData.preferredDeliveryRadius || "",
+        preferred_working_days: registerData.preferredWorkingDays || [],
+        preferred_start_time: registerData.preferredStartTime || "",
+        preferred_end_time: registerData.preferredEndTime || "",
+        long_distance_preference: registerData.longDistancePreference || false,
+    };
+    console.log("Rider input for mutation:", riderInput);
+    const { data } = await createRider({ variables: { input: riderInput } });
+    if (!data || !data.createRider) {
+      setMessage("Failed to register rider. Please try again.");
+    }
+  };
+
+  const createChefAccount = async () => {
+    const chefInput = {
+      user_id: registerData.user_id,
+      // Add any additional chef-specific fields here
+    };
+  //  const { data } = await createChef({ variables: { input: chefInput } });
+   // if (!data || !data.createChef) {
+   //   setMessage("Failed to register chef. Please try again.");
+   // }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+    const { customer, chef, rider } = registerData.roles;
+
     if (step === 1) {
-      const { roles } = registerData;
-      if (!roles.customer && !roles.chef && !roles.rider) {
+      if (!customer && !chef && !rider) {
         setMessage("Please select at least one role to proceed.");
         return;
       }
-      setStep(2);
-    } else if (step === 2 && !registerData.roles.rider) {
-      // Step 2: Register User data
-      try {
-        const userInput = {
-          first_name: registerData.firstName,
-          last_name: registerData.lastName,
-          email: registerData.email,
-          password_hash: registerData.password, // Ensure this is hashed if necessary
-          mobile_number: registerData.mobile,
-          role: Object.keys(registerData.roles).find((role) => registerData.roles[role]),
-          address_line_1: registerData.address,
-          city: registerData.city,
-          province: registerData.province,
-          postal_code: registerData.postalCode,
-          country: registerData.country,
-          gender: registerData.gender,
-        };
-  
-        const { data } = await createUser({ variables: { input: userInput } });
-        console.log("User registered successfully:", data);
-        if (data && data.createUser) {
-          setRegisterData((prevData) => ({ ...prevData, user_id: data.createUser.id }));
-          navigate("/home");
-        } else {
-          setMessage("Failed to register user. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error registering user:", error);
-        setMessage("Failed to register user.");
+      setStep(customer || chef ? 2 : 3); // Skip to step 3 if only Rider is selected
+    } else if (step === 2) {
+      // Create User Account
+      await createUserAccount();
+
+      // Go to Rider information if Rider role selected
+      if (rider) {
+        setStep(3);
+      } else {
+        // Submit and navigate directly if only Customer or Chef roles are selected
+        if (chef) await createChefAccount();
+        navigate("/home");
       }
-    } else if (step === 3 && registerData.roles.rider) {
-      // Step 3: Register Rider-specific data
-      try {
-        const riderInput = {
-          user_id: registerData.user_id,
-          vehicle_type: registerData.vehicleType,
-          vehicle_registration_number: registerData.vehicleRegNumber,
-          vehicle_insurance_number: registerData.vehicleInsuranceNumber,
-          insurance_expiry_date: registerData.insuranceExpiryDate,
-          driver_license_number: registerData.driverLicenseNumber,
-          license_expiry_date: registerData.licenseExpiryDate,
-          preferred_delivery_radius: registerData.preferredDeliveryRadius,
-          preferred_working_days: registerData.preferredWorkingDays,
-          preferred_start_time: registerData.preferredStartTime,
-          preferred_end_time: registerData.preferredEndTime,
-          long_distance_preference: registerData.longDistancePreference,
-        };
-  
-        const { data } = await createRider({ variables: { input: riderInput } });
-        console.log("Rider registered successfully:", data);
-        if (data && data.createRider) {
-          navigate("/home");
-        } else {
-          setMessage("Failed to register rider. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error registering rider:", error);
-        setMessage("Failed to register rider.");
+    } else if (step === 3) {
+      // Register Rider-specific information
+      if (rider) {
+        await createRiderAccount();
+        navigate("/home");
       }
     }
   };
 
-  const selectedRolesCount = Object.values(registerData.roles).filter(
-    Boolean
-  ).length;
+  const selectedRolesCount = Object.values(registerData.roles).filter(Boolean).length;
 
   return (
     <Container fluid>
@@ -161,14 +200,10 @@ const Register = () => {
             <div className="login-box">
               <img src={Logo} className="logo" alt="Logo" />
               {step === 1 && (
-                <h2 className="form-title mt-5 mb-2">
-                  Get Started with HomeBite
-                </h2>
-              )}
-              {step === 1 && (
-                <p className="mb-4">
-                  Enjoy the best home-cooked meals delivered to your doorstep.
-                </p>
+                <>
+                  <h2 className="form-title mt-5 mb-2">Get Started with HomeBite</h2>
+                  <p className="mb-4">Enjoy the best home-cooked meals delivered to your doorstep.</p>
+                </>
               )}
               {message && <Alert variant="danger">{message}</Alert>}
 
@@ -180,6 +215,8 @@ const Register = () => {
                         label="First Name"
                         name="firstName"
                         placeholder="Enter your First Name"
+                        value={registerData.firstName}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -187,6 +224,8 @@ const Register = () => {
                         label="Last Name"
                         name="lastName"
                         placeholder="Enter your Last Name"
+                        value={registerData.lastName}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -195,6 +234,8 @@ const Register = () => {
                         type="password"
                         name="password"
                         placeholder="Create a strong password"
+                        value={registerData.password}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -208,18 +249,28 @@ const Register = () => {
                     <Col md={12}>
                       <h5 className="form-sub-title">Select your Gender</h5>
                       <div className="gender-options">
-                        <RadioButton label="Male" name="gender" value="male" />
-                        <RadioButton
-                          label="Female"
-                          name="gender"
-                          value="female"
-                        />
-                        <RadioButton
-                          label="Other"
-                          name="gender"
-                          value="other"
-                        />
-                      </div>
+  <RadioButton
+    label="Male"
+    name="gender"
+    value="male"
+    checked={registerData.gender === "male"}
+    onChange={handleChange}
+  />
+  <RadioButton
+    label="Female"
+    name="gender"
+    value="female"
+    checked={registerData.gender === "female"}
+    onChange={handleChange}
+  />
+  <RadioButton
+    label="Other"
+    name="gender"
+    value="other"
+    checked={registerData.gender === "other"}
+    onChange={handleChange}
+  />
+</div>
                     </Col>
                     <Col md={6}>
                       <InputField
@@ -227,6 +278,8 @@ const Register = () => {
                         name="email"
                         type="email"
                         placeholder="Enter your email address"
+                        value={registerData.email}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -234,13 +287,12 @@ const Register = () => {
                         label="Mobile Number"
                         name="mobile"
                         placeholder="Mobile Number"
+                        value={registerData.mobile}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={12}>
-                      <RoleOptions
-                        roles={registerData.roles}
-                        onRoleChange={handleRoleChange}
-                      />
+                      <RoleOptions roles={registerData.roles} onRoleChange={handleRoleChange} />
                     </Col>
                     <Col md={12}>
                       <Button type="submit" className="btn-primary w-100 mb-3">
@@ -248,40 +300,41 @@ const Register = () => {
                       </Button>
                     </Col>
                     <Col md={12}>
-                    <p className="text-center">
-                          Already Have an Account?{" "}
-                          <a href="/login" className="btn btn-link">
-                            Sign in here
-                          </a>
-                        </p>
+                      <p className="text-center">
+                        Already Have an Account?{" "}
+                        <a href="/login" className="btn btn-link">
+                          Sign in here
+                        </a>
+                      </p>
                     </Col>
                   </>
                 )}
 
-                {step === 2 &&  (
+                {step === 2 && (
                   <>
                     <Col md={12}>
-                      <div className="additional-details">
-                        <h2 className="form-title">Additional Information</h2>
-                        <hr />
-                        <h3>Step 1 of {selectedRolesCount}</h3>
-                        <h4 className="form-sub-title">
-                          For {selectedRolesCount > 1 ? "Customer" : "Customer"}
-                        </h4>
-                        <hr />
-                        <InputField
-                          label="Address"
-                          name="address"
-                          placeholder="Start Typing Your Address"
-                        />
-                      </div>
+                      <h2 className="form-title">Additional Information</h2>
+                      <hr />
+                      <h3>Step 1 of {selectedRolesCount}</h3>
+                      <h4 className="form-sub-title">
+                        For {selectedRolesCount > 1 ? "Multiple Roles" : "Customer"}
+                      </h4>
+                      <InputField
+                        label="Address"
+                        name="address"
+                        placeholder="Start Typing Your Address"
+                        value={registerData.address}
+                        onChange={handleChange}
+                      />
                     </Col>
-
+                    {/* Add more fields for address, rider, and chef specifics here */}
                     <Col md={6}>
                       <InputField
                         label="Flat / House Number"
-                        name="flat"
+                        name="address2"
                         placeholder="Flat / House Number"
+                        value={registerData.address2}
+  onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -292,6 +345,8 @@ const Register = () => {
                         label="Province"
                         name="province"
                         placeholder="Province"
+                        value={registerData.province}
+  onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -299,6 +354,8 @@ const Register = () => {
                         label="Postal Code"
                         name="postalCode"
                         placeholder="Postal Code"
+                        value={registerData.postalCode}
+  onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -306,6 +363,8 @@ const Register = () => {
                         label="Country"
                         name="country"
                         placeholder="Country"
+                        value={registerData.country}
+  onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -313,6 +372,8 @@ const Register = () => {
                         label="Nearby Landmark (optional)"
                         name="landmark"
                         placeholder="Nearby Landmark (optional)"
+                        value={registerData.nearby_landmark}
+  onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
@@ -326,195 +387,195 @@ const Register = () => {
                         </Button>
                       </div>
                     </Col>
+                    
                     <Col md={6}>
-                      <Button type="submit" className="btn-primary w-100">
-                        Proceed
+                      <Button type="submit" className="btn-primary w-100 mt-3">
+                        Submit
                       </Button>
                     </Col>
                   </>
-                )}
-
-                {step === 3 && registerData.roles.rider && (
-                  <>
-                  <Col md={12}>
-                    <h5>Vehicle Information</h5>
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Vehicle Type"
-                      name="vehicleType"
-                      placeholder="Select Vehicle Type"
-                      as="select"
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Vehicle Type</option>
-                      <option value="Bike">Bike</option>
-                      <option value="Scooter">Scooter</option>
-                      <option value="Motorcycle">Motorcycle</option>
-                      <option value="Car">Car</option>
-                      <option value="Other">Other</option>
-                    </InputField>
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Vehicle Registration Number"
-                      name="vehicleRegNumber"
-                      placeholder="Vehicle Registration Number"
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Vehicle Insurance Number"
-                      name="vehicleInsuranceNumber"
-                      placeholder="Vehicle Insurance Number"
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Insurance Expiry Date"
-                      type="date"
-                      name="insuranceExpiryDate"
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Driver's License Number"
-                      name="driverLicenseNumber"
-                      placeholder="Driver's License Number"
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="License Expiry Date"
-                      type="date"
-                      name="licenseExpiryDate"
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={12}>
-                    <h5>Upload Driver License/Insurance</h5>
-                    <InputField
-                      label="Upload Driver License"
-                      type="file"
-                      name="document_upload_path"
-                      onChange={(e) =>
-                        setRegisterData({
-                          ...registerData,
-                          document_upload_path: e.target.files[0],
-                        })
-                      }
-                    />
-                  </Col>
-
-                  {/* Availability Section */}
-                  <Col md={12}>
-                    <h5>Availability</h5>
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Preferred Delivery Radius"
-                      name="preferredDeliveryRadius"
-                      placeholder="Select Radius"
-                      as="select"
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Radius</option>
-                      <option value="5 km">5 km</option>
-                      <option value="10 km">10 km</option>
-                      <option value="15 km">15 km</option>
-                      <option value="20+ km">20+ km</option>
-                    </InputField>
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Preferred Working Days"
-                      name="preferredWorkingDays"
-                      placeholder="Select Days"
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Start Time"
-                      name="preferredStartTime"
-                      type="time"
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="End Time"
-                      name="preferredEndTime"
-                      type="time"
-                      onChange={handleChange}
-                    />
-                  </Col>
-
-
-                  {/* Payment Information */}
-                  <Col md={12}>
-                    <h5>Payment Information</h5>
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Bank Account Number"
-                      name="bankAccountNumber"
-                      placeholder="Bank Account Number"
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={6}>
-                    <InputField
-                      label="Transit Number"
-                      name="transitNumber"
-                      placeholder="Transit Number"
-                      onChange={handleChange}
-                    />
-                  </Col>
-
-                  {/* Profile Verification */}
-                  <Col md={12}>
-                    <h5>Profile Verification</h5>
-                    <InputField
-                      label="Upload Profile Picture"
-                      type="file"
-                      name="profilePicture"
-                      onChange={(e) =>
-                        setRegisterData({
-                          ...registerData,
-                          profilePicture: e.target.files[0],
-                        })
-                      }
-                    />
-                  </Col>
-
-                  {/* Submit Button */}
-                  <Col md={12}>
-                    <Button type="submit" className="btn-primary w-100">
-                      Submit
-                    </Button>
-                  </Col>
-                </>
-                )}
+                )}{step === 3 && registerData.roles.rider && (
+                    <>
+                    <Col md={12}>
+                      <h5>Vehicle Information</h5>
+                    </Col>
+                    <Col md={6}>
+  <InputField
+    label="Vehicle Type"
+    name="vehicleType"
+    type="select" // Assuming InputField can handle a select type
+    value={registerData.vehicleType}
+    onChange={handleChange}
+    options={[
+      { value: "", label: "Select Vehicle Type" },
+      { value: "Bike", label: "Bike" },
+      { value: "Scooter", label: "Scooter" },
+      { value: "Motorcycle", label: "Motorcycle" },
+      { value: "Car", label: "Car" },
+      { value: "Other", label: "Other" },
+    ]}
+  />
+</Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Vehicle Registration Number"
+                        name="vehicleRegNumber"
+                        placeholder="Vehicle Registration Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Vehicle Insurance Number"
+                        name="vehicleInsuranceNumber"
+                        placeholder="Vehicle Insurance Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Insurance Expiry Date"
+                        type="date"
+                        name="insuranceExpiryDate"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Driver's License Number"
+                        name="driverLicenseNumber"
+                        placeholder="Driver's License Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="License Expiry Date"
+                        type="date"
+                        name="licenseExpiryDate"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={12}>
+                      <h5>Upload Driver License/Insurance</h5>
+                      <InputField
+                        label="Upload Driver License"
+                        type="file"
+                        name="document_upload_path"
+                        onChange={(e) =>
+                          setRegisterData({
+                            ...registerData,
+                            document_upload_path: e.target.files[0],
+                          })
+                        }
+                      />
+                    </Col>
+  
+                    {/* Availability Section */}
+                    <Col md={12}>
+                      <h5>Availability</h5>
+                    </Col>
+                    <Col md={12}>
+                      <div className="mb-3">
+                        <label>Preferred Working Days</label>
+                        <div className="d-flex flex-wrap">
+                          {workingDaysOptions.map((option) => (
+                            <Checkbox
+                              key={option.value}
+                              label={option.label}
+                              name="preferredWorkingDays"
+                              value={option.value}
+                              checked={registerData.preferredWorkingDays.includes(option.value)}
+                              onChange={handleCheckboxChange}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </Col>
+                    <Col md={6}>
+  <InputField
+    label="Preferred Delivery Radius"
+    name="preferredDeliveryRadius"
+    type="select"
+    value={registerData.preferredDeliveryRadius}
+    onChange={handleChange}
+    options={[
+      { value: "", label: "Select Radius" },
+      { value: "5 km", label: "5 km" },
+      { value: "10 km", label: "10 km" },
+      { value: "15 km", label: "15 km" },
+      { value: "20+ km", label: "20+ km" },
+    ]}
+  />
+</Col>
+                   
+                    <Col md={6}>
+                      <InputField
+                        label="Start Time"
+                        name="preferredStartTime"
+                        type="time"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="End Time"
+                        name="preferredEndTime"
+                        type="time"
+                        onChange={handleChange}
+                      />
+                    </Col>
+  
+  
+                    {/* Payment Information */}
+                    <Col md={12}>
+                      <h5>Payment Information</h5>
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Bank Account Number"
+                        name="bankAccountNumber"
+                        placeholder="Bank Account Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Transit Number"
+                        name="transitNumber"
+                        placeholder="Transit Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+  
+                    {/* Profile Verification */}
+                    <Col md={12}>
+                      <h5>Profile Verification</h5>
+                      <InputField
+                        label="Upload Profile Picture"
+                        type="file"
+                        name="profilePicture"
+                        onChange={(e) =>
+                          setRegisterData({
+                            ...registerData,
+                            profilePicture: e.target.files[0],
+                          })
+                        }
+                      />
+                    </Col>
+  
+                    {/* Submit Button */}
+                    <Col md={12}>
+                      <Button type="submit" className="btn-primary w-100">
+                        Submit
+                      </Button>
+                    </Col>
+                  </>
+                  )}
               </form>
             </div>
           </div>
-
-          <footer>
-            <div className="d-flex justify-content-between footer-container">
-              <p>HomeBite © All Rights Reserved</p>
-              <div className="d-flex link-color">
-                <i className="material-icons mx-2">email</i>
-                <p className="align-middle">help@homebite.com</p>
-              </div>
-            </div>
-          </footer>
         </Col>
-
         <Col
           md={5}
           className="d-flex align-items-center justify-content-center p-0 position-relative"
