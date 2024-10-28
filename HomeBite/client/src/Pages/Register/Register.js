@@ -98,6 +98,7 @@ const Register = () => {
   };
 
   const createUserAccount = async () => {
+    
     const userInput = {
         first_name: registerData.firstName || "",
         last_name: registerData.lastName || "",

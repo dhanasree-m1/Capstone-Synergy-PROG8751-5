@@ -4,6 +4,7 @@ import './Checkbox.scss';
 
 const Checkbox = ({ label, name, value, checked, onChange }) => {
   return (
+    
     <Form.Check
       type="checkbox"
       label={label}

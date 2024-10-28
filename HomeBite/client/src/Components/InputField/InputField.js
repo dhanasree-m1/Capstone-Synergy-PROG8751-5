@@ -7,6 +7,7 @@ const InputField = ({ id, label, type, name, value, onChange, placeholder, requi
     <Form.Group className="input-field mb-3">
       <Form.Label htmlFor={id}>{label}</Form.Label>
       {type === 'select' ? (
+        
         <Form.Control
           as="select"
           id={id}
