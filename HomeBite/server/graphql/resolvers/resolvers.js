@@ -77,6 +77,12 @@ const resolvers = {
       const newRider = new Rider(input);
       return await newRider.save();
     },
+    createChef: async (_, { input }) => {  // Move createChef into Mutation
+      const user = await User.findById(input.user_id);
+      if (!user) throw new Error("User not found");
+      const newChef = new Chef(input);
+      return await newChef.save();
+    },
     updateUser: async (_, { id, input }) => {
       return await User.findByIdAndUpdate(id, input, { new: true });
     },
@@ -85,12 +91,7 @@ const resolvers = {
     }
   },
 
-  createChef: async (_, { input }) => {
-    const user = await User.findById(input.user_id);
-    if (!user) throw new Error("User not found");
-    const newChef = new Chef(input);
-    return await newChef.save();
-  },
+  
 
   Rider: {
     user: async (rider) => {

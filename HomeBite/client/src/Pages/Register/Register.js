@@ -171,7 +171,7 @@ const Register = () => {
       preferred_start_time: registerData.chefStartTime,
       preferred_end_time: registerData.chefEndTime,
     };
-
+console.log("chef input...",chefInput)
     const { data } = await createChef({ variables: { input: chefInput } });
     if (!data || !data.createChef) {
       setMessage("Failed to register chef. Please try again.");
@@ -196,6 +196,7 @@ const Register = () => {
       if (rider) {
         setStep(3);
       } else {
+        console.log("in cheff")
         // Submit and navigate directly if only Customer or Chef roles are selected
         if (chef) await createChefAccount();
         navigate("/");
