@@ -19,6 +19,7 @@ const Register = () => {
     lastName: "",
     email: "",
     password: "",
+    confirmPassword:"",
     mobile: "",
     address: "",
     address2: "",
@@ -66,6 +67,7 @@ const Register = () => {
       ...prevData,
       [name]: value,
     }));
+    setMessage("");
   };
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
@@ -85,7 +87,96 @@ const Register = () => {
     { label: "Saturday", value: "Saturday" },
     { label: "Sunday", value: "Sunday" },
   ];
+ // Validation helper functions
+ const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
+ const validatePhoneNumber = (number) => /^\d{10}$/.test(number);
+ const validatePostalCode = (postalCode) => /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postalCode); // Canadian format
+ const validateFutureDate = (date) => new Date(date) >= new Date();
 
+ const validateStep1 = () => {
+    const { firstName, lastName, email, password, confirmPassword, roles } = registerData;
+    let isValid = true;
+  
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      setMessage("Please fill in all required fields.");
+      isValid = false;
+    } else if (password !== confirmPassword) {
+      setMessage("Passwords do not match.");
+      isValid = false;
+    } else if (!roles.customer && !roles.chef && !roles.rider) {
+      setMessage("Please select at least one role.");
+      isValid = false;
+    }
+  
+    return isValid;
+  };
+  const validateStep2 = () => {
+    const { address, address2, city, province, postalCode, country } = registerData;
+    let isValid = true;
+  
+    // Validate each field and set message accordingly if missing
+    if (!address.trim()) {
+      setMessage("Address is required.");
+      isValid = false;
+    } else if (!city.trim()) {
+      setMessage("City is required.");
+      isValid = false;
+    } else if (!province.trim()) {
+      setMessage("Province is required.");
+      isValid = false;
+    } else if (!country.trim()) {
+      setMessage("Country is required.");
+      isValid = false;
+    } else if (!postalCode.trim()) {
+      setMessage("Postal code is required.");
+      isValid = false;
+    } else if (!/^([a-zA-Z]\d[a-zA-z]( )?\d[a-zA-Z]\d)$/.test(postalCode)) { // Adjust regex as needed for postal code format
+      setMessage("Please enter a valid postal code.");
+      isValid = false;
+    } else {
+      setMessage(""); // Clear message if all validations pass
+    }
+  
+    return isValid;
+  };
+  const validateRider = () => {
+    const {
+      vehicleType,
+      vehicleRegNumber,
+      driverLicenseNumber,
+      preferredDeliveryRadius,
+      preferredWorkingDays,
+      preferredStartTime,
+      preferredEndTime,
+      insuranceExpiryDate,
+      licenseExpiryDate,
+    } = registerData;
+
+    if (
+      !vehicleType ||
+      !vehicleRegNumber ||
+      !driverLicenseNumber ||
+      !preferredDeliveryRadius ||
+      preferredWorkingDays.length === 0 ||
+      !preferredStartTime ||
+      !preferredEndTime
+    ) {
+      setMessage("Please fill in all required fields for Rider.");
+      return false;
+    }
+
+    if (insuranceExpiryDate && !validateFutureDate(insuranceExpiryDate)) {
+      setMessage("Insurance expiry date cannot be in the past.");
+      return false;
+    }
+
+    if (licenseExpiryDate && !validateFutureDate(licenseExpiryDate)) {
+      setMessage("License expiry date cannot be in the past.");
+      return false;
+    }
+
+    return true;
+  };
   const handleRoleChange = (e) => {
     const { name, checked } = e.target;
     setRegisterData((prevData) => ({
@@ -95,6 +186,7 @@ const Register = () => {
         [name]: checked,
       },
     }));
+    setMessage("");
   };
 
   const createUserAccount = async () => {
@@ -116,39 +208,53 @@ const Register = () => {
       country: registerData.country || "",
       nearby_landmark: registerData.nearby_landmark || "",
     };
+    console.log("User input for mutation:", userInput);
     const { data } = await createUser({ variables: { input: userInput } });
     if (data && data.createUser) {
-      setRegisterData((prevData) => ({
-        ...prevData,
-        user_id: data.createUser.id,
-      }));
+        
+     
       console.log("User ID for Rider:", data.createUser.id);
-      console.log("User created successfully!!");
+      console.log("User created successfully!!")
+      return data.createUser.id;
     } else {
       setMessage("Failed to register user. Please try again.");
     }
+    return null
   };
 
-  const createRiderAccount = async () => {
+  const createRiderAccount = async (userId) => {
+    
+    try {
+    if (!userId) {
+      setMessage("User ID is missing. Rider cannot be created.");
+      console.error("User ID missing for Rider creation");
+      return;
+    }
     const riderInput = {
-      user_id: registerData.user_id || "", // Ensure user_id is set
-      vehicle_type: registerData.vehicleType || "",
-      vehicle_registration_number: registerData.vehicleRegNumber || "",
-      vehicle_insurance_number: registerData.vehicleInsuranceNumber || "",
-      insurance_expiry_date: registerData.insuranceExpiryDate || "",
-      driver_license_number: registerData.driverLicenseNumber || "",
-      license_expiry_date: registerData.licenseExpiryDate || "",
-      preferred_delivery_radius: registerData.preferredDeliveryRadius || "",
-      preferred_working_days: registerData.preferredWorkingDays || [],
-      preferred_start_time: registerData.preferredStartTime || "",
-      preferred_end_time: registerData.preferredEndTime || "",
-      long_distance_preference: registerData.longDistancePreference || false,
+        user_id:userId, // Ensure user_id is set
+        vehicle_type: registerData.vehicleType || "",
+        vehicle_registration_number: registerData.vehicleRegNumber || "",
+        vehicle_insurance_number: registerData.vehicleInsuranceNumber || "",
+        insurance_expiry_date: registerData.insuranceExpiryDate || "",
+        driver_license_number: registerData.driverLicenseNumber || "",
+        license_expiry_date: registerData.licenseExpiryDate || "",
+        preferred_delivery_radius: registerData.preferredDeliveryRadius || "",
+        preferred_working_days: registerData.preferredWorkingDays || [],
+        preferred_start_time: registerData.preferredStartTime || "",
+        preferred_end_time: registerData.preferredEndTime || "",
+        long_distance_preference: registerData.longDistancePreference || false,
     };
     console.log("Rider input for mutation:", riderInput);
     const { data } = await createRider({ variables: { input: riderInput } });
     if (!data || !data.createRider) {
       setMessage("Failed to register rider. Please try again.");
+    } else {
+      console.log("Rider created successfully!");
     }
+} catch (error) {
+    console.error("Error creating rider:", error);
+    setMessage("Failed to register rider.");
+  }
   };
 
   const createChefAccount = async () => {
@@ -162,40 +268,125 @@ const Register = () => {
     // }
   };
 
-  const handleSubmit = async (e) => {
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     const { customer, chef, rider } = registerData.roles;
+    
+    
+//     if (step === 1) {
+   
+//     if (validateStep1()) {
+//         setMessage(""); 
+//       setStep(customer || chef ? 2 : 3);
+//      } // Skip to step 3 if only Rider is selected
+//     } else if (step === 2) {
+//       // Create User Account
+//       //if (customer && !validateCustomer()) return;
+//       if (validateStep2()) {
+//         setMessage("");
+//         await handleFormSubmission()
+//       //await createUserAccount();
+//       }
+
+      
+      
+//     } else if (step === 3) {
+//       // Register Rider-specific information
+      
+//     }
+//   };
+// const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     const { customer, chef, rider } = registerData.roles;
+
+//     // Step 1 Validation and Navigation
+//     if (step === 1) {
+//         console.log("step1")
+//         if (validateStep1()) {
+//             // Move to step based on roles
+//             if (customer || chef) {
+//                 console.log("step11")
+//                 setStep(2); // Move to address step for customer/chef
+//             } else if (rider) {
+//                 console.log("step111")
+//                 setStep(3); // Skip to rider step if only rider is selected
+//             }
+//         }
+//         return;
+//     }
+
+//     // Step 2: Address Information
+//     if (step === 2) {
+//         console.log("step2")
+//         if (validateStep2()) {
+//             console.log("step22")
+//             // Navigate based on role selection
+//             if (rider) {
+//                 console.log("step222")
+//                 setStep(3); // Proceed to Rider details if rider role is selected
+//             } else {
+//                 console.log("step2222")
+//                 await handleFormSubmission(); // No rider role, so submit after address
+//             }
+//         }
+//         return;
+//     }
+
+//     // Step 3: Rider-Specific Information
+//     if (step === 3) {
+//         console.log("step3")
+//         if (validateRider()) {
+//             console.log("step33")
+//             await handleFormSubmission(); // Submit for rider after validation
+//         }
+//     }
+//     setMessage("User registered successfully!!.");
+// };
+const handleSubmit = async (e) => {
     e.preventDefault();
     const { customer, chef, rider } = registerData.roles;
 
     if (step === 1) {
-      if (!customer && !chef && !rider) {
-        setMessage("Please select at least one role to proceed.");
-        return;
+      if (validateStep1()) {
+        setStep(customer || chef ? 2 : 3);
       }
-      setStep(customer || chef ? 2 : 3); // Skip to step 3 if only Rider is selected
     } else if (step === 2) {
-      // Create User Account
-      await createUserAccount();
-
-      // Go to Rider information if Rider role selected
-      if (rider) {
-        setStep(3);
-      } else {
-        // Submit and navigate directly if only Customer or Chef roles are selected
-        if (chef) await createChefAccount();
-        navigate("/");
+      if (validateStep2()) {
+        if (rider) {
+          setStep(3);
+        } else {
+          await handleFormSubmission();
+        }
       }
     } else if (step === 3) {
-      // Register Rider-specific information
-      if (rider) {
-        await createRiderAccount();
-        navigate("/");
+      if (validateRider()) {
+        await handleFormSubmission();
       }
     }
   };
 
-  const selectedRolesCount = Object.values(registerData.roles).filter(
-    Boolean
-  ).length;
+const handleFormSubmission = async () => {
+    try {
+        // Create User Account and get userId
+        const userId = await createUserAccount();
+        console.log("userid:"+userId)
+        if (userId) {
+            setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
+            const { rider, chef } = registerData.roles;
+            
+            // Create additional accounts based on roles
+            if (rider) await createRiderAccount(userId);
+            if (chef) await createChefAccount(userId);
+
+            // Navigate to home or success page after all steps complete
+            navigate("/");
+        }
+    } catch (error) {
+        console.error("Error in form submission:", error);
+        setMessage("Failed to register. Please try again.");
+    }
+};
+  const selectedRolesCount = Object.values(registerData.roles).filter(Boolean).length;
 
   return (
     <Container fluid>
@@ -251,8 +442,10 @@ const Register = () => {
                       <InputField
                         label="Confirm Password"
                         type="password"
-                        name="confirmpassword"
+                        name="confirmPassword"
                         placeholder="Re-enter your password to confirm"
+                        value={registerData.confirmPassword}
+    onChange={handleChange}
                       />
                     </Col>
                     <Col md={12}>
@@ -351,7 +544,8 @@ const Register = () => {
                       />
                     </Col>
                     <Col md={6}>
-                      <InputField label="City" name="city" placeholder="City" />
+                      <InputField label="City" name="city" placeholder="City" value={registerData.city}
+  onChange={handleChange} />
                     </Col>
                     <Col md={6}>
                       <InputField
