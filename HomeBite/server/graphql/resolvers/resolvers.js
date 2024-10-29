@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../../src/models/users.js';
 import  {Rider} from '../../src/models/riders.js';
+import { Chef } from '../../src/models/chefs.js';
 
 // Define the generateToken function
 const generateToken = (user) => {
@@ -84,11 +85,19 @@ const resolvers = {
     }
   },
 
+  createChef: async (_, { input }) => {
+    const user = await User.findById(input.user_id);
+    if (!user) throw new Error("User not found");
+    const newChef = new Chef(input);
+    return await newChef.save();
+  },
+
   Rider: {
     user: async (rider) => {
       return await User.findById(rider.user_id);
     }
   }
 };
+
 
 export default resolvers;

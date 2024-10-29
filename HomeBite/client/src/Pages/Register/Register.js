@@ -47,11 +47,13 @@ const Register = () => {
     preferredEndTime: "",
     longDistancePreference: false,
     // Chef-specific fields
-    profilePicture: null,
     specialtyCuisines: [],
     typeOfMeals: [],
-    experienceInCooking: "",
+    cookingExperience: "",
     maxOrdersPerDay: "",
+    preferredWorkingDays: [],
+    chefStartTime: "",
+    chefEndTime: "",
     profilePicture: null,
     // Payment information
     bankAccountNumber: "",
@@ -81,6 +83,7 @@ const Register = () => {
       return { ...prevData, preferredWorkingDays: updatedDays };
     });
   };
+  
   const workingDaysOptions = [
     { label: "Monday", value: "Monday" },
     { label: "Tuesday", value: "Tuesday" },
@@ -159,12 +162,16 @@ const Register = () => {
 
   const createChefAccount = async () => {
     const chefInput = {
-      user_id: registerData.user_id,
+      user_id: registerData.user_id, 
       specialty_cuisines: registerData.specialtyCuisines,
       type_of_meals: registerData.typeOfMeals,
-      experience_in_cooking: registerData.experienceInCooking,
-      max_orders_per_day: registerData.maxOrdersPerDay,
+      cooking_experience: registerData.cookingExperience,
+      max_orders_per_day: parseInt(registerData.maxOrdersPerDay),
+      preferred_working_days: registerData.preferredWorkingDays,
+      preferred_start_time: registerData.chefStartTime,
+      preferred_end_time: registerData.chefEndTime,
     };
+
     const { data } = await createChef({ variables: { input: chefInput } });
     if (!data || !data.createChef) {
       setMessage("Failed to register chef. Please try again.");
@@ -609,17 +616,63 @@ const Register = () => {
 
                     <Col md={12}><h5>Culinary Information</h5></Col>
                     <Col md={6}>
-                      <InputField label="Specialty Cuisines" type="select" name="specialtyCuisines" options={[{ label: "Indian", value: "Indian" }, { label: "Italian", value: "Italian" }, { label: "Mexican", value: "Mexican" }]} multiple onChange={(e) => handleChange(e)} />
-                    </Col>
-                    <Col md={6}>
-                      <InputField label="Type of Meals" type="select" name="typeOfMeals" options={[{ label: "Breakfast", value: "Breakfast" }, { label: "Lunch", value: "Lunch" }, { label: "Dinner", value: "Dinner" }, { label: "Snacks", value: "Snacks" }]} multiple onChange={(e) => handleChange(e)} />
-                    </Col>
-                    <Col md={6}>
-                      <InputField label="Experience in Cooking" name="experienceInCooking" type="select" options={[{ label: "Less than 1 year", value: "Less than 1 year" }, { label: "1-3 years", value: "1-3 years" }, { label: "3-5 years", value: "3-5 years" }, { label: "5+ years", value: "5+ years" }]} onChange={handleChange} />
-                    </Col>
-                    <Col md={6}>
-                      <InputField label="Max Orders Per Day" name="maxOrdersPerDay" placeholder="Enter maximum orders per day" value={registerData.maxOrdersPerDay} onChange={handleChange} />
-                    </Col>
+      <InputField
+        label="Specialty Cuisines"
+        name="specialtyCuisines"
+        type="select"
+        multiple
+        value={registerData.specialtyCuisines}
+        onChange={handleChange}
+        options={[
+          { value: "Indian", label: "Indian" },
+          { value: "Italian", label: "Italian" },
+          { value: "Mexican", label: "Mexican" },
+          { value: "Chinese", label: "Chinese" },
+          { value: "Other", label: "Other" },
+        ]}
+      />
+    </Col>
+    <Col md={6}>
+      <InputField
+        label="Type of Meals"
+        name="typeOfMeals"
+        type="select"
+        multiple
+        value={registerData.typeOfMeals}
+        onChange={handleChange}
+        options={[
+          { value: "Breakfast", label: "Breakfast" },
+          { value: "Lunch", label: "Lunch" },
+          { value: "Dinner", label: "Dinner" },
+          { value: "Snacks", label: "Snacks" },
+        ]}
+      />
+    </Col>
+    <Col md={6}>
+      <InputField
+        label="Cooking Experience"
+        name="cookingExperience"
+        type="select"
+        value={registerData.cookingExperience}
+        onChange={handleChange}
+        options={[
+          { value: "Less than 1 year", label: "Less than 1 year" },
+          { value: "1-3 years", label: "1-3 years" },
+          { value: "3-5 years", label: "3-5 years" },
+          { value: "5+ years", label: "5+ years" },
+        ]}
+      />
+    </Col>
+    <Col md={6}>
+      <InputField
+        label="Max Orders per Day"
+        name="maxOrdersPerDay"
+        type="number"
+        placeholder="Max Orders per Day"
+        value={registerData.maxOrdersPerDay}
+        onChange={handleChange}
+      />
+    </Col>
 
                     <Col md={12}><h5>Availability</h5></Col>
                     <Col md={12}>
@@ -633,8 +686,24 @@ const Register = () => {
                     <Col md={6}>
                       <InputField label="Preferred Delivery Radius" name="preferredDeliveryRadius" type="select" value={registerData.preferredDeliveryRadius} onChange={handleChange} options={[{ value: "5 km", label: "5 km" }, { value: "10 km", label: "10 km" }, { value: "15 km", label: "15 km" }, { value: "20+ km", label: "20+ km" }]} />
                     </Col>
-                    <Col md={6}><InputField label="Start Time" name="preferredStartTime" type="time" onChange={handleChange} /></Col>
-                    <Col md={6}><InputField label="End Time" name="preferredEndTime" type="time" onChange={handleChange} /></Col>
+                    <Col md={6}>
+      <InputField
+        label="Start Time"
+        name="chefStartTime"
+        type="time"
+        value={registerData.chefStartTime}
+        onChange={handleChange}
+      />
+    </Col>
+    <Col md={6}>
+      <InputField
+        label="End Time"
+        name="chefEndTime"
+        type="time"
+        value={registerData.chefEndTime}
+        onChange={handleChange}
+      />
+    </Col>
 
                     <Col md={12}><h5>Payment Information</h5></Col>
                     <Col md={6}><InputField label="Bank Account Number" name="bankAccountNumber" placeholder="Bank Account Number" onChange={handleChange} /></Col>

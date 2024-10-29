@@ -108,6 +108,18 @@ const typeDefs = gql`
     long_distance_preference: Boolean
   }
 
+  input CreateChefInput {
+  user_id: ID!
+  specialty_cuisines: [String!]
+  type_of_meals: [String!]
+  cooking_experience: String
+  max_orders_per_day: Int
+  preferred_working_days: [String!]
+  preferred_start_time: String
+  preferred_end_time: String
+}
+
+
 input LoginInput {
   email: String!
   password: String!
