@@ -50,7 +50,7 @@ const Register = () => {
     // Chef-specific fields
     specialtyCuisines: [],
     typeOfMeals: [],
-    cookingExperience: "",
+    cookingExperience: "5+ years",
     maxOrdersPerDay: "",
     preferredWorkingDays: [],
     chefStartTime: "",
@@ -69,11 +69,28 @@ const Register = () => {
   const [createChef] = useMutation(CREATE_CHEF);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setRegisterData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    //const { name, value } = e.target;
+    const { name, value, multiple, options } = e.target;
+    // setRegisterData((prevData) => ({
+    //   ...prevData,
+    //   [name]: value,
+    // }));
+    if (multiple) {
+      // For multi-selects, collect all selected options
+      const selectedOptions = Array.from(options)
+        .filter(option => option.selected)
+        .map(option => option.value);
+  
+      setRegisterData((prevData) => ({
+        ...prevData,
+        [name]: selectedOptions, // Set the array of selected values
+      }));
+    } else {
+      setRegisterData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
     setMessage("");
   };
   const handleCheckboxChange = (e) => {
@@ -266,16 +283,23 @@ const Register = () => {
   };
 
   const createChefAccount = async (userId) => {
+    if (!userId) {
+      setMessage("User ID is missing. Chef account cannot be created.");
+      console.error("User ID missing for Chef creation");
+      return;
+    }
     const chefInput = {
-      user_id: userId, 
-      specialty_cuisines: registerData.specialtyCuisines,
-      type_of_meals: registerData.typeOfMeals,
-      cooking_experience: registerData.cookingExperience,
-      max_orders_per_day: parseInt(registerData.maxOrdersPerDay),
-      preferred_working_days: registerData.preferredWorkingDays,
-      preferred_start_time: registerData.chefStartTime,
-      preferred_end_time: registerData.chefEndTime,
+      user_id: userId,
+      specialty_cuisines: registerData.specialtyCuisines || [],
+      type_of_meals: registerData.typeOfMeals || [],
+      cooking_experience: registerData.cookingExperience || "",
+      max_orders_per_day: parseInt(registerData.maxOrdersPerDay) || 0, // Set a default value if empty
+      preferred_working_days: registerData.preferredWorkingDays || [],
+      preferred_start_time: registerData.chefStartTime || "",
+      preferred_end_time: registerData.chefEndTime || "",
     };
+  
+    console.log("Chef input for mutation:", chefInput);
 console.log("chef input...",chefInput)
     const { data } = await createChef({ variables: { input: chefInput } });
     if (!data || !data.createChef) {
@@ -370,13 +394,16 @@ const handleSubmit = async (e) => {
         if (rider) {
           setStep(3);
         } else {
-          await handleFormSubmission();
+          setStep(4);
+         // await handleFormSubmission();
         }
       }
     } else if (step === 3) {
       if (validateRider()) {
         await handleFormSubmission();
       }
+    }else if(step ===4){
+      await handleFormSubmission();
     }
   };
 
@@ -797,7 +824,7 @@ const handleFormSubmission = async () => {
                   </>
                 )}
                 {/* Step 2 - Chef-Specific Fields */}
-                {step === 3 && registerData.roles.chef && (
+                {step === 4 && registerData.roles.chef && (
                   <>
                   <h2 className="form-title">Additional Information</h2>
                   <p>Step 3 of 3 - For Chef</p>
@@ -809,38 +836,39 @@ const handleFormSubmission = async () => {
 
                     <Col md={12}><h5>Culinary Information</h5></Col>
                     <Col md={6}>
-      <InputField
-        label="Specialty Cuisines"
-        name="specialtyCuisines"
-        type="select"
-        multiple
-        value={registerData.specialtyCuisines}
-        onChange={handleChange}
-        options={[
-          { value: "Indian", label: "Indian" },
-          { value: "Italian", label: "Italian" },
-          { value: "Mexican", label: "Mexican" },
-          { value: "Chinese", label: "Chinese" },
-          { value: "Other", label: "Other" },
-        ]}
-      />
-    </Col>
-    <Col md={6}>
-      <InputField
-        label="Type of Meals"
-        name="typeOfMeals"
-        type="select"
-        multiple
-        value={registerData.typeOfMeals}
-        onChange={handleChange}
-        options={[
-          { value: "Breakfast", label: "Breakfast" },
-          { value: "Lunch", label: "Lunch" },
-          { value: "Dinner", label: "Dinner" },
-          { value: "Snacks", label: "Snacks" },
-        ]}
-      />
-    </Col>
+  <InputField
+    label="Specialty Cuisines"
+    name="specialtyCuisines"
+    type="select"
+     // Add this to allow multiple selection
+    value={registerData.specialtyCuisines}
+    onChange={handleChange}
+    multiple={true}
+    options={[
+      { value: "Indian", label: "Indian" },
+      { value: "Italian", label: "Italian" },
+      { value: "Mexican", label: "Mexican" },
+      { value: "Chinese", label: "Chinese" },
+      { value: "Other", label: "Other" },
+    ]}
+  />
+</Col>
+<Col md={6}>
+  <InputField
+    label="Type of Meals"
+    name="typeOfMeals"
+    type="select"
+    multiple={true} // Add this to allow multiple selection
+    value={registerData.typeOfMeals}
+    onChange={handleChange}
+    options={[
+      { value: "Breakfast", label: "Breakfast" },
+      { value: "Lunch", label: "Lunch" },
+      { value: "Dinner", label: "Dinner" },
+      { value: "Snacks", label: "Snacks" },
+    ]}
+  />
+</Col>
     <Col md={6}>
       <InputField
         label="Cooking Experience"
