@@ -50,11 +50,8 @@ const Register = () => {
     // Chef-specific fields
     specialtyCuisines: [],
     typeOfMeals: [],
-    cookingExperience: "5+ years",
+    cookingExperience: "",
     maxOrdersPerDay: "",
-    preferredWorkingDays: [],
-    chefStartTime: "",
-    chefEndTime: "",
     profilePicture: null,
     // Payment information
     bankAccountNumber: "",
@@ -93,7 +90,18 @@ const Register = () => {
     }
     setMessage("");
   };
-  const handleCheckboxChange = (e) => {
+
+  const handleCheckboxChange = (e, fieldName) => {
+    const { value, checked } = e.target;
+    setRegisterData((prevData) => {
+      const updatedArray = checked
+        ? [...prevData[fieldName], value]
+        : prevData[fieldName].filter((item) => item !== value);
+      return { ...prevData, [fieldName]: updatedArray };
+    });
+  };
+  
+  const handleWorkingDaysChange = (e) => {
     const { value, checked } = e.target;
     setRegisterData((prevData) => {
       const updatedDays = checked
@@ -293,10 +301,10 @@ const Register = () => {
       specialty_cuisines: registerData.specialtyCuisines || [],
       type_of_meals: registerData.typeOfMeals || [],
       cooking_experience: registerData.cookingExperience || "",
-      max_orders_per_day: parseInt(registerData.maxOrdersPerDay) || 0, // Set a default value if empty
+      max_orders_per_day: parseInt(registerData.maxOrdersPerDay) || 0,
       preferred_working_days: registerData.preferredWorkingDays || [],
-      preferred_start_time: registerData.chefStartTime || "",
-      preferred_end_time: registerData.chefEndTime || "",
+      preferred_start_time: registerData.preferredStartTime || "",
+      preferred_end_time: registerData.preferredEndTime || "",
     };
   
     console.log("Chef input for mutation:", chefInput);
@@ -381,6 +389,7 @@ console.log("chef input...",chefInput)
 //     }
 //     setMessage("User registered successfully!!.");
 // };
+/*
 const handleSubmit = async (e) => {
     e.preventDefault();
     const { customer, chef, rider } = registerData.roles;
@@ -406,7 +415,23 @@ const handleSubmit = async (e) => {
       await handleFormSubmission();
     }
   };
+*/
 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { customer, chef, rider } = registerData.roles;
+  if (step === 1 && validateStep1()) {
+    setStep(customer || chef ? 2 : 3);
+  } else if (step === 2 && validateStep2()) {
+    if (rider) setStep(3);
+    else setStep(4);
+  } else if (step === 3 && validateRider()) {
+    await handleFormSubmission();
+  } else if (step === 4) {
+    await handleFormSubmission();
+  }
+};
+/*
 const handleFormSubmission = async () => {
     try {
         // Create User Account and get userId
@@ -427,6 +452,20 @@ const handleFormSubmission = async () => {
         console.error("Error in form submission:", error);
         setMessage("Failed to register. Please try again.");
     }
+};
+*/
+const handleFormSubmission = async () => {
+  try {
+    const userId = await createUserAccount();
+    if (userId) {
+      setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
+      if (registerData.roles.rider) await createRiderAccount(userId);
+      if (registerData.roles.chef) await createChefAccount(userId);
+      navigate("/");
+    }
+  } catch (error) {
+    setMessage("Failed to register. Please try again.");
+  }
 };
   const selectedRolesCount = Object.values(registerData.roles).filter(Boolean).length;
 
@@ -823,123 +862,75 @@ const handleFormSubmission = async () => {
                     </Col>
                   </>
                 )}
-                {/* Step 2 - Chef-Specific Fields */}
+                {/* Step 4 - Chef-Specific Fields */}
                 {step === 4 && registerData.roles.chef && (
                   <>
-                  <h2 className="form-title">Additional Information</h2>
-                  <p>Step 3 of 3 - For Chef</p>
-                  <hr />
+                    <h2 className="form-title">Additional Information</h2>
+                    <p>Step 3 of 3 - For Chef</p>
+                    <hr />
+
+                    {/* Profile Picture */}
                     <Col md={12}><h5>Profile Verification</h5></Col>
                     <Col md={12}>
                       <InputField label="Upload Profile Picture" type="file" name="profilePicture" onChange={(e) => setRegisterData({ ...registerData, profilePicture: e.target.files[0] })} />
                     </Col>
 
+                    {/* Culinary Information */}
                     <Col md={12}><h5>Culinary Information</h5></Col>
-                    <Col md={6}>
-  <InputField
-    label="Specialty Cuisines"
-    name="specialtyCuisines"
-    type="select"
-     // Add this to allow multiple selection
-    value={registerData.specialtyCuisines}
-    onChange={handleChange}
-    multiple={true}
-    options={[
-      { value: "Indian", label: "Indian" },
-      { value: "Italian", label: "Italian" },
-      { value: "Mexican", label: "Mexican" },
-      { value: "Chinese", label: "Chinese" },
-      { value: "Other", label: "Other" },
-    ]}
-  />
-</Col>
-<Col md={6}>
-  <InputField
-    label="Type of Meals"
-    name="typeOfMeals"
-    type="select"
-    multiple={true} // Add this to allow multiple selection
-    value={registerData.typeOfMeals}
-    onChange={handleChange}
-    options={[
-      { value: "Breakfast", label: "Breakfast" },
-      { value: "Lunch", label: "Lunch" },
-      { value: "Dinner", label: "Dinner" },
-      { value: "Snacks", label: "Snacks" },
-    ]}
-  />
-</Col>
-    <Col md={6}>
-      <InputField
-        label="Cooking Experience"
-        name="cookingExperience"
-        type="select"
-        value={registerData.cookingExperience}
-        onChange={handleChange}
-        options={[
-          { value: "Less than 1 year", label: "Less than 1 year" },
-          { value: "1-3 years", label: "1-3 years" },
-          { value: "3-5 years", label: "3-5 years" },
-          { value: "5+ years", label: "5+ years" },
-        ]}
-      />
-    </Col>
-    <Col md={6}>
-      <InputField
-        label="Max Orders per Day"
-        name="maxOrdersPerDay"
-        type="number"
-        placeholder="Max Orders per Day"
-        value={registerData.maxOrdersPerDay}
-        onChange={handleChange}
-      />
-    </Col>
-
-                    <Col md={12}><h5>Availability</h5></Col>
                     <Col md={12}>
-                      <label>Preferred Working Days</label>
+                      <label>Specialty Cuisines</label>
                       <div className="d-flex flex-wrap">
-                        {workingDaysOptions.map((option) => (
-                          <Checkbox key={option.value} label={option.label} name="preferredWorkingDays" value={option.value} checked={registerData.preferredWorkingDays.includes(option.value)} onChange={handleCheckboxChange} />
+                        {["Indian", "Italian", "Mexican", "Chinese", "Other"].map((cuisine) => (
+                          <Checkbox key={cuisine} label={cuisine} name="specialtyCuisines" value={cuisine} checked={registerData.specialtyCuisines.includes(cuisine)} onChange={(e) => handleCheckboxChange(e, "specialtyCuisines")} />
                         ))}
                       </div>
                     </Col>
-                    <Col md={6}>
-                      <InputField label="Preferred Delivery Radius" name="preferredDeliveryRadius" type="select" value={registerData.preferredDeliveryRadius} onChange={handleChange} options={[{ value: "5 km", label: "5 km" }, { value: "10 km", label: "10 km" }, { value: "15 km", label: "15 km" }, { value: "20+ km", label: "20+ km" }]} />
-                    </Col>
-                    <Col md={6}>
-      <InputField
-        label="Start Time"
-        name="chefStartTime"
-        type="time"
-        value={registerData.chefStartTime}
-        onChange={handleChange}
-      />
-    </Col>
-    <Col md={6}>
-      <InputField
-        label="End Time"
-        name="chefEndTime"
-        type="time"
-        value={registerData.chefEndTime}
-        onChange={handleChange}
-      />
-    </Col>
-
-                    <Col md={12}><h5>Payment Information</h5></Col>
-                    <Col md={6}><InputField label="Bank Account Number" name="bankAccountNumber" placeholder="Bank Account Number" onChange={handleChange} /></Col>
-                    <Col md={6}><InputField label="Transit Number" name="transitNumber" placeholder="Transit Number" onChange={handleChange} /></Col>
                     <Col md={12}>
-                      <Checkbox label="Agree to Terms and Conditions" name="terms" />
-                      <Checkbox label="Agreement to Safety Guidelines" name="safetyGuidelines" />
+                      <label>Type of Meals</label>
+                      <div className="d-flex flex-wrap">
+                        {["Breakfast", "Lunch", "Dinner", "Snacks"].map((meal) => (
+                          <Checkbox key={meal} label={meal} name="typeOfMeals" value={meal} checked={registerData.typeOfMeals.includes(meal)} onChange={(e) => handleCheckboxChange(e, "typeOfMeals")} />
+                        ))}
+                      </div>
                     </Col>
-                    <Col md={6}>
-                      <Button type="button" className="btn-secondary w-100" onClick={() => setStep(2)}>Back</Button>
+                    <Col md={12}>
+                      <label>Experience in Cooking</label>
+                      <div className="d-flex flex-wrap">
+                        {["Less than 1 year", "1-3 years", "3-5 years", "5+ years"].map((experience) => (
+                          <Checkbox key={experience} label={experience} name="cookingExperience" value={experience} checked={registerData.cookingExperience === experience} onChange={(e) => setRegisterData({ ...registerData, cookingExperience: e.target.value })} />
+                        ))}
+                      </div>
                     </Col>
 
                     <Col md={12}>
-                      <Button type="submit" className="btn-primary w-100">Complete Registration</Button>
+                      <h5>Availability</h5>
+                      <div className="d-flex flex-wrap">
+                        {workingDaysOptions.map((option) => (
+                          <Checkbox key={option.value} label={option.label} name="preferredWorkingDays" value={option.value} checked={registerData.preferredWorkingDays.includes(option.value)} onChange={handleWorkingDaysChange} />
+                        ))}
+                      </div>
                     </Col>
+                    {/* Payment Information */}
+                    <Col md={12}>
+                      <h5>Payment Information</h5>
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Bank Account Number"
+                        name="bankAccountNumber"
+                        placeholder="Bank Account Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Transit Number"
+                        name="transitNumber"
+                        placeholder="Transit Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={12}><Button type="submit" className="btn-primary w-100">Complete Registration</Button></Col>
                   </>
                 )}
               </form>
