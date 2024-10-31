@@ -10,7 +10,7 @@ import Button from "../../Components/Button/Button";
 import RoleOptions from "../../Components/RoleOptions/RoleOptions";
 import { Container, Row, Col, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
-import { CREATE_USER, CREATE_RIDER } from "../../queries";
+import { CREATE_USER, CREATE_RIDER, CREATE_CHEF } from "../../queries";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -47,7 +47,14 @@ const Register = () => {
     preferredStartTime: "",
     preferredEndTime: "",
     longDistancePreference: false,
-    // Chef-specific fields (you can add specific chef fields if necessary)
+    // Chef-specific fields 
+    specialtyCuisines: [],
+    typeOfMeals: [],
+    cookingExperience: "",
+    maxOrdersPerDay: "",
+    profilePicture: null,
+    preferredStartTimeChef: "",
+    preferredEndTimeChef: "",
     profilePicture: null,
     // Payment information
     bankAccountNumber: "",
@@ -59,17 +66,44 @@ const Register = () => {
 
   const [createUser] = useMutation(CREATE_USER);
   const [createRider] = useMutation(CREATE_RIDER);
-  //const [createChef] = useMutation(CREATE_CHEF);
+  const [createChef] = useMutation(CREATE_CHEF);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setRegisterData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    //const { name, value } = e.target;
+    const { name, value, multiple, options } = e.target;
+    if (multiple) {
+      // For multi-selects, collect all selected options
+      const selectedOptions = Array.from(options)
+        .filter(option => option.selected)
+        .map(option => option.value);
+  
+      setRegisterData((prevData) => ({
+        ...prevData,
+        [name]: selectedOptions, // Set the array of selected values
+      }));
+    } else {
+      setRegisterData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+    // setRegisterData((prevData) => ({
+    //   ...prevData,
+    //   [name]: value,
+    // }));
     setMessage("");
   };
-  const handleCheckboxChange = (e) => {
+ 
+  const handleCheckboxChange = (e, fieldName) => {
+    const { value, checked } = e.target;
+    setRegisterData((prevData) => {
+      const updatedArray = checked
+        ? [...prevData[fieldName], value]
+        : prevData[fieldName].filter((item) => item !== value);
+      return { ...prevData, [fieldName]: updatedArray };
+    });
+  };
+  const handleWorkingDaysChange = (e) => {
     const { value, checked } = e.target;
     setRegisterData((prevData) => {
       const updatedDays = checked
@@ -257,91 +291,35 @@ const Register = () => {
   }
   };
 
-  const createChefAccount = async () => {
+  const createChefAccount = async (userId) => {
+    if (!userId) {
+      setMessage("User ID is missing. Chef account cannot be created.");
+      console.error("User ID missing for Chef creation");
+      return;
+    }
+    
     const chefInput = {
-      user_id: registerData.user_id,
-      // Add any additional chef-specific fields here
+      user_id: userId,
+      specialty_cuisines: registerData.specialtyCuisines || [],
+      type_of_meals: registerData.typeOfMeals || [],
+      cooking_experience: registerData.cookingExperience || "",
+      max_orders_per_day: parseInt(registerData.maxOrdersPerDay) || 0,
+      preferred_working_days: registerData.preferredWorkingDays || [],
+      preferred_start_time: registerData.preferredStartTimeChef || "",
+      preferred_end_time: registerData.preferredEndTimeChef || "",
     };
-    //  const { data } = await createChef({ variables: { input: chefInput } });
-    // if (!data || !data.createChef) {
-    //   setMessage("Failed to register chef. Please try again.");
-    // }
+  
+    console.log("Chef input for mutation:", chefInput);
+console.log("chef input...",chefInput)
+    const { data } = await createChef({ variables: { input: chefInput } });
+    if (!data || !data.createChef) {
+      setMessage("Failed to register chef. Please try again.");
+    }else {
+      console.log("Chef created successfully!");
+    }
   };
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const { customer, chef, rider } = registerData.roles;
-    
-    
-//     if (step === 1) {
-   
-//     if (validateStep1()) {
-//         setMessage(""); 
-//       setStep(customer || chef ? 2 : 3);
-//      } // Skip to step 3 if only Rider is selected
-//     } else if (step === 2) {
-//       // Create User Account
-//       //if (customer && !validateCustomer()) return;
-//       if (validateStep2()) {
-//         setMessage("");
-//         await handleFormSubmission()
-//       //await createUserAccount();
-//       }
 
-      
-      
-//     } else if (step === 3) {
-//       // Register Rider-specific information
-      
-//     }
-//   };
-// const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const { customer, chef, rider } = registerData.roles;
-
-//     // Step 1 Validation and Navigation
-//     if (step === 1) {
-//         console.log("step1")
-//         if (validateStep1()) {
-//             // Move to step based on roles
-//             if (customer || chef) {
-//                 console.log("step11")
-//                 setStep(2); // Move to address step for customer/chef
-//             } else if (rider) {
-//                 console.log("step111")
-//                 setStep(3); // Skip to rider step if only rider is selected
-//             }
-//         }
-//         return;
-//     }
-
-//     // Step 2: Address Information
-//     if (step === 2) {
-//         console.log("step2")
-//         if (validateStep2()) {
-//             console.log("step22")
-//             // Navigate based on role selection
-//             if (rider) {
-//                 console.log("step222")
-//                 setStep(3); // Proceed to Rider details if rider role is selected
-//             } else {
-//                 console.log("step2222")
-//                 await handleFormSubmission(); // No rider role, so submit after address
-//             }
-//         }
-//         return;
-//     }
-
-//     // Step 3: Rider-Specific Information
-//     if (step === 3) {
-//         console.log("step3")
-//         if (validateRider()) {
-//             console.log("step33")
-//             await handleFormSubmission(); // Submit for rider after validation
-//         }
-//     }
-//     setMessage("User registered successfully!!.");
-// };
 const handleSubmit = async (e) => {
     e.preventDefault();
     const { customer, chef, rider } = registerData.roles;
@@ -355,13 +333,16 @@ const handleSubmit = async (e) => {
         if (rider) {
           setStep(3);
         } else {
-          await handleFormSubmission();
+          setStep(4);
+         // await handleFormSubmission();
         }
       }
     } else if (step === 3) {
       if (validateRider()) {
         await handleFormSubmission();
       }
+    }else if (step === 4) {
+      await handleFormSubmission();
     }
   };
 
@@ -693,10 +674,9 @@ const handleFormSubmission = async () => {
                               label={option.label}
                               name="preferredWorkingDays"
                               value={option.value}
-                              checked={registerData.preferredWorkingDays.includes(
-                                option.value
-                              )}
-                              onChange={handleCheckboxChange}
+                              checked={registerData.preferredWorkingDays.includes(option.value)}
+                              
+                              onChange={handleWorkingDaysChange}
                             />
                           ))}
                         </div>
@@ -779,6 +759,101 @@ const handleFormSubmission = async () => {
                         Submit
                       </Button>
                     </Col>
+                  </>
+                  )}
+                   {/* Step 4 - Chef-Specific Fields */}
+                {step === 4 && registerData.roles.chef && (
+                  <>
+                    <h2 className="form-title">Additional Information</h2>
+                    <p>Step 3 of 3 - For Chef</p>
+                    <hr />
+
+                    {/* Profile Picture */}
+                    <Col md={12}><h5>Profile Verification</h5></Col>
+                    <Col md={12}>
+                      <InputField label="Upload Profile Picture" type="file" name="profilePicture" onChange={(e) => setRegisterData({ ...registerData, profilePicture: e.target.files[0] })} />
+                    </Col>
+
+                    {/* Culinary Information */}
+                    <Col md={12}><h5>Culinary Information</h5></Col>
+                    <Col md={12}>
+                      <label>Specialty Cuisines</label>
+                      <div className="d-flex flex-wrap">
+                        {["Indian", "Italian", "Mexican", "Chinese", "Other"].map((cuisine) => (
+                          <Checkbox key={cuisine} label={cuisine} name="specialtyCuisines" value={cuisine} checked={registerData.specialtyCuisines.includes(cuisine)} onChange={(e) => handleCheckboxChange(e, "specialtyCuisines")} />
+                        ))}
+                      </div>
+                    </Col>
+                    <Col md={12}>
+                      <label>Type of Meals</label>
+                      <div className="d-flex flex-wrap">
+                        {["Breakfast", "Lunch", "Dinner", "Snacks"].map((meal) => (
+                          <Checkbox key={meal} label={meal} name="typeOfMeals" value={meal} checked={registerData.typeOfMeals.includes(meal)} onChange={(e) => handleCheckboxChange(e, "typeOfMeals")} />
+                        ))}
+                      </div>
+                    </Col>
+                    <Col md={12}>
+                      <label>Experience in Cooking</label>
+                      <div className="d-flex flex-wrap">
+                        {["Less than 1 year", "1-3 years", "3-5 years", "5+ years"].map((experience) => (
+                          <Checkbox key={experience} label={experience} name="cookingExperience" value={experience} checked={registerData.cookingExperience === experience} onChange={(e) => setRegisterData({ ...registerData, cookingExperience: e.target.value })} />
+                        ))}
+                      </div>
+                    </Col>
+
+                    <Col md={12}>
+                      <h5>Availability</h5>
+                      <div className="d-flex flex-wrap">
+                        {workingDaysOptions.map((option) => (
+                          <Checkbox key={option.value} label={option.label} name="preferredWorkingDays" value={option.value} checked={registerData.preferredWorkingDays.includes(option.value)} onChange={handleWorkingDaysChange} />
+                        ))}
+                      </div>
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Start Time"
+                        name="preferredStartTimeChef"
+                        type="time"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="End Time"
+                        name="preferredEndTimeChef"
+                        type="time"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={12}>
+                      <InputField
+                        label="Maximum Orders Per day"
+                        name="maxOrdersPerDay"
+                        placeholder="Enter the numebr"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    {/* Payment Information */}
+                    <Col md={12}>
+                      <h5>Payment Information</h5>
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Bank Account Number"
+                        name="bankAccountNumber"
+                        placeholder="Bank Account Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Transit Number"
+                        name="transitNumber"
+                        placeholder="Transit Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={12}><Button type="submit" className="btn-primary w-100">Complete Registration</Button></Col>
                   </>
                 )}
               </form>

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../../src/models/users.js';
 import  {Rider} from '../../src/models/riders.js';
+import { Chef } from '../../src/models/chefs.js';
 
 // Define the generateToken function
 const generateToken = (user) => {
@@ -25,6 +26,9 @@ const resolvers = {
     },
     getRider: async (_, { id }) => {
       return await Rider.findById(id).populate('user');
+    },
+    getChef: async (_, { id }) => {
+      return await Chef.findById(id).populate('user');
     }
   },
 
@@ -76,6 +80,16 @@ const resolvers = {
       const newRider = new Rider(input);
       return await newRider.save();
     },
+    createChef: async (_, { input }) => {  // Move createChef into Mutation
+      const user = await User.findById(input.user_id);
+      if (!user) throw new Error("User not found");
+      const newChef = new Chef(input);
+      return await newChef.save();
+      return {
+        ...newChef.toObject(),
+        user, // include user data to populate the non-nullable field
+      };
+    },
     updateUser: async (_, { id, input }) => {
       return await User.findByIdAndUpdate(id, input, { new: true });
     },
@@ -87,6 +101,11 @@ const resolvers = {
   Rider: {
     user: async (rider) => {
       return await User.findById(rider.user_id);
+    }
+  },
+  Chef: {
+    user: async (chef) => {
+      return await User.findById(chef.user_id);
     }
   }
 };

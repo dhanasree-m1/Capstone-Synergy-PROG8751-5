@@ -12,4 +12,4 @@ const ChefSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Chef', ChefSchema);
+export const Chef = mongoose.model('Chef', ChefSchema);
