@@ -314,6 +314,8 @@ console.log("chef input...",chefInput)
     const { data } = await createChef({ variables: { input: chefInput } });
     if (!data || !data.createChef) {
       setMessage("Failed to register chef. Please try again.");
+    }else {
+      console.log("Chef created successfully!");
     }
   };
 
