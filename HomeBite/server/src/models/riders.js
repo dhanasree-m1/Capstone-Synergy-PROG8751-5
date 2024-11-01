@@ -8,7 +8,7 @@ const RiderSchema = new mongoose.Schema({
   insurance_expiry_date: { type: Date },
   driver_license_number: { type: String, required: true },
   license_expiry_date: { type: Date },
-  document_upload_path: { type: String },
+  // document_upload_path: { type: String },
   preferred_delivery_radius: { type: String, enum: ['5 km', '10 km', '15 km', '20+ km'], default: '5 km' },
   preferred_working_days: [{ type: String, enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] }],
   preferred_start_time: { type: String },

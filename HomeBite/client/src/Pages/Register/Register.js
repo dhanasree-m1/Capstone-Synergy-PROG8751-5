@@ -18,6 +18,12 @@ import { useMutation } from "@apollo/client";
 import { CREATE_USER, CREATE_RIDER, CREATE_CHEF } from "../../queries";
 import { CREATE_PAYMENT_INFO } from "../../queries";
 
+
+const client = new ApolloClient({
+  uri: 'http://localhost:5000/graphql', // Replace with your GraphQL server URI
+  cache: new InMemoryCache(),
+});
+
 const Register = () => {
   const [step, setStep] = useState(1);
   const [registerData, setRegisterData] = useState({
@@ -47,7 +53,7 @@ const Register = () => {
     insuranceExpiryDate: "",
     driverLicenseNumber: "",
     licenseExpiryDate: "",
-    document_upload_path: "",
+    //document_upload_path: "",
     preferredDeliveryRadius: "",
     preferredWorkingDays: [],
     preferredStartTime: "",
@@ -61,12 +67,12 @@ const Register = () => {
     profilePicture: null,
     preferredStartTimeChef: "",
     preferredEndTimeChef: "",
-    profilePicture: null,
     // Payment information
     bankAccountNumber: "",
     transitNumber: "",
   });
 
+  
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -119,15 +125,15 @@ const Register = () => {
       return { ...prevData, preferredWorkingDays: updatedDays };
     });
   };
-  const workingDaysOptions = [
-    { label: "Monday", value: "Monday" },
-    { label: "Tuesday", value: "Tuesday" },
-    { label: "Wednesday", value: "Wednesday" },
-    { label: "Thursday", value: "Thursday" },
-    { label: "Friday", value: "Friday" },
-    { label: "Saturday", value: "Saturday" },
-    { label: "Sunday", value: "Sunday" },
-  ];
+  // const workingDaysOptions = [
+  //   { label: "Monday", value: "Monday" },
+  //   { label: "Tuesday", value: "Tuesday" },
+  //   { label: "Wednesday", value: "Wednesday" },
+  //   { label: "Thursday", value: "Thursday" },
+  //   { label: "Friday", value: "Friday" },
+  //   { label: "Saturday", value: "Saturday" },
+  //   { label: "Sunday", value: "Sunday" },
+  // ];
   // Validation helper functions
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
   const validatePhoneNumber = (mobile) => /^\d{10}$/.test(mobile);
@@ -252,83 +258,102 @@ const Register = () => {
       insuranceExpiryDate,
       licenseExpiryDate,
     } = registerData;
-// Regular expressions for formats
-const regNumberPattern = /^[A-Z0-9-]{5,10}$/; // Example pattern for a vehicle registration number
-const licensePattern = /^[A-Z0-9-]{5,15}$/;   // Example pattern for a driver's license number
-const insurancePattern = /^[a-zA-Z0-9]{8,}$/; // At least 8 alphanumeric characters for insurance number
-
-// Check for required fields
-if (
-  !vehicleType ||
-  !vehicleRegNumber ||
-  !vehicleInsuranceNumber ||
-  !driverLicenseNumber ||
-  !preferredDeliveryRadius ||
-  preferredWorkingDays.length === 0 ||
-  !preferredStartTime ||
-  !preferredEndTime
-) {
-  setMessage("Please fill in all required fields for Rider.");
-  return false;
-}
-
-// Validate vehicle registration number
-if (!regNumberPattern.test(vehicleRegNumber)) {
-  setMessage("Please enter a valid vehicle registration number.");
-  return false;
-}
-
-// Validate driver’s license number
-if (!licensePattern.test(driverLicenseNumber)) {
-  setMessage("Please enter a valid driver's license number.");
-  return false;
-}
-
-// Validate vehicle insurance number
-if (!insurancePattern.test(vehicleInsuranceNumber)) {
-  setMessage("Vehicle insurance number must be alphanumeric and at least 8 characters long.");
-  return false;
-}
-
-// Validate future dates for insurance and license expiry
-if (insuranceExpiryDate && !validateFutureDate(insuranceExpiryDate)) {
-  setMessage("Insurance expiry date cannot be in the past.");
-  return false;
-}
-
-if (licenseExpiryDate && !validateFutureDate(licenseExpiryDate)) {
-  setMessage("License expiry date cannot be in the past.");
-  return false;
-}
-
-// All validations passed
-return true;
-};
-
-  const validateChef = () => {
-    const {
-      specialtyCuisines,
-      typeOfMeals,
-      cookingExperience,
-      maxOrdersPerDay,
-      preferredWorkingDays,
-      preferredStartTimeChef,
-      preferredEndTimeChef,
-    } = registerData;
-
+  
+    // Regular expressions for formats
+    const regNumberPattern = /^[A-Z0-9-]{5,10}$/; // Example pattern for a vehicle registration number
+    const licensePattern = /^[A-Z0-9-]{5,15}$/;   // Example pattern for a driver's license number
+    const insurancePattern = /^[a-zA-Z0-9]{8,}$/; // At least 8 alphanumeric characters for insurance number
+  
+    // Check for required fields
     if (
-      specialtyCuisines.length === 0 ||
-      typeOfMeals.length === 0 ||
-      !cookingExperience ||
-      !maxOrdersPerDay ||
-      preferredWorkingDays.length === 0 ||
-      !preferredStartTimeChef ||
-      !preferredEndTimeChef
+      !vehicleType ||
+      !vehicleRegNumber ||
+      !vehicleInsuranceNumber ||
+      !driverLicenseNumber ||
+      !preferredDeliveryRadius ||
+      !Array.isArray(preferredWorkingDays) || preferredWorkingDays.length === 0 ||
+      !preferredStartTime ||
+      !preferredEndTime
     ) {
-      setMessage("Please fill in all required fields for Chef.");
+      setMessage("Please fill in all required fields for Rider.");
       return false;
     }
+    setMessage(""); // Reset message if this check passes
+  
+    // Validate vehicle registration number
+    if (!regNumberPattern.test(vehicleRegNumber)) {
+      setMessage("Please enter a valid vehicle registration number.");
+      return false;
+    }
+    setMessage(""); // Reset message if this check passes
+  
+    // Validate driver’s license number
+    if (!licensePattern.test(driverLicenseNumber)) {
+      setMessage("Please enter a valid driver's license number.");
+      return false;
+    }
+    setMessage(""); // Reset message if this check passes
+  
+    // Validate vehicle insurance number
+    if (!insurancePattern.test(vehicleInsuranceNumber)) {
+      setMessage("Vehicle insurance number must be alphanumeric and at least 8 characters long.");
+      return false;
+    }
+    setMessage(""); // Reset message if this check passes
+  
+    // Validate future dates for insurance and license expiry
+    if (insuranceExpiryDate && !validateFutureDate(insuranceExpiryDate)) {
+      setMessage("Insurance expiry date cannot be in the past.");
+      return false;
+    }
+    if (licenseExpiryDate && !validateFutureDate(licenseExpiryDate)) {
+      setMessage("License expiry date cannot be in the past.");
+      return false;
+    }
+  
+    // All validations passed
+    return true;
+  };
 
+const validateChef = () => {
+  const { specialtyCuisines, typeOfMeals, cookingExperience, preferredWorkingDays, maxOrdersPerDay } = registerData;
+  
+  const validExperienceOptions = ["Less than 1 year", "1-3 years", "3-5 years", "5+ years"];
+  
+  if (!specialtyCuisines.length || !typeOfMeals.length || !cookingExperience || !validExperienceOptions.includes(cookingExperience) || !preferredWorkingDays.length || !maxOrdersPerDay) {
+    setMessage("Please ensure all chef details are filled in and valid.");
+    return false;
+  }
+
+  return true;
+};
+
+  const ValidatePayment = () => {
+    const { bankAccountNumber, transitNumber } = registerData;
+  
+    // Define regular expressions for format validations
+    const bankAccountPattern = /^\d{8,12}$/;  // Bank account: 8-12 digits
+    const transitPattern = /^\d{5}$/;          // Transit number: exactly 5 digits
+  
+    if (!bankAccountNumber || !transitNumber) {
+      setMessage("Please fill in all required fields for Payment.");
+      return false;
+    }
+  
+    // Validate bank account number
+    if (!bankAccountPattern.test(bankAccountNumber)) {
+      setMessage("Please enter a valid bank account number (8-12 digits).");
+      return false;
+    }
+  
+    // Validate transit number
+    if (!transitPattern.test(transitNumber)) {
+      setMessage("Please enter a valid 5-digit transit number.");
+      return false;
+    }
+  
+    // Clear the message if all validations pass
+    setMessage("");
     return true;
   };
 
@@ -383,24 +408,26 @@ return true;
         return;
       }
       const riderInput = {
-        user_id: userId, // Ensure user_id is set
+        user_id: userId,
         vehicle_type: registerData.vehicleType || "",
         vehicle_registration_number: registerData.vehicleRegNumber || "",
-        vehicle_insurance_number: registerData.vehicleInsuranceNumber || "",
-        insurance_expiry_date: registerData.insuranceExpiryDate || "",
+        vehicle_insurance_number: registerData.vehicleInsuranceNumber || null,
+        insurance_expiry_date: registerData.insuranceExpiryDate || null,
         driver_license_number: registerData.driverLicenseNumber || "",
-        license_expiry_date: registerData.licenseExpiryDate || "",
+        license_expiry_date: registerData.licenseExpiryDate || null,
         preferred_delivery_radius: registerData.preferredDeliveryRadius || "",
         preferred_working_days: registerData.preferredWorkingDays || [],
-        preferred_start_time: registerData.preferredStartTime || "",
-        preferred_end_time: registerData.preferredEndTime || "",
+        preferred_start_time: registerData.preferredStartTime || null,
+        preferred_end_time: registerData.preferredEndTime || null,
         long_distance_preference: registerData.longDistancePreference || false,
       };
       console.log("Rider input for mutation:", riderInput);
+      console.log("Rider input for mutation:", JSON.stringify(riderInput, null, 2));
       const { data } = await createRider({ variables: { input: riderInput } });
       if (!data || !data.createRider) {
         setMessage("Failed to register rider. Please try again.");
       } else {
+        console.log("Rider input for mutation:", riderInput);
         console.log("Rider created successfully!");
       }
     } catch (error) {
@@ -466,67 +493,139 @@ return true;
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { customer, chef, rider } = registerData.roles;
-
+  
     if (step === 1) {
-      // Await validateStep1 to complete before proceeding
+      console.log("A1");
+      // Step 1 validation (common fields)
       const isValidStep1 = await validateStep1();
       if (isValidStep1) {
-        setStep(2); // Proceed to the customer form if Step 1 validation passes
+        console.log("A2");
+        setStep(2); // Proceed to customer form if validation passes
       }
     } else if (step === 2) {
-      // Validate Step 2 and handle customer submission
+      console.log("A3");
+      // Customer-specific validation at step 2
       if (validateStep2()) {
-        // If only customer role is selected, complete the registration and navigate to "/"
         if (customer && !chef && !rider) {
-          await handleFormSubmission(); // Save and redirect
-        } else {
-          // If Rider or Chef role is selected with Customer, move to the next step for additional details
-          if (rider) setStep(3); // Move to Rider fields
-          else if (chef) setStep(4); // Move to Chef fields
+          console.log("A4 - Customer only");
+          await handleFormSubmission(); // Save and navigate for Customer only
+        } else if (rider && chef) {
+          console.log("A5 - Customer, Rider, and Chef");
+          setStep(3); // Move to Rider form, then Chef form after Rider
+        } else if (rider) {
+          console.log("A6 - Customer and Rider only");
+          setStep(3); // Move to Rider form if Customer and Rider are selected
+        } else if (chef) {
+          console.log("A7 - Customer and Chef only");
+          setStep(4); // Move to Chef form if Customer and Chef are selected
         }
       }
     } else if (step === 3 && rider) {
-      // Validate and save Rider-specific fields
+      console.log("A8 - Rider step");
+      // Rider-specific validation at step 3
       if (validateRider()) {
-        await createRiderAccount(registerData.user_id); // Save Rider
-        navigate("/"); // Redirect to initial path
+        if (chef) {
+          console.log("A9 - Proceed to Chef after Rider");
+          setStep(4); // Move to Chef form after completing Rider form
+        } else {
+          console.log("A10 - Rider only or Customer + Rider complete");
+          await handleFormSubmission(); // Save for Rider only or Customer + Rider
+        }
       }
     } else if (step === 4 && chef) {
-      // Validate and save Chef-specific fields
+      console.log("A11 - Chef step");
+      // Chef-specific validation at step 4
       if (validateChef()) {
-        await createChefAccount(registerData.user_id); // Save Chef
-        navigate("/"); // Redirect to initial path
+        console.log("A12 - Complete Chef");
+        await handleFormSubmission(); // Save and complete for Chef or all roles
+      }
+    } else if (customer && chef && rider) {
+      console.log("A13 - All roles selected");
+      // All validations at once for Customer, Rider, and Chef
+      if (
+        await validateStep1() &&
+        validateStep2() &&
+        validateRider() &&
+        validateChef()
+      ) {
+        console.log("A14 - All validations passed");
+        await handleFormSubmission(); // Save and navigate for all roles
       }
     }
+    // if (step === 1) {
+    //   // Await validateStep1 to complete before proceeding
+    //   const isValidStep1 = await validateStep1();
+    //   if (isValidStep1) {
+    //     setStep(2); // Proceed to the customer form if Step 1 validation passes
+    //   }
+    // } else if (step === 2) {
+    //   // Validate Step 2 and handle customer submission
+    //   if (validateStep2()) {
+    //     // If only customer role is selected, complete the registration and navigate to "/"
+    //     if (customer && !chef && !rider) {
+    //       await handleFormSubmission(); // Save and redirect
+    //     } else {
+    //       // If Rider or Chef role is selected with Customer, move to the next step for additional details
+    //       if (rider) setStep(3); // Move to Rider fields
+    //       else if (chef) setStep(4); // Move to Chef fields
+    //     }
+    //   }
+    // } else if (step === 3 && rider) {
+    //   // Validate and save Rider-specific fields
+    //   if (validateRider()) {
+    //     await createRiderAccount(registerData.user_id); // Save Rider
+    //     navigate("/"); // Redirect to initial path
+    //   }
+    // } else if (step === 4 && chef) {
+    //   // Validate and save Chef-specific fields
+    //   if (validateChef()) {
+    //     await createChefAccount(registerData.user_id); // Save Chef
+    //     navigate("/"); // Redirect to initial path
+    //   }
+    // }
   };
+  
 
   const handleFormSubmission = async () => {
     try {
-        // Create User Account and get userId
-        const userId = await createUserAccount();
-        console.log("userid:"+userId)
-        if (userId) {
-            setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
-            const { rider, chef } = registerData.roles;
-            
-            // Create additional accounts based on roles
-            if (rider) await createRiderAccount(userId);
-            if (chef) await createChefAccount(userId);
-             // Save payment information
-      await createPaymentInfo({
-        variables: {
-          input: {
-            user_id: userId,
-            bank_account_number: registerData.bankAccountNumber || "",
-            transit_number: registerData.transitNumber || "",
-          },
-        },
-      });
-
-
-        // Navigate to home or success page after all steps complete
-        navigate("/", { state: { successMessage: "User registered successfully!" } });
+      // Step 1: Create User Account and get `user_id`
+      const userId = await createUserAccount();
+      console.log("User ID created:", userId);
+      if (!userId) {
+        throw new Error("User ID creation failed.");
       }
+      // Update `user_id` in `registerData` for further use
+      setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
+  
+      // Step 2: Based on selected roles, create additional accounts
+      const { rider, chef } = registerData.roles;
+  
+      if (rider) {
+        await createRiderAccount(userId); // Create Rider account if selected
+        console.log("Rider account created successfully.");
+      }
+  
+      if (chef) {
+        await createChefAccount(userId); // Create Chef account if selected
+        console.log("Chef account created successfully.");
+      }
+  
+      // Step 3: Validate Payment Information if filled and create Payment Info
+      // if (ValidatePayment()) {
+      //   await createPaymentInfo({
+      //     variables: {
+      //       input: {
+      //         user_id: userId,
+      //         bank_account_number: registerData.bankAccountNumber || "",
+      //         transit_number: registerData.transitNumber || "",
+      //       },
+      //     },
+      //   });
+      //   console.log("Payment information saved successfully.");
+      // }
+  
+      // Step 4: Navigate to home or success page
+      navigate("/", { state: { successMessage: "User registered successfully!" } });
     } catch (error) {
       console.error("Error in form submission:", error);
       setMessage("Failed to register. Please try again.");
@@ -836,7 +935,7 @@ return true;
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Upload Driver License/Insurance</h5>
                       <InputField
                         label="Upload Driver License"
@@ -849,7 +948,7 @@ return true;
                           })
                         }
                       />
-                    </Col>
+                    </Col> */}
 
                     {/* Availability Section */}
                     {/* <Col md={12}>
@@ -882,22 +981,7 @@ return true;
                         onDayChange={handleWorkingDaysChange}
                       />
                       </Col>
-                    <Col md={6}>
-                      <InputField
-                        label="Preferred Delivery Radius"
-                        name="preferredDeliveryRadius"
-                        type="select"
-                        value={registerData.preferredDeliveryRadius}
-                        onChange={handleChange}
-                        options={[
-                          { value: "", label: "Select Radius" },
-                          { value: "5 km", label: "5 km" },
-                          { value: "10 km", label: "10 km" },
-                          { value: "15 km", label: "15 km" },
-                          { value: "20+ km", label: "20+ km" },
-                        ]}
-                      />
-                    </Col>
+                    
 
                     <Col md={6}>
                       <InputField
@@ -915,9 +999,24 @@ return true;
                         onChange={handleChange}
                       />
                     </Col>
-
+                    <Col md={6}>
+                      <InputField
+                        label="Preferred Delivery Radius"
+                        name="preferredDeliveryRadius"
+                        type="select"
+                        value={registerData.preferredDeliveryRadius}
+                        onChange={handleChange}
+                        options={[
+                          { value: "", label: "Select Radius" },
+                          { value: "5 km", label: "5 km" },
+                          { value: "10 km", label: "10 km" },
+                          { value: "15 km", label: "15 km" },
+                          { value: "20+ km", label: "20+ km" },
+                        ]}
+                      />
+                    </Col>
                     {/* Payment Information */}
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Payment Information</h5>
                     </Col>
                     <Col md={6}>
@@ -935,10 +1034,10 @@ return true;
                         placeholder="Transit Number"
                         onChange={handleChange}
                       />
-                    </Col>
+                    </Col> */}
 
                     {/* Profile Verification */}
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Profile Verification</h5>
                       <InputField
                         label="Upload Profile Picture"
@@ -951,7 +1050,7 @@ return true;
                           })
                         }
                       />
-                    </Col>
+                    </Col> */}
 
                     {/* Submit Button */}
                     <Col md={12}>
@@ -981,7 +1080,7 @@ return true;
                     <Col md={12}>
                       <h3>Profile Verification</h3>
                     </Col>
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <InputField
                         label="Upload Profile Picture"
                         type="file"
@@ -993,7 +1092,7 @@ return true;
                           })
                         }
                       />
-                    </Col>
+                    </Col> */}
 
                     {/* Culinary Information */}
                     <Col md={12}>
@@ -1165,7 +1264,7 @@ return true;
                       />
                     </Col>
                     {/* Payment Information */}
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Payment Information</h5>
                     </Col>
                     <Col md={6}>
@@ -1183,7 +1282,7 @@ return true;
                         placeholder="Transit Number"
                         onChange={handleChange}
                       />
-                    </Col>
+                    </Col> */}
                     <Col md={6}>
                       <div className="d-flex justify-content-between mb-3">
                         <Button
