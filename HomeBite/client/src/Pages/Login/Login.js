@@ -19,6 +19,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
       const response = await fetch("http://localhost:5000/graphql", {
         method: "POST",
@@ -91,13 +92,16 @@ const Login = () => {
                 <div className="auth-links d-flex justify-content-between">
                   <p>
                     New to HomeBite?{" "}
-                    <a href="/register" className="btn btn-link">
+                    <a href="/register" className="App-link">
                       Create an account
                     </a>
                   </p>
-                  <a href="/forgot-password" className="btn btn-link">
+                  <p>
+                    <a href="/forgot-password" className="App-link">
                     Forgot Password?
                   </a>
+                  </p>
+                  
                 </div>
               </form>
             </div>

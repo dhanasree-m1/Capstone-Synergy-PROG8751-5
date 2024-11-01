@@ -106,7 +106,6 @@ input CreatePaymentInfoInput {
     insurance_expiry_date: String
     driver_license_number: String!
     license_expiry_date: String
-    document_upload_path: String
     preferred_delivery_radius: String
     preferred_working_days: [String!]
     preferred_start_time: String
@@ -122,7 +121,6 @@ input CreatePaymentInfoInput {
     insurance_expiry_date: String
     driver_license_number: String
     license_expiry_date: String
-    document_upload_path: String
     preferred_delivery_radius: String
     preferred_working_days: [String]
     preferred_start_time: String
@@ -141,22 +139,16 @@ input CreateChefInput {
   preferred_start_time: String
   preferred_end_time: String
 }
-input LoginInput {
-  email: String!
-  password: String!
-}
 
-type LoginResponse {
-  token: String!
-  user: User!
-}
   type Query {
     getUser(id: ID!): User
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
+    isEmailUnique(email: String!): Boolean!
   }
 
   type Mutation {
+    login(input: LoginInput): LoginResponse
     createUser(input: CreateUserInput!): User
     createRider(input: CreateRiderInput!): Rider
     createChef(input: CreateChefInput!): Chef 

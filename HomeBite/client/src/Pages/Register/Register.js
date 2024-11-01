@@ -1,17 +1,28 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import "./Register.scss";
 import loginbg from "../../assets/images/login-bg.jpg";
 import Logo from "../../assets/images/logo.svg";
 import InputField from "../../Components/InputField/InputField";
+import CampusDropdown from "../../Components/CampusDropdown/CampusDropdown";
 import Checkbox from "../../Components/Checkbox/Checkbox";
 import RadioButton from "../../Components/RadioButton/RadioButton";
 import Button from "../../Components/Button/Button";
 import RoleOptions from "../../Components/RoleOptions/RoleOptions";
-import { Container, Row, Col, Alert } from "react-bootstrap";
+import SpecialtyCuisinesOptions from "../../Components/SpecialtyCuisinesOptions/SpecialtyCuisinesOptions";
+import TypeOfMealsOptions from "../../Components/TypeOfMealsOptions/TypeOfMealsOptions";
+import AvailabilityOptions from "../../Components/AvailabilityOptions/AvailabilityOptions";
+import { Form, Container, Row, Col, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 import { CREATE_USER, CREATE_RIDER, CREATE_CHEF } from "../../queries";
 import { CREATE_PAYMENT_INFO } from "../../queries";
+
+
+const client = new ApolloClient({
+  uri: 'http://localhost:5000/graphql', // Replace with your GraphQL server URI
+  cache: new InMemoryCache(),
+});
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -20,7 +31,7 @@ const Register = () => {
     lastName: "",
     email: "",
     password: "",
-    confirmPassword:"",
+    confirmPassword: "",
     mobile: "",
     address: "",
     address2: "",
@@ -42,13 +53,13 @@ const Register = () => {
     insuranceExpiryDate: "",
     driverLicenseNumber: "",
     licenseExpiryDate: "",
-    document_upload_path: "",
+    //document_upload_path: "",
     preferredDeliveryRadius: "",
     preferredWorkingDays: [],
     preferredStartTime: "",
     preferredEndTime: "",
     longDistancePreference: false,
-    // Chef-specific fields 
+    // Chef-specific fields
     specialtyCuisines: [],
     typeOfMeals: [],
     cookingExperience: "",
@@ -56,12 +67,12 @@ const Register = () => {
     profilePicture: null,
     preferredStartTimeChef: "",
     preferredEndTimeChef: "",
-    profilePicture: null,
     // Payment information
     bankAccountNumber: "",
     transitNumber: "",
   });
 
+  
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -76,9 +87,9 @@ const Register = () => {
     if (multiple) {
       // For multi-selects, collect all selected options
       const selectedOptions = Array.from(options)
-        .filter(option => option.selected)
-        .map(option => option.value);
-  
+        .filter((option) => option.selected)
+        .map((option) => option.value);
+
       setRegisterData((prevData) => ({
         ...prevData,
         [name]: selectedOptions, // Set the array of selected values
@@ -95,7 +106,7 @@ const Register = () => {
     // }));
     setMessage("");
   };
- 
+
   const handleCheckboxChange = (e, fieldName) => {
     const { value, checked } = e.target;
     setRegisterData((prevData) => {
@@ -114,28 +125,51 @@ const Register = () => {
       return { ...prevData, preferredWorkingDays: updatedDays };
     });
   };
-  
-  const workingDaysOptions = [
-    { label: "Monday", value: "Monday" },
-    { label: "Tuesday", value: "Tuesday" },
-    { label: "Wednesday", value: "Wednesday" },
-    { label: "Thursday", value: "Thursday" },
-    { label: "Friday", value: "Friday" },
-    { label: "Saturday", value: "Saturday" },
-    { label: "Sunday", value: "Sunday" },
-  ];
- // Validation helper functions
- const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
- const validatePhoneNumber = (number) => /^\d{10}$/.test(number);
- const validatePostalCode = (postalCode) => /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postalCode); // Canadian format
- const validateFutureDate = (date) => new Date(date) >= new Date();
+  // const workingDaysOptions = [
+  //   { label: "Monday", value: "Monday" },
+  //   { label: "Tuesday", value: "Tuesday" },
+  //   { label: "Wednesday", value: "Wednesday" },
+  //   { label: "Thursday", value: "Thursday" },
+  //   { label: "Friday", value: "Friday" },
+  //   { label: "Saturday", value: "Saturday" },
+  //   { label: "Sunday", value: "Sunday" },
+  // ];
+  // Validation helper functions
+  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
+  const validatePhoneNumber = (mobile) => /^\d{10}$/.test(mobile);
+  const validatePostalCode = (postalCode) =>
+    /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postalCode); // Canadian format
+  const validateFutureDate = (date) => new Date(date) >= new Date();
 
- const validateStep1 = () => {
-    const { firstName, lastName, email, password, confirmPassword, roles } = registerData;
+  const validateStep1 = async () => {
+    const {
+      firstName,
+      lastName,
+      gender,
+      email,
+      mobile,
+      password,
+      confirmPassword,
+      roles,
+    } = registerData;
     let isValid = true;
-  
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setMessage("Please fill in all required fields.");
+
+    if (
+      !firstName ||
+      !lastName ||
+      !gender ||
+      !email ||
+      !mobile ||
+      !password ||
+      !confirmPassword
+    ) {
+      setMessage("Please fill in all fields.");
+      isValid = false;
+    } else if (!validateEmail(email)) {
+      setMessage("Please enter a valid email.");
+      isValid = false;
+    } else if (!validatePhoneNumber(mobile)) {
+      setMessage("Please enter a valid mobile number.");
       isValid = false;
     } else if (password !== confirmPassword) {
       setMessage("Passwords do not match.");
@@ -143,17 +177,51 @@ const Register = () => {
     } else if (!roles.customer && !roles.chef && !roles.rider) {
       setMessage("Please select at least one role.");
       isValid = false;
+    } else {
+      // Check if email is unique
+      const isUniqueEmail = await checkDuplicateEmail(registerData.email);
+      if (!isUniqueEmail) return false; // Stop if email already exists
     }
-  
     return isValid;
+
   };
+
+  const checkDuplicateEmail = async (email) => {
+    try {
+      const { data } = await client.query({
+        query: gql`
+          query IsEmailUnique($email: String!) {
+            isEmailUnique(email: $email)
+          }
+        `,
+        variables: { email },
+      });
+
+      if (!data.isEmailUnique) {
+        setMessage("An account with this email already exists.");
+        return false; // Email is not unique
+      } else {
+        setMessage("");
+        return true; // Email is unique
+      }
+    } catch (error) {
+      console.error("Error checking for duplicate email:", error);
+      setMessage("An error occurred. Please try again.");
+      return false;
+    }
+  };
+
   const validateStep2 = () => {
-    const { address, address2, city, province, postalCode, country } = registerData;
+    const { address, address2, city, province, postalCode, country } =
+      registerData;
     let isValid = true;
-  
+
     // Validate each field and set message accordingly if missing
     if (!address.trim()) {
-      setMessage("Address is required.");
+      setMessage("Campus Name is required.");
+      isValid = false;
+    } else if (!address2.trim()) {
+      setMessage("Building Name is required.");
       isValid = false;
     } else if (!city.trim()) {
       setMessage("City is required.");
@@ -167,19 +235,21 @@ const Register = () => {
     } else if (!postalCode.trim()) {
       setMessage("Postal code is required.");
       isValid = false;
-    } else if (!/^([a-zA-Z]\d[a-zA-z]( )?\d[a-zA-Z]\d)$/.test(postalCode)) { // Adjust regex as needed for postal code format
+    } else if (!/^([a-zA-Z]\d[a-zA-z]( )?\d[a-zA-Z]\d)$/.test(postalCode)) {
+      // Adjust regex as needed for postal code format
       setMessage("Please enter a valid postal code.");
       isValid = false;
     } else {
       setMessage(""); // Clear message if all validations pass
     }
-  
+
     return isValid;
   };
   const validateRider = () => {
     const {
       vehicleType,
       vehicleRegNumber,
+      vehicleInsuranceNumber,
       driverLicenseNumber,
       preferredDeliveryRadius,
       preferredWorkingDays,
@@ -188,32 +258,105 @@ const Register = () => {
       insuranceExpiryDate,
       licenseExpiryDate,
     } = registerData;
-
+  
+    // Regular expressions for formats
+    const regNumberPattern = /^[A-Z0-9-]{5,10}$/; // Example pattern for a vehicle registration number
+    const licensePattern = /^[A-Z0-9-]{5,15}$/;   // Example pattern for a driver's license number
+    const insurancePattern = /^[a-zA-Z0-9]{8,}$/; // At least 8 alphanumeric characters for insurance number
+  
+    // Check for required fields
     if (
       !vehicleType ||
       !vehicleRegNumber ||
+      !vehicleInsuranceNumber ||
       !driverLicenseNumber ||
       !preferredDeliveryRadius ||
-      preferredWorkingDays.length === 0 ||
+      !Array.isArray(preferredWorkingDays) || preferredWorkingDays.length === 0 ||
       !preferredStartTime ||
       !preferredEndTime
     ) {
       setMessage("Please fill in all required fields for Rider.");
       return false;
     }
-
+    setMessage(""); // Reset message if this check passes
+  
+    // Validate vehicle registration number
+    if (!regNumberPattern.test(vehicleRegNumber)) {
+      setMessage("Please enter a valid vehicle registration number.");
+      return false;
+    }
+    setMessage(""); // Reset message if this check passes
+  
+    // Validate driver’s license number
+    if (!licensePattern.test(driverLicenseNumber)) {
+      setMessage("Please enter a valid driver's license number.");
+      return false;
+    }
+    setMessage(""); // Reset message if this check passes
+  
+    // Validate vehicle insurance number
+    if (!insurancePattern.test(vehicleInsuranceNumber)) {
+      setMessage("Vehicle insurance number must be alphanumeric and at least 8 characters long.");
+      return false;
+    }
+    setMessage(""); // Reset message if this check passes
+  
+    // Validate future dates for insurance and license expiry
     if (insuranceExpiryDate && !validateFutureDate(insuranceExpiryDate)) {
       setMessage("Insurance expiry date cannot be in the past.");
       return false;
     }
-
     if (licenseExpiryDate && !validateFutureDate(licenseExpiryDate)) {
       setMessage("License expiry date cannot be in the past.");
       return false;
     }
-
+  
+    // All validations passed
     return true;
   };
+
+const validateChef = () => {
+  const { specialtyCuisines, typeOfMeals, cookingExperience, preferredWorkingDays, maxOrdersPerDay } = registerData;
+  
+  const validExperienceOptions = ["Less than 1 year", "1-3 years", "3-5 years", "5+ years"];
+  
+  if (!specialtyCuisines.length || !typeOfMeals.length || !cookingExperience || !validExperienceOptions.includes(cookingExperience) || !preferredWorkingDays.length || !maxOrdersPerDay) {
+    setMessage("Please ensure all chef details are filled in and valid.");
+    return false;
+  }
+
+  return true;
+};
+
+  const ValidatePayment = () => {
+    const { bankAccountNumber, transitNumber } = registerData;
+  
+    // Define regular expressions for format validations
+    const bankAccountPattern = /^\d{8,12}$/;  // Bank account: 8-12 digits
+    const transitPattern = /^\d{5}$/;          // Transit number: exactly 5 digits
+  
+    if (!bankAccountNumber || !transitNumber) {
+      setMessage("Please fill in all required fields for Payment.");
+      return false;
+    }
+  
+    // Validate bank account number
+    if (!bankAccountPattern.test(bankAccountNumber)) {
+      setMessage("Please enter a valid bank account number (8-12 digits).");
+      return false;
+    }
+  
+    // Validate transit number
+    if (!transitPattern.test(transitNumber)) {
+      setMessage("Please enter a valid 5-digit transit number.");
+      return false;
+    }
+  
+    // Clear the message if all validations pass
+    setMessage("");
+    return true;
+  };
+
   const handleRoleChange = (e) => {
     const { name, checked } = e.target;
     setRegisterData((prevData) => ({
@@ -248,50 +391,49 @@ const Register = () => {
     console.log("User input for mutation:", userInput);
     const { data } = await createUser({ variables: { input: userInput } });
     if (data && data.createUser) {
-        
-     
       console.log("User ID for Rider:", data.createUser.id);
-      console.log("User created successfully!!")
+      console.log("User created successfully!!");
       return data.createUser.id;
     } else {
       setMessage("Failed to register user. Please try again.");
     }
-    return null
+    return null;
   };
 
   const createRiderAccount = async (userId) => {
-    
     try {
-    if (!userId) {
-      setMessage("User ID is missing. Rider cannot be created.");
-      console.error("User ID missing for Rider creation");
-      return;
-    }
-    const riderInput = {
-        user_id:userId, // Ensure user_id is set
+      if (!userId) {
+        setMessage("User ID is missing. Rider cannot be created.");
+        console.error("User ID missing for Rider creation");
+        return;
+      }
+      const riderInput = {
+        user_id: userId,
         vehicle_type: registerData.vehicleType || "",
         vehicle_registration_number: registerData.vehicleRegNumber || "",
-        vehicle_insurance_number: registerData.vehicleInsuranceNumber || "",
-        insurance_expiry_date: registerData.insuranceExpiryDate || "",
+        vehicle_insurance_number: registerData.vehicleInsuranceNumber || null,
+        insurance_expiry_date: registerData.insuranceExpiryDate || null,
         driver_license_number: registerData.driverLicenseNumber || "",
-        license_expiry_date: registerData.licenseExpiryDate || "",
+        license_expiry_date: registerData.licenseExpiryDate || null,
         preferred_delivery_radius: registerData.preferredDeliveryRadius || "",
         preferred_working_days: registerData.preferredWorkingDays || [],
-        preferred_start_time: registerData.preferredStartTime || "",
-        preferred_end_time: registerData.preferredEndTime || "",
+        preferred_start_time: registerData.preferredStartTime || null,
+        preferred_end_time: registerData.preferredEndTime || null,
         long_distance_preference: registerData.longDistancePreference || false,
-    };
-    console.log("Rider input for mutation:", riderInput);
-    const { data } = await createRider({ variables: { input: riderInput } });
-    if (!data || !data.createRider) {
-      setMessage("Failed to register rider. Please try again.");
-    } else {
-      console.log("Rider created successfully!");
+      };
+      console.log("Rider input for mutation:", riderInput);
+      console.log("Rider input for mutation:", JSON.stringify(riderInput, null, 2));
+      const { data } = await createRider({ variables: { input: riderInput } });
+      if (!data || !data.createRider) {
+        setMessage("Failed to register rider. Please try again.");
+      } else {
+        console.log("Rider input for mutation:", riderInput);
+        console.log("Rider created successfully!");
+      }
+    } catch (error) {
+      console.error("Error creating rider:", error);
+      setMessage("Failed to register rider.");
     }
-} catch (error) {
-    console.error("Error creating rider:", error);
-    setMessage("Failed to register rider.");
-  }
   };
 
   const createChefAccount = async (userId) => {
@@ -300,7 +442,7 @@ const Register = () => {
       console.error("User ID missing for Chef creation");
       return;
     }
-    
+
     const chefInput = {
       user_id: userId,
       specialty_cuisines: registerData.specialtyCuisines || [],
@@ -311,108 +453,187 @@ const Register = () => {
       preferred_start_time: registerData.preferredStartTimeChef || "",
       preferred_end_time: registerData.preferredEndTimeChef || "",
     };
-  
+
     console.log("Chef input for mutation:", chefInput);
-console.log("chef input...",chefInput)
+    console.log("chef input...", chefInput);
     const { data } = await createChef({ variables: { input: chefInput } });
     if (!data || !data.createChef) {
       setMessage("Failed to register chef. Please try again.");
-    }else {
+    } else {
       console.log("Chef created successfully!");
     }
   };
 
+  // const handleSubmit = async (e) => {
+  //     e.preventDefault();
+  //     const { customer, chef, rider } = registerData.roles;
 
-const handleSubmit = async (e) => {
+  //     if (step === 1) {
+  //       if (validateStep1()) {
+  //         setStep(customer || chef ? 2 : 3);
+  //       }
+  //     } else if (step === 2) {
+  //       if (validateStep2()) {
+  //         if (rider) {
+  //           setStep(3);
+  //         } else {
+  //           setStep(4);
+  //          // await handleFormSubmission();
+  //         }
+  //       }
+  //     } else if (step === 3) {
+  //       if (validateRider()) {
+  //         await handleFormSubmission();
+  //       }
+  //     }else if (step === 4) {
+  //       await handleFormSubmission();
+  //     }
+  //   };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { customer, chef, rider } = registerData.roles;
-
+  
     if (step === 1) {
-      if (validateStep1()) {
-        setStep(customer || chef ? 2 : 3);
+      console.log("A1");
+      // Step 1 validation (common fields)
+      const isValidStep1 = await validateStep1();
+      if (isValidStep1) {
+        console.log("A2");
+        setStep(2); // Proceed to customer form if validation passes
       }
     } else if (step === 2) {
+      console.log("A3");
+      // Customer-specific validation at step 2
       if (validateStep2()) {
-        if (rider) {
-          setStep(3);
-        } else {
-          setStep(4);
-         // await handleFormSubmission();
+        if (customer && !chef && !rider) {
+          console.log("A4 - Customer only");
+          await handleFormSubmission(); // Save and navigate for Customer only
+        } else if (rider && chef) {
+          console.log("A5 - Customer, Rider, and Chef");
+          setStep(3); // Move to Rider form, then Chef form after Rider
+        } else if (rider) {
+          console.log("A6 - Customer and Rider only");
+          setStep(3); // Move to Rider form if Customer and Rider are selected
+        } else if (chef) {
+          console.log("A7 - Customer and Chef only");
+          setStep(4); // Move to Chef form if Customer and Chef are selected
         }
       }
-    } else if (step === 3) {
+    } else if (step === 3 && rider) {
+      console.log("A8 - Rider step");
+      // Rider-specific validation at step 3
       if (validateRider()) {
-        await handleFormSubmission();
+        if (chef) {
+          console.log("A9 - Proceed to Chef after Rider");
+          setStep(4); // Move to Chef form after completing Rider form
+        } else {
+          console.log("A10 - Rider only or Customer + Rider complete");
+          await handleFormSubmission(); // Save for Rider only or Customer + Rider
+        }
       }
-    }else if (step === 4) {
-      await handleFormSubmission();
+    } else if (step === 4 && chef) {
+      console.log("A11 - Chef step");
+      // Chef-specific validation at step 4
+      if (validateChef()) {
+        console.log("A12 - Complete Chef");
+        await handleFormSubmission(); // Save and complete for Chef or all roles
+      }
+    } else if (customer && chef && rider) {
+      console.log("A13 - All roles selected");
+      // All validations at once for Customer, Rider, and Chef
+      if (
+        await validateStep1() &&
+        validateStep2() &&
+        validateRider() &&
+        validateChef()
+      ) {
+        console.log("A14 - All validations passed");
+        await handleFormSubmission(); // Save and navigate for all roles
+      }
+    }
+    // if (step === 1) {
+    //   // Await validateStep1 to complete before proceeding
+    //   const isValidStep1 = await validateStep1();
+    //   if (isValidStep1) {
+    //     setStep(2); // Proceed to the customer form if Step 1 validation passes
+    //   }
+    // } else if (step === 2) {
+    //   // Validate Step 2 and handle customer submission
+    //   if (validateStep2()) {
+    //     // If only customer role is selected, complete the registration and navigate to "/"
+    //     if (customer && !chef && !rider) {
+    //       await handleFormSubmission(); // Save and redirect
+    //     } else {
+    //       // If Rider or Chef role is selected with Customer, move to the next step for additional details
+    //       if (rider) setStep(3); // Move to Rider fields
+    //       else if (chef) setStep(4); // Move to Chef fields
+    //     }
+    //   }
+    // } else if (step === 3 && rider) {
+    //   // Validate and save Rider-specific fields
+    //   if (validateRider()) {
+    //     await createRiderAccount(registerData.user_id); // Save Rider
+    //     navigate("/"); // Redirect to initial path
+    //   }
+    // } else if (step === 4 && chef) {
+    //   // Validate and save Chef-specific fields
+    //   if (validateChef()) {
+    //     await createChefAccount(registerData.user_id); // Save Chef
+    //     navigate("/"); // Redirect to initial path
+    //   }
+    // }
+  };
+  
+
+  const handleFormSubmission = async () => {
+    try {
+      // Step 1: Create User Account and get `user_id`
+      const userId = await createUserAccount();
+      console.log("User ID created:", userId);
+      if (!userId) {
+        throw new Error("User ID creation failed.");
+      }
+      // Update `user_id` in `registerData` for further use
+      setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
+  
+      // Step 2: Based on selected roles, create additional accounts
+      const { rider, chef } = registerData.roles;
+  
+      if (rider) {
+        await createRiderAccount(userId); // Create Rider account if selected
+        console.log("Rider account created successfully.");
+      }
+  
+      if (chef) {
+        await createChefAccount(userId); // Create Chef account if selected
+        console.log("Chef account created successfully.");
+      }
+  
+      // Step 3: Validate Payment Information if filled and create Payment Info
+      // if (ValidatePayment()) {
+      //   await createPaymentInfo({
+      //     variables: {
+      //       input: {
+      //         user_id: userId,
+      //         bank_account_number: registerData.bankAccountNumber || "",
+      //         transit_number: registerData.transitNumber || "",
+      //       },
+      //     },
+      //   });
+      //   console.log("Payment information saved successfully.");
+      // }
+  
+      // Step 4: Navigate to home or success page
+      navigate("/", { state: { successMessage: "User registered successfully!" } });
+    } catch (error) {
+      console.error("Error in form submission:", error);
+      setMessage("Failed to register. Please try again.");
     }
   };
-/*
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const { customer, chef, rider } = registerData.roles;
-  if (step === 1 && validateStep1()) {
-    setStep(customer || chef ? 2 : 3);
-  } else if (step === 2 && validateStep2()) {
-    if (rider) setStep(3);
-    else setStep(4);
-  } else if (step === 3 && validateRider()) {
-    await handleFormSubmission();
-  } else if (step === 4) {
-    await handleFormSubmission();
-  }
-};
-*/
-const handleFormSubmission = async () => {
-    try {
-        // Create User Account and get userId
-        const userId = await createUserAccount();
-        console.log("userid:"+userId)
-        if (userId) {
-            setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
-            const { rider, chef } = registerData.roles;
-            
-            // Create additional accounts based on roles
-            if (rider) await createRiderAccount(userId);
-            if (chef) await createChefAccount(userId);
-             // Save payment information
-      await createPaymentInfo({
-        variables: {
-          input: {
-            user_id: userId,
-            bank_account_number: registerData.bankAccountNumber || "",
-            transit_number: registerData.transitNumber || "",
-          },
-        },
-      });
-
-
-            // Navigate to home or success page after all steps complete
-            navigate("/");
-        }
-    } catch (error) {
-        console.error("Error in form submission:", error);
-        setMessage("Failed to register. Please try again.");
-    }
-};
-/*
-const handleFormSubmission = async () => {
-  try {
-    const userId = await createUserAccount();
-    if (userId) {
-      setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
-      if (registerData.roles.rider) await createRiderAccount(userId);
-      if (registerData.roles.chef) await createChefAccount(userId);
-      navigate("/");
-    }
-  } catch (error) {
-    setMessage("Failed to register. Please try again.");
-  }
-};
-*/
-  const selectedRolesCount = Object.values(registerData.roles).filter(Boolean).length;
+  const selectedRolesCount = Object.values(registerData.roles).filter(
+    Boolean
+  ).length;
 
   return (
     <Container fluid>
@@ -420,20 +641,18 @@ const handleFormSubmission = async () => {
         <Col md={7} className="p-0">
           <div className="login-container">
             <div className="login-box">
-              <img src={Logo} className="logo" alt="Logo" />
+              <img src={Logo} className="logo mb-5" alt="Logo" />
+              {message && <Alert variant="danger">{message}</Alert>}
               {step === 1 && (
                 <>
-                  <h2 className="form-title mt-5 mb-2">
-                    Get Started with HomeBite
-                  </h2>
+                  <h2 className="form-title mb-2">Get Started with HomeBite</h2>
                   <p className="mb-4">
                     Enjoy the best home-cooked meals delivered to your doorstep.
                   </p>
                 </>
               )}
-              {message && <Alert variant="danger">{message}</Alert>}
 
-              <form onSubmit={handleSubmit} className="row p-0 mt-5">
+              <form onSubmit={handleSubmit} className="row p-0 mt-3">
                 {step === 1 && (
                   <>
                     <Col md={6}>
@@ -471,12 +690,12 @@ const handleFormSubmission = async () => {
                         name="confirmPassword"
                         placeholder="Re-enter your password to confirm"
                         value={registerData.confirmPassword}
-    onChange={handleChange}
+                        onChange={handleChange}
                       />
                     </Col>
                     <Col md={12}>
                       <h5 className="form-sub-title">Select your Gender</h5>
-                      <div className="gender-options">
+                      <div className="gender-options mb-3">
                         <RadioButton
                           label="Male"
                           name="gender"
@@ -533,7 +752,7 @@ const handleFormSubmission = async () => {
                     <Col md={12}>
                       <p className="text-center">
                         Already Have an Account?{" "}
-                        <a href="/login" className="btn btn-link">
+                        <a href="/login" className="App-link">
                           Sign in here
                         </a>
                       </p>
@@ -551,56 +770,71 @@ const handleFormSubmission = async () => {
                         For{" "}
                         {selectedRolesCount > 1 ? "Multiple Roles" : "Customer"}
                       </h4>
-                      <InputField
+                    </Col>
+                    <hr />
+                    {/* <InputField
                         label="Address"
                         name="address"
                         placeholder="Start Typing Your Address"
                         value={registerData.address}
                         onChange={handleChange}
+                      /> */}
+
+                    {/* Campus Selection */}
+
+                    <Col md={12}>
+                      <CampusDropdown
+                        registerData={registerData}
+                        setRegisterData={setRegisterData}
                       />
                     </Col>
                     {/* Add more fields for address, rider, and chef specifics here */}
-                    <Col md={6}>
+                    <Col md={12}>
                       <InputField
-                        label="Flat / House Number"
+                        label="Building Name/ Block Name"
                         name="address2"
-                        placeholder="Flat / House Number"
+                        placeholder="Enter Building / Block Name to Deliver Food"
                         value={registerData.address2}
                         onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
-                      <InputField label="City" name="city" placeholder="City" value={registerData.city}
-  onChange={handleChange} />
-                    </Col>
-                    <Col md={6}>
                       <InputField
-                        label="Province"
-                        name="province"
-                        placeholder="Province"
-                        value={registerData.province}
+                        label="City"
+                        name="city"
+                        value={registerData.city}
                         onChange={handleChange}
+                        readOnly
                       />
                     </Col>
                     <Col md={6}>
                       <InputField
                         label="Postal Code"
                         name="postalCode"
-                        placeholder="Postal Code"
                         value={registerData.postalCode}
                         onChange={handleChange}
+                        readOnly
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Province"
+                        name="province"
+                        value={registerData.province}
+                        onChange={handleChange}
+                        readOnly
                       />
                     </Col>
                     <Col md={6}>
                       <InputField
                         label="Country"
                         name="country"
-                        placeholder="Country"
                         value={registerData.country}
                         onChange={handleChange}
+                        readOnly
                       />
                     </Col>
-                    <Col md={6}>
+                    <Col md={12}>
                       <InputField
                         label="Nearby Landmark (optional)"
                         name="landmark"
@@ -623,7 +857,7 @@ const handleFormSubmission = async () => {
 
                     <Col md={6}>
                       <Button type="submit" className="btn-primary w-100 mt-3">
-                        Submit
+                        Complete Registration
                       </Button>
                     </Col>
                   </>
@@ -631,8 +865,19 @@ const handleFormSubmission = async () => {
                 {step === 3 && registerData.roles.rider && (
                   <>
                     <Col md={12}>
-                      <h5>Vehicle Information</h5>
+                      <h2 className="form-title">Vehicle Information</h2>
+                      <hr />
+                      <h3>Step 2 of 2</h3>
+                      <h4 className="form-sub-title">
+                        For{" "}
+                        {selectedRolesCount > 1 ? "Multiple Roles" : "Rider"}
+                      </h4>
+                      
                     </Col>
+                    <hr />
+                    {/* <Col md={12}>
+                      <h5>Vehicle Information</h5>
+                    </Col> */}
                     <Col md={6}>
                       <InputField
                         label="Vehicle Type"
@@ -690,7 +935,7 @@ const handleFormSubmission = async () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Upload Driver License/Insurance</h5>
                       <InputField
                         label="Upload Driver License"
@@ -703,10 +948,10 @@ const handleFormSubmission = async () => {
                           })
                         }
                       />
-                    </Col>
+                    </Col> */}
 
                     {/* Availability Section */}
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Availability</h5>
                     </Col>
                     <Col md={12}>
@@ -719,30 +964,24 @@ const handleFormSubmission = async () => {
                               label={option.label}
                               name="preferredWorkingDays"
                               value={option.value}
-                              checked={registerData.preferredWorkingDays.includes(option.value)}
-                              
+                              checked={registerData.preferredWorkingDays.includes(
+                                option.value
+                              )}
                               onChange={handleWorkingDaysChange}
                             />
                           ))}
                         </div>
                       </div>
-                    </Col>
-                    <Col md={6}>
-                      <InputField
-                        label="Preferred Delivery Radius"
-                        name="preferredDeliveryRadius"
-                        type="select"
-                        value={registerData.preferredDeliveryRadius}
-                        onChange={handleChange}
-                        options={[
-                          { value: "", label: "Select Radius" },
-                          { value: "5 km", label: "5 km" },
-                          { value: "10 km", label: "10 km" },
-                          { value: "15 km", label: "15 km" },
-                          { value: "20+ km", label: "20+ km" },
-                        ]}
+                    </Col> */}
+                    
+                    <Col md={12}>
+                     
+                      <AvailabilityOptions
+                        selectedDays={registerData.preferredWorkingDays}
+                        onDayChange={handleWorkingDaysChange}
                       />
-                    </Col>
+                      </Col>
+                    
 
                     <Col md={6}>
                       <InputField
@@ -760,9 +999,24 @@ const handleFormSubmission = async () => {
                         onChange={handleChange}
                       />
                     </Col>
-
+                    <Col md={6}>
+                      <InputField
+                        label="Preferred Delivery Radius"
+                        name="preferredDeliveryRadius"
+                        type="select"
+                        value={registerData.preferredDeliveryRadius}
+                        onChange={handleChange}
+                        options={[
+                          { value: "", label: "Select Radius" },
+                          { value: "5 km", label: "5 km" },
+                          { value: "10 km", label: "10 km" },
+                          { value: "15 km", label: "15 km" },
+                          { value: "20+ km", label: "20+ km" },
+                        ]}
+                      />
+                    </Col>
                     {/* Payment Information */}
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Payment Information</h5>
                     </Col>
                     <Col md={6}>
@@ -780,10 +1034,10 @@ const handleFormSubmission = async () => {
                         placeholder="Transit Number"
                         onChange={handleChange}
                       />
-                    </Col>
+                    </Col> */}
 
                     {/* Profile Verification */}
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Profile Verification</h5>
                       <InputField
                         label="Upload Profile Picture"
@@ -796,63 +1050,194 @@ const handleFormSubmission = async () => {
                           })
                         }
                       />
-                    </Col>
+                    </Col> */}
 
                     {/* Submit Button */}
                     <Col md={12}>
                       <Button type="submit" className="btn-primary w-100">
-                        Submit
+                        Proceed Registration
                       </Button>
                     </Col>
                   </>
-                  )}
-                   {/* Step 4 - Chef-Specific Fields */}
+                )}
+                {/* Step 4 - Chef-Specific Fields */}
                 {step === 4 && registerData.roles.chef && (
                   <>
-                    <h2 className="form-title">Additional Information</h2>
-                    <p>Step 3 of 3 - For Chef</p>
-                    <hr />
+                    <Col md={12}>
+                      <h2 className="form-title">Additional Information</h2>
+                      <hr />
+                      <h3>Step 2 of 2</h3>
+                      <h4 className="form-sub-title">
+                        For {selectedRolesCount > 1 ? "Multiple Roles" : "Chef"}
+                      </h4>
+                      <hr />
+                    </Col>
+                    {/* <h2 className="form-title">Additional Information</h2>
+                    <p>Step 2 of {selectedRolesCount}</p>
+                    <hr /> */}
 
                     {/* Profile Picture */}
-                    <Col md={12}><h5>Profile Verification</h5></Col>
                     <Col md={12}>
-                      <InputField label="Upload Profile Picture" type="file" name="profilePicture" onChange={(e) => setRegisterData({ ...registerData, profilePicture: e.target.files[0] })} />
+                      <h3>Profile Verification</h3>
                     </Col>
+                    {/* <Col md={12}>
+                      <InputField
+                        label="Upload Profile Picture"
+                        type="file"
+                        name="profilePicture"
+                        onChange={(e) =>
+                          setRegisterData({
+                            ...registerData,
+                            profilePicture: e.target.files[0],
+                          })
+                        }
+                      />
+                    </Col> */}
 
                     {/* Culinary Information */}
-                    <Col md={12}><h5>Culinary Information</h5></Col>
                     <Col md={12}>
+                      <h5>Culinary Information</h5>
+                    </Col>
+                    <Col md={12}>
+                      <SpecialtyCuisinesOptions
+                        cuisines={registerData.specialtyCuisines}
+                        onCuisineChange={(e) =>
+                          handleCheckboxChange(e, "specialtyCuisines")
+                        }
+                      />
+                    </Col>
+                    <Col md={12}>
+                      <TypeOfMealsOptions
+                        meals={registerData.typeOfMeals}
+                        onMealChange={(e) =>
+                          handleCheckboxChange(e, "typeOfMeals")
+                        }
+                      />
+                    </Col>
+                    <Col md={12}>
+                      <Form.Group className="input-field mb-3">
+                        <Form.Label htmlFor="Experience in Cooking">
+                          Experience in Cooking
+                        </Form.Label>
+                        <Form.Control
+                          as="select"
+                          name="cookingExperience"
+                          value={registerData.cookingExperience}
+                          onChange={(e) =>
+                            setRegisterData({
+                              ...registerData,
+                              cookingExperience: e.target.value,
+                            })
+                          }
+                        >
+                          <option value="" disabled>
+                            Select your experience
+                          </option>
+                          <option value="Less than 1 year">
+                            Less than 1 year
+                          </option>
+                          <option value="1-3 years">1-3 years</option>
+                          <option value="3-5 years">3-5 years</option>
+                          <option value="5+ years">5+ years</option>
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                    {/* <Col md={12}>
                       <label>Specialty Cuisines</label>
                       <div className="d-flex flex-wrap">
-                        {["Indian", "Italian", "Mexican", "Chinese", "Other"].map((cuisine) => (
-                          <Checkbox key={cuisine} label={cuisine} name="specialtyCuisines" value={cuisine} checked={registerData.specialtyCuisines.includes(cuisine)} onChange={(e) => handleCheckboxChange(e, "specialtyCuisines")} />
+                        {[
+                          "Indian",
+                          "Italian",
+                          "Mexican",
+                          "Chinese",
+                          "Other",
+                        ].map((cuisine) => (
+                          <Checkbox
+                            key={cuisine}
+                            label={cuisine}
+                            name="specialtyCuisines"
+                            value={cuisine}
+                            checked={registerData.specialtyCuisines.includes(
+                              cuisine
+                            )}
+                            onChange={(e) =>
+                              handleCheckboxChange(e, "specialtyCuisines")
+                            }
+                          />
                         ))}
                       </div>
-                    </Col>
-                    <Col md={12}>
+                    </Col> */}
+                    {/* <Col md={12}>
                       <label>Type of Meals</label>
                       <div className="d-flex flex-wrap">
-                        {["Breakfast", "Lunch", "Dinner", "Snacks"].map((meal) => (
-                          <Checkbox key={meal} label={meal} name="typeOfMeals" value={meal} checked={registerData.typeOfMeals.includes(meal)} onChange={(e) => handleCheckboxChange(e, "typeOfMeals")} />
-                        ))}
+                        {["Breakfast", "Lunch", "Dinner", "Snacks"].map(
+                          (meal) => (
+                            <Checkbox
+                              key={meal}
+                              label={meal}
+                              name="typeOfMeals"
+                              value={meal}
+                              checked={registerData.typeOfMeals.includes(meal)}
+                              onChange={(e) =>
+                                handleCheckboxChange(e, "typeOfMeals")
+                              }
+                            />
+                          )
+                        )}
                       </div>
-                    </Col>
-                    <Col md={12}>
+                    </Col> */}
+                    {/* <Col md={12}>
                       <label>Experience in Cooking</label>
                       <div className="d-flex flex-wrap">
-                        {["Less than 1 year", "1-3 years", "3-5 years", "5+ years"].map((experience) => (
-                          <Checkbox key={experience} label={experience} name="cookingExperience" value={experience} checked={registerData.cookingExperience === experience} onChange={(e) => setRegisterData({ ...registerData, cookingExperience: e.target.value })} />
+                        {[
+                          "Less than 1 year",
+                          "1-3 years",
+                          "3-5 years",
+                          "5+ years",
+                        ].map((experience) => (
+                          <Checkbox
+                            key={experience}
+                            label={experience}
+                            name="cookingExperience"
+                            value={experience}
+                            checked={
+                              registerData.cookingExperience === experience
+                            }
+                            onChange={(e) =>
+                              setRegisterData({
+                                ...registerData,
+                                cookingExperience: e.target.value,
+                              })
+                            }
+                          />
                         ))}
                       </div>
-                    </Col>
+                    </Col> */}
 
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Availability</h5>
                       <div className="d-flex flex-wrap">
                         {workingDaysOptions.map((option) => (
-                          <Checkbox key={option.value} label={option.label} name="preferredWorkingDays" value={option.value} checked={registerData.preferredWorkingDays.includes(option.value)} onChange={handleWorkingDaysChange} />
+                          <Checkbox
+                            key={option.value}
+                            label={option.label}
+                            name="preferredWorkingDays"
+                            value={option.value}
+                            checked={registerData.preferredWorkingDays.includes(
+                              option.value
+                            )}
+                            onChange={handleWorkingDaysChange}
+                          />
                         ))}
                       </div>
+                    </Col> */}
+
+                    <Col md={12}>
+                     
+                      <AvailabilityOptions
+                        selectedDays={registerData.preferredWorkingDays}
+                        onDayChange={handleWorkingDaysChange}
+                      />
                     </Col>
                     <Col md={6}>
                       <InputField
@@ -879,7 +1264,7 @@ const handleFormSubmission = async () => {
                       />
                     </Col>
                     {/* Payment Information */}
-                    <Col md={12}>
+                    {/* <Col md={12}>
                       <h5>Payment Information</h5>
                     </Col>
                     <Col md={6}>
@@ -897,8 +1282,23 @@ const handleFormSubmission = async () => {
                         placeholder="Transit Number"
                         onChange={handleChange}
                       />
+                    </Col> */}
+                    <Col md={6}>
+                      <div className="d-flex justify-content-between mb-3">
+                        <Button
+                          type="button"
+                          className="btn-secondary w-100"
+                          onClick={() => setStep(1)}
+                        >
+                          Back
+                        </Button>
+                      </div>
                     </Col>
-                    <Col md={12}><Button type="submit" className="btn-primary w-100">Complete Registration</Button></Col>
+                    <Col md={6}>
+                      <Button type="submit" className="btn-primary w-100">
+                        Complete Registration
+                      </Button>
+                    </Col>
                   </>
                 )}
               </form>
