@@ -16,12 +16,7 @@ import AvailabilityOptions from "../../Components/AvailabilityOptions/Availabili
 import { Form, Container, Row, Col, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 import { CREATE_USER, CREATE_RIDER, CREATE_CHEF } from "../../queries";
-
-// Initialize Apollo Client
-const client = new ApolloClient({
-  uri: "http://localhost:5000/graphql", // Replace with your GraphQL server URI
-  cache: new InMemoryCache(),
-});
+import { CREATE_PAYMENT_INFO } from "../../queries";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -78,6 +73,7 @@ const Register = () => {
   const [createUser] = useMutation(CREATE_USER);
   const [createRider] = useMutation(CREATE_RIDER);
   const [createChef] = useMutation(CREATE_CHEF);
+  const [createPaymentInfo] = useMutation(CREATE_PAYMENT_INFO);
 
   const handleChange = (e) => {
     //const { name, value } = e.target;
@@ -506,16 +502,27 @@ return true;
 
   const handleFormSubmission = async () => {
     try {
-      // Create User Account and get userId
-      const userId = await createUserAccount();
-      console.log("userid:" + userId);
-      if (userId) {
-        setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
-        const { rider, chef } = registerData.roles;
+        // Create User Account and get userId
+        const userId = await createUserAccount();
+        console.log("userid:"+userId)
+        if (userId) {
+            setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
+            const { rider, chef } = registerData.roles;
+            
+            // Create additional accounts based on roles
+            if (rider) await createRiderAccount(userId);
+            if (chef) await createChefAccount(userId);
+             // Save payment information
+      await createPaymentInfo({
+        variables: {
+          input: {
+            user_id: userId,
+            bank_account_number: registerData.bankAccountNumber || "",
+            transit_number: registerData.transitNumber || "",
+          },
+        },
+      });
 
-        // Create additional accounts based on roles
-        if (rider) await createRiderAccount(userId);
-        if (chef) await createChefAccount(userId);
 
         // Navigate to home or success page after all steps complete
         navigate("/", { state: { successMessage: "User registered successfully!" } });
