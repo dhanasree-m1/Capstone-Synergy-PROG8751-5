@@ -29,7 +29,11 @@ const resolvers = {
     },
     getChef: async (_, { id }) => {
       return await Chef.findById(id).populate('user');
-    }
+    },
+        async isEmailUnique(_, { email }) {
+        const existingUser = await User.findOne({ email });
+        return !existingUser; // true if no user found, false if exists
+      },
   },
 
   Mutation: {

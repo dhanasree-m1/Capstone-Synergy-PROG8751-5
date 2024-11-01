@@ -62,6 +62,7 @@ export const CREATE_RIDER = gql`
       }
       vehicle_type
       vehicle_registration_number
+      vehicleInsuranceNumber
       driver_license_number
       preferred_delivery_radius
       preferred_working_days
@@ -79,6 +80,7 @@ export const UPDATE_RIDER = gql`
       id
       vehicle_type
       vehicle_registration_number
+      vehicleInsuranceNumber
       driver_license_number
       preferred_delivery_radius
       preferred_working_days

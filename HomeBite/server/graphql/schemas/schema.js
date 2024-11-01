@@ -151,6 +151,7 @@ type LoginResponse {
     getUser(id: ID!): User
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
+    isEmailUnique(email: String!): Boolean!
   }
 
   type Mutation {

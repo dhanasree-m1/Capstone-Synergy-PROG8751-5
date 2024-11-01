@@ -91,11 +91,11 @@ const Login = () => {
                 <div className="auth-links d-flex justify-content-between">
                   <p>
                     New to HomeBite?{" "}
-                    <a href="/register" className="btn btn-link">
+                    <a href="/register" className="App-link">
                       Create an account
                     </a>
                   </p>
-                  <a href="/forgot-password" className="btn btn-link">
+                  <a href="/forgot-password" className="App-link">
                     Forgot Password?
                   </a>
                 </div>
