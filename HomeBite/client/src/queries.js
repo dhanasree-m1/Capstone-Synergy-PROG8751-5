@@ -88,7 +88,6 @@ export const UPDATE_RIDER = gql`
     }
   }
 `;
-
 // Mutation for creating a chef
 export const CREATE_CHEF = gql`
   mutation CreateChef($input: CreateChefInput!) {
@@ -107,6 +106,21 @@ export const CREATE_CHEF = gql`
       preferred_working_days
       preferred_start_time
       preferred_end_time
+    }
+  }
+`;
+export const CREATE_PAYMENT_INFO = gql`
+  mutation CreatePaymentInfo($input: CreatePaymentInfoInput!) {
+    createPaymentInfo(input: $input) {
+      id
+      user {
+        id
+        first_name
+        last_name
+        email
+      }
+      bank_account_number
+      transit_number
     }
   }
 `;

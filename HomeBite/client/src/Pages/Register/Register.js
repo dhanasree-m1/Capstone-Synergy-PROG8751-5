@@ -11,6 +11,7 @@ import RoleOptions from "../../Components/RoleOptions/RoleOptions";
 import { Container, Row, Col, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 import { CREATE_USER, CREATE_RIDER, CREATE_CHEF } from "../../queries";
+import { CREATE_PAYMENT_INFO } from "../../queries";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -47,11 +48,14 @@ const Register = () => {
     preferredStartTime: "",
     preferredEndTime: "",
     longDistancePreference: false,
-    // Chef-specific fields
+    // Chef-specific fields 
     specialtyCuisines: [],
     typeOfMeals: [],
     cookingExperience: "",
     maxOrdersPerDay: "",
+    profilePicture: null,
+    preferredStartTimeChef: "",
+    preferredEndTimeChef: "",
     profilePicture: null,
     // Payment information
     bankAccountNumber: "",
@@ -64,14 +68,11 @@ const Register = () => {
   const [createUser] = useMutation(CREATE_USER);
   const [createRider] = useMutation(CREATE_RIDER);
   const [createChef] = useMutation(CREATE_CHEF);
+  const [createPaymentInfo] = useMutation(CREATE_PAYMENT_INFO);
 
   const handleChange = (e) => {
     //const { name, value } = e.target;
     const { name, value, multiple, options } = e.target;
-    // setRegisterData((prevData) => ({
-    //   ...prevData,
-    //   [name]: value,
-    // }));
     if (multiple) {
       // For multi-selects, collect all selected options
       const selectedOptions = Array.from(options)
@@ -88,9 +89,13 @@ const Register = () => {
         [name]: value,
       }));
     }
+    // setRegisterData((prevData) => ({
+    //   ...prevData,
+    //   [name]: value,
+    // }));
     setMessage("");
   };
-
+ 
   const handleCheckboxChange = (e, fieldName) => {
     const { value, checked } = e.target;
     setRegisterData((prevData) => {
@@ -100,7 +105,6 @@ const Register = () => {
       return { ...prevData, [fieldName]: updatedArray };
     });
   };
-  
   const handleWorkingDaysChange = (e) => {
     const { value, checked } = e.target;
     setRegisterData((prevData) => {
@@ -296,6 +300,7 @@ const Register = () => {
       console.error("User ID missing for Chef creation");
       return;
     }
+    
     const chefInput = {
       user_id: userId,
       specialty_cuisines: registerData.specialtyCuisines || [],
@@ -303,8 +308,8 @@ const Register = () => {
       cooking_experience: registerData.cookingExperience || "",
       max_orders_per_day: parseInt(registerData.maxOrdersPerDay) || 0,
       preferred_working_days: registerData.preferredWorkingDays || [],
-      preferred_start_time: registerData.preferredStartTime || "",
-      preferred_end_time: registerData.preferredEndTime || "",
+      preferred_start_time: registerData.preferredStartTimeChef || "",
+      preferred_end_time: registerData.preferredEndTimeChef || "",
     };
   
     console.log("Chef input for mutation:", chefInput);
@@ -312,84 +317,12 @@ console.log("chef input...",chefInput)
     const { data } = await createChef({ variables: { input: chefInput } });
     if (!data || !data.createChef) {
       setMessage("Failed to register chef. Please try again.");
+    }else {
+      console.log("Chef created successfully!");
     }
   };
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const { customer, chef, rider } = registerData.roles;
-    
-    
-//     if (step === 1) {
-   
-//     if (validateStep1()) {
-//         setMessage(""); 
-//       setStep(customer || chef ? 2 : 3);
-//      } // Skip to step 3 if only Rider is selected
-//     } else if (step === 2) {
-//       // Create User Account
-//       //if (customer && !validateCustomer()) return;
-//       if (validateStep2()) {
-//         setMessage("");
-//         await handleFormSubmission()
-//       //await createUserAccount();
-//       }
 
-      
-      
-//     } else if (step === 3) {
-//       // Register Rider-specific information
-      
-//     }
-//   };
-// const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const { customer, chef, rider } = registerData.roles;
-
-//     // Step 1 Validation and Navigation
-//     if (step === 1) {
-//         console.log("step1")
-//         if (validateStep1()) {
-//             // Move to step based on roles
-//             if (customer || chef) {
-//                 console.log("step11")
-//                 setStep(2); // Move to address step for customer/chef
-//             } else if (rider) {
-//                 console.log("step111")
-//                 setStep(3); // Skip to rider step if only rider is selected
-//             }
-//         }
-//         return;
-//     }
-
-//     // Step 2: Address Information
-//     if (step === 2) {
-//         console.log("step2")
-//         if (validateStep2()) {
-//             console.log("step22")
-//             // Navigate based on role selection
-//             if (rider) {
-//                 console.log("step222")
-//                 setStep(3); // Proceed to Rider details if rider role is selected
-//             } else {
-//                 console.log("step2222")
-//                 await handleFormSubmission(); // No rider role, so submit after address
-//             }
-//         }
-//         return;
-//     }
-
-//     // Step 3: Rider-Specific Information
-//     if (step === 3) {
-//         console.log("step3")
-//         if (validateRider()) {
-//             console.log("step33")
-//             await handleFormSubmission(); // Submit for rider after validation
-//         }
-//     }
-//     setMessage("User registered successfully!!.");
-// };
-/*
 const handleSubmit = async (e) => {
     e.preventDefault();
     const { customer, chef, rider } = registerData.roles;
@@ -411,11 +344,11 @@ const handleSubmit = async (e) => {
       if (validateRider()) {
         await handleFormSubmission();
       }
-    }else if(step ===4){
+    }else if (step === 4) {
       await handleFormSubmission();
     }
   };
-*/
+/*
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -431,7 +364,7 @@ const handleSubmit = async (e) => {
     await handleFormSubmission();
   }
 };
-/*
+*/
 const handleFormSubmission = async () => {
     try {
         // Create User Account and get userId
@@ -444,6 +377,17 @@ const handleFormSubmission = async () => {
             // Create additional accounts based on roles
             if (rider) await createRiderAccount(userId);
             if (chef) await createChefAccount(userId);
+             // Save payment information
+      await createPaymentInfo({
+        variables: {
+          input: {
+            user_id: userId,
+            bank_account_number: registerData.bankAccountNumber || "",
+            transit_number: registerData.transitNumber || "",
+          },
+        },
+      });
+
 
             // Navigate to home or success page after all steps complete
             navigate("/");
@@ -453,7 +397,7 @@ const handleFormSubmission = async () => {
         setMessage("Failed to register. Please try again.");
     }
 };
-*/
+/*
 const handleFormSubmission = async () => {
   try {
     const userId = await createUserAccount();
@@ -467,6 +411,7 @@ const handleFormSubmission = async () => {
     setMessage("Failed to register. Please try again.");
   }
 };
+*/
   const selectedRolesCount = Object.values(registerData.roles).filter(Boolean).length;
 
   return (
@@ -774,10 +719,9 @@ const handleFormSubmission = async () => {
                               label={option.label}
                               name="preferredWorkingDays"
                               value={option.value}
-                              checked={registerData.preferredWorkingDays.includes(
-                                option.value
-                              )}
-                              onChange={handleCheckboxChange}
+                              checked={registerData.preferredWorkingDays.includes(option.value)}
+                              
+                              onChange={handleWorkingDaysChange}
                             />
                           ))}
                         </div>
@@ -861,8 +805,8 @@ const handleFormSubmission = async () => {
                       </Button>
                     </Col>
                   </>
-                )}
-                {/* Step 4 - Chef-Specific Fields */}
+                  )}
+                   {/* Step 4 - Chef-Specific Fields */}
                 {step === 4 && registerData.roles.chef && (
                   <>
                     <h2 className="form-title">Additional Information</h2>
@@ -909,6 +853,30 @@ const handleFormSubmission = async () => {
                           <Checkbox key={option.value} label={option.label} name="preferredWorkingDays" value={option.value} checked={registerData.preferredWorkingDays.includes(option.value)} onChange={handleWorkingDaysChange} />
                         ))}
                       </div>
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Start Time"
+                        name="preferredStartTimeChef"
+                        type="time"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="End Time"
+                        name="preferredEndTimeChef"
+                        type="time"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={12}>
+                      <InputField
+                        label="Maximum Orders Per day"
+                        name="maxOrdersPerDay"
+                        placeholder="Enter the numebr"
+                        onChange={handleChange}
+                      />
                     </Col>
                     {/* Payment Information */}
                     <Col md={12}>
