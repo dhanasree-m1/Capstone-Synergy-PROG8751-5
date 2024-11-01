@@ -11,6 +11,7 @@ import RoleOptions from "../../Components/RoleOptions/RoleOptions";
 import { Container, Row, Col, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 import { CREATE_USER, CREATE_RIDER, CREATE_CHEF } from "../../queries";
+import { CREATE_PAYMENT_INFO } from "../../queries";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -67,6 +68,7 @@ const Register = () => {
   const [createUser] = useMutation(CREATE_USER);
   const [createRider] = useMutation(CREATE_RIDER);
   const [createChef] = useMutation(CREATE_CHEF);
+  const [createPaymentInfo] = useMutation(CREATE_PAYMENT_INFO);
 
   const handleChange = (e) => {
     //const { name, value } = e.target;
@@ -358,6 +360,17 @@ const handleFormSubmission = async () => {
             // Create additional accounts based on roles
             if (rider) await createRiderAccount(userId);
             if (chef) await createChefAccount(userId);
+             // Save payment information
+      await createPaymentInfo({
+        variables: {
+          input: {
+            user_id: userId,
+            bank_account_number: registerData.bankAccountNumber || "",
+            transit_number: registerData.transitNumber || "",
+          },
+        },
+      });
+
 
             // Navigate to home or success page after all steps complete
             navigate("/");

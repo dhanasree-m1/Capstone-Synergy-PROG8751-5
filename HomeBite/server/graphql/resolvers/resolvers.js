@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { User } from '../../src/models/users.js';
 import  {Rider} from '../../src/models/riders.js';
 import { Chef } from '../../src/models/chefs.js';
+import { PaymentInfo } from '../../src/models/payment_info.js';
 
 const resolvers = {
   Query: {
@@ -44,7 +45,11 @@ const resolvers = {
     },
     updateRider: async (_, { id, input }) => {
       return await Rider.findByIdAndUpdate(id, input, { new: true });
-    }
+    },
+    createPaymentInfo: async (_, { input }) => {
+      const paymentInfo = new PaymentInfo(input);
+      return await paymentInfo.save();
+    },
   },
 
   Rider: {
@@ -56,7 +61,12 @@ const resolvers = {
     user: async (chef) => {
       return await User.findById(chef.user_id);
     }
-  }
+  },
+  PaymentInfo: {
+    user: async (paymentInfo) => {
+      return await User.findById(paymentInfo.user_id);
+    },
+  },
 };
 
 export default resolvers;

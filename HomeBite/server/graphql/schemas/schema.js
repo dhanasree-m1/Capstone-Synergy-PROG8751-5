@@ -49,6 +49,17 @@ const typeDefs = gql`
     preferred_end_time: String
     created_at: String
   }
+  type PaymentInfo {
+  id: ID!
+  user: User!
+  bank_account_number: String
+  transit_number: String
+}
+input CreatePaymentInfoInput {
+  user_id: ID!
+  bank_account_number: String
+  transit_number: String
+}
   input CreateUserInput {
     first_name: String!
     last_name: String!
@@ -148,6 +159,7 @@ type LoginResponse {
     createChef(input: CreateChefInput!): Chef 
     updateUser(id: ID!, input: UpdateUserInput!): User
     updateRider(id: ID!, input: UpdateRiderInput!): Rider
+    createPaymentInfo(input: CreatePaymentInfoInput!): PaymentInfo
   }
 `;
 

@@ -109,5 +109,20 @@ export const CREATE_CHEF = gql`
     }
   }
 `;
+export const CREATE_PAYMENT_INFO = gql`
+  mutation CreatePaymentInfo($input: CreatePaymentInfoInput!) {
+    createPaymentInfo(input: $input) {
+      id
+      user {
+        id
+        first_name
+        last_name
+        email
+      }
+      bank_account_number
+      transit_number
+    }
+  }
+`;
 
 
