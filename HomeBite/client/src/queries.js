@@ -127,4 +127,46 @@ export const CREATE_PAYMENT_INFO = gql`
   }
 `;
 
+// Query for fetching completed orders
+export const GET_COMPLETED_ORDERS = gql`
+  query GetCompletedOrders {
+    completedOrders {
+      order_id
+      customer {
+        first_name
+        last_name
+        address_line_1
+        address_line_2
+        city
+        province
+        postal_code
+        country
+      }
+      items {
+        product_name
+        quantity
+        special_request
+        unit_price
+      }
+      total_amount
+      status
+      created_at
+      completion_time
+      delivery_agent {
+        first_name
+        last_name
+      }
+    }
+  }
+`;
 
+// Mutation for marking an order as completed
+export const MARK_ORDER_COMPLETED = gql`
+  mutation MarkOrderCompleted($order_id: ID!) {
+    markOrderCompleted(order_id: $order_id) {
+      order_id
+      status
+      completion_time
+    }
+  }
+`;

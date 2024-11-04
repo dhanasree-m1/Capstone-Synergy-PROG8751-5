@@ -54,6 +54,41 @@ const typeDefs = gql`
   user: User!
   bank_account_number: String
   transit_number: String
+ }
+
+ type Order {
+    order_id: ID!
+    customer_id: ID!
+    chef_id: ID!
+    rider_id: ID!
+    total_amount: Float!
+    status: String!
+    created_at: String!
+    completion_time: String
+    delivery_agent: String
+    items: [OrderItem]
+  }
+
+  type OrderItem {
+    product_id: ID!
+    quantity: Int!
+    special_request: String
+    unit_price: Float!
+    product_name: String!
+  }
+type Mutation {
+  forgotPassword(email: String!): ForgotPasswordResponse
+}
+
+type ForgotPasswordResponse {
+  message: String
+}
+type Mutation {
+  resetPassword(token: String!, newPassword: String!): ResetPasswordResponse
+}
+
+type ResetPasswordResponse {
+  message: String
 }
 input CreatePaymentInfoInput {
   user_id: ID!
@@ -128,7 +163,15 @@ input CreatePaymentInfoInput {
     long_distance_preference: Boolean
   }
 
+input LoginInput {
+  email: String!
+  password: String!
+}
 
+type LoginResponse {
+  token: String!
+  user: User!
+}
 input CreateChefInput {
   user_id: ID!
   specialty_cuisines: [String]
@@ -145,6 +188,7 @@ input CreateChefInput {
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
     isEmailUnique(email: String!): Boolean!
+    completedOrders: [Order]
   }
 
   type Mutation {
@@ -155,6 +199,7 @@ input CreateChefInput {
     updateUser(id: ID!, input: UpdateUserInput!): User
     updateRider(id: ID!, input: UpdateRiderInput!): Rider
     createPaymentInfo(input: CreatePaymentInfoInput!): PaymentInfo
+    markOrderCompleted(order_id: ID!): Order
   }
 `;
 
