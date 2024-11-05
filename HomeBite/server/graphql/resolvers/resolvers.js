@@ -45,10 +45,12 @@ const resolvers = {
         console.log("hii")
         console.log(email)
         const user = await User.findOne({ email: email });
-       // console.log(email);
+       console.log(user);
         //const user = await User.findOne({ where: { email } });
         if (!user) {
-          throw new Error("No user found with this email.");
+         throw new Error("No user found with this email.");
+         //console.log("no user found");
+          //return { message: "No user found with this email." };
         }
 
         // Generate a reset token with JSON Web Token
@@ -64,7 +66,8 @@ const resolvers = {
         return { message: "Password reset link sent to your email." };
       } catch (error) {
         console.error("Error in forgotPassword:", error);
-        throw new Error("Failed to send reset password email. Please try again later.");
+        const err=error;
+        throw new Error(`Failed to send reset password email.${err} `);
       }
     },
     async resetPassword(parent, { token, newPassword }, context) {
@@ -84,7 +87,7 @@ const resolvers = {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         // Update user password and clear the reset token
-        user.password = hashedPassword;
+        user.password_hash = hashedPassword;
         user.resetToken = null;
         await user.save();
 
