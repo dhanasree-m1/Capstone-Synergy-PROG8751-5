@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
-import OrderDetails from './OrderDetails'; // Make sure this component displays each order detail
+import OrderDetails from './OrderDetails'; 
 import { GET_COMPLETED_ORDERS } from './queries'; // Adjust the path as needed
 
 const OrderCompleted = () => {
