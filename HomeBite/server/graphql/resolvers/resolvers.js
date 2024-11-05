@@ -5,7 +5,8 @@ import { User } from '../../src/models/users.js';
 import  {Rider} from '../../src/models/riders.js';
 import { Chef } from '../../src/models/chefs.js';
 import { PaymentInfo } from '../../src/models/payment_info.js';
-import Order from "../models/orders";
+import { sendResetEmail } from '../../utils/emailService.js';
+// import { sendResetEmail } from "../utils/emailService.js";import Order from "../models/orders";
 import OrderItem from "../models/order_items";
 
 
@@ -54,12 +55,103 @@ const resolvers = {
   },
 
   Mutation: {
+    async forgotPassword(parent, { email }, context) {
+      try {
+        // Find user by email
+        console.log("hii")
+        console.log(email)
+        const user = await User.findOne({ email: email });
+       console.log(user);
+        //const user = await User.findOne({ where: { email } });
+        if (!user) {
+         throw new Error("No user found with this email.");
+         //console.log("no user found");
+          //return { message: "No user found with this email." };
+        }
+
+        // Generate a reset token with JSON Web Token
+        const resetToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+        // Optionally, save the reset token in the user’s record in the database
+        user.resetToken = resetToken;
+        await user.save();
+
+        // Send reset link via email
+        await sendResetEmail(user.email, resetToken);
+
+        return { message: "Password reset link sent to your email." };
+      } catch (error) {
+        console.error("Error in forgotPassword:", error);
+        const err=error;
+        throw new Error(`Failed to send reset password email.${err} `);
+      }
+    },
+    async resetPassword(parent, { token, newPassword }, context) {
+      try {
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        // Find user by ID
+        const user = await User.findById(userId);
+        console.log(user)
+        if (!user) {
+          throw new Error("Invalid or expired token.");
+        }
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update user password and clear the reset token
+        user.password_hash = hashedPassword;
+        user.resetToken = null;
+        await user.save();
+
+        return { message: "Password has been reset successfully." };
+      } catch (error) {
+        console.error("Error in resetPassword:", error);
+        throw new Error("Failed to reset password. Token may be invalid or expired.");
+      }
+    },
     createUser: async (_, { input }) => {
       const newUser = new User(input);
       return await newUser.save();
     },
     
+    login: async (_, { input }) => {
+      // Find the user by email
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(input.email)) {
+        throw new Error("Invalid email format");
+      }
+      const user = await User.findOne({ email: input.email });
+      console.log("Found user:", user);
+      
+      // Check if the user exists
+      if (!user) {
+        throw new Error("User not found");
+      }
     
+      // Compare the provided password with the stored password hash
+      const isMatch = await bcrypt.compare(input.password, user.password_hash); // Compare with input.password
+      if (!isMatch) {
+        throw new Error("Invalid password");
+      }
+    
+      // Generate a token (ensure you have a function to generate a token)
+      const token = generateToken(user); 
+    
+      // Return the token and user information
+      return {
+        token,
+        user: {
+          id: user.id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          email: user.email,
+        },
+      };
+    },
  
     createRider: async (_, { input }) => {
       const user = await User.findById(input.user_id);

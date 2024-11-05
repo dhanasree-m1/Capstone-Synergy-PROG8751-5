@@ -90,6 +90,20 @@ type Mutation {
 type ResetPasswordResponse {
   message: String
 }
+type Mutation {
+  forgotPassword(email: String!): ForgotPasswordResponse
+}
+
+type ForgotPasswordResponse {
+  message: String
+}
+type Mutation {
+  resetPassword(token: String!, newPassword: String!): ResetPasswordResponse
+}
+
+type ResetPasswordResponse {
+  message: String
+}
 input CreatePaymentInfoInput {
   user_id: ID!
   bank_account_number: String
