@@ -54,52 +54,40 @@ const typeDefs = gql`
   user: User!
   bank_account_number: String
   transit_number: String
- }
-
- type Order {
-    order_id: ID!
-    customer_id: ID!
-    chef_id: ID!
-    rider_id: ID!
-    total_amount: Float!
+}
+type Order {
+     _id: ID!
     status: String!
-    created_at: String!
-    completion_time: String
-    delivery_agent: String
+    customer_id: User
     items: [OrderItem]
+    payment: Payment
+    total_amount: Float
+    created_at: String
+  }
+  type Product {
+    id: ID!
+    name: String!
   }
 
   type OrderItem {
-    product_id: ID!
+    product_id: Product!
     quantity: Int!
     special_request: String
-    unit_price: Float!
-    product_name: String!
+    unit_price: Float
   }
-type Mutation {
-  forgotPassword(email: String!): ForgotPasswordResponse
-}
+
+  type Payment {
+    payment_method: String
+    amount: Float
+    payment_status: String
+  }
+
+
 
 type ForgotPasswordResponse {
   message: String
 }
-type Mutation {
-  resetPassword(token: String!, newPassword: String!): ResetPasswordResponse
-}
 
-type ResetPasswordResponse {
-  message: String
-}
-type Mutation {
-  forgotPassword(email: String!): ForgotPasswordResponse
-}
-
-type ForgotPasswordResponse {
-  message: String
-}
-type Mutation {
-  resetPassword(token: String!, newPassword: String!): ResetPasswordResponse
-}
 
 type ResetPasswordResponse {
   message: String
@@ -201,6 +189,8 @@ input CreateChefInput {
     getUser(id: ID!): User
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
+    getCurrentOrders: [Order]
+    
     isEmailUnique(email: String!): Boolean!
     completedOrders: [Order]
   }
@@ -212,8 +202,14 @@ input CreateChefInput {
     createChef(input: CreateChefInput!): Chef 
     updateUser(id: ID!, input: UpdateUserInput!): User
     updateRider(id: ID!, input: UpdateRiderInput!): Rider
+    forgotPassword(email: String!): ForgotPasswordResponse
     createPaymentInfo(input: CreatePaymentInfoInput!): PaymentInfo
-    markOrderCompleted(order_id: ID!): Order
+    resetPassword(token: String!, newPassword: String!): ResetPasswordResponse
+    updateOrderStatus(orderId: ID!, status: String!): Response
+  }
+  type Response {
+    success: Boolean!
+    message: String!
   }
 `;
 

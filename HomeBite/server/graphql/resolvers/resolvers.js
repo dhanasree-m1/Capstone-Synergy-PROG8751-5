@@ -5,6 +5,8 @@ import { User } from '../../src/models/users.js';
 import  {Rider} from '../../src/models/riders.js';
 import { Chef } from '../../src/models/chefs.js';
 import { PaymentInfo } from '../../src/models/payment_info.js';
+import { Orders } from '../../src/models/orders.js'; 
+import { OrderItem } from '../../src/models/order_items.js';
 import { sendResetEmail } from '../../utils/emailService.js';
 // import { sendResetEmail } from "../utils/emailService.js";import Order from "../models/orders";
 import OrderItem from '../../src/models/order_items.js';
@@ -27,33 +29,30 @@ const resolvers = {
         const existingUser = await User.findOne({ email });
         return !existingUser; // true if no user found, false if exists
       },
-      completedOrders: async () => {
+      getCurrentOrders: async () => {
         try {
-          const orders = await Order.find({ status: 'completed' })
-            .populate('customer_id', 'first_name last_name address_line_1 address_line_2 city province postal_code country')
-            .populate('rider_id', 'first_name last_name')
+          return await Orders.find({ status: { $ne: "Completed" } })
             .populate({
-              path: 'items',
+              path: "customer_id",
+              select: "first_name last_name email address_line_1 address_line_2 city province postal_code country",
+            })
+            .populate({
+              path: "items",
               populate: {
-                path: 'product_id', // Assuming Product model is referenced
-                select: 'name' // Selecting product name
-              }
+                path: "product_id",
+                select: "name"
+              },
+              select: "quantity special_request unit_price",
+            })
+            .populate({
+              path: "payment", // Ensure that the payment reference is correct in your order model
+              select: "payment_method amount payment_status",
             });
-  
-          return orders.map(order => ({
-            ...order.toObject(),
-            customer: order.customer_id,
-            delivery_agent: order.rider_id,
-            items: order.items.map(item => ({
-              ...item.toObject(),
-              product_name: item.product_id.name
-            }))
-          }));
         } catch (error) {
-          throw new Error("Failed to fetch completed orders: " + error.message);
+          console.error("Error fetching orders:", error);
+          throw new Error("Failed to fetch current orders.");
         }
-      }
-    
+      },
   },
 
   Mutation: {
@@ -179,21 +178,24 @@ const resolvers = {
     updateRider: async (_, { id, input }) => {
       return await Rider.findByIdAndUpdate(id, input, { new: true });
     },
-
-    markOrderCompleted: async (_, { order_id }) => {
+    createPaymentInfo: async (_, { input }) => {
+      const paymentInfo = new PaymentInfo(input);
+      return await paymentInfo.save();
+    },
+    updateOrderStatus: async (_, { orderId, status }) => {
       try {
-        const updatedOrder = await Order.findByIdAndUpdate(
-          order_id,
-          { status: 'completed', completion_time: new Date() },
-          { new: true }
-        ).populate('rider_id', 'first_name last_name');
-
-        return updatedOrder;
+        const order = await Orders.findById(orderId);
+        if (!order) {
+          throw new Error("Order not found");
+        }
+        order.status = status;
+        await order.save();
+        return { success: true, message: "Order status updated successfully" };
       } catch (error) {
-        throw new Error("Failed to mark order as completed: " + error.message);
+        console.error("Error updating order status:", error);
+        return { success: false, message: "Failed to update order status" };
       }
-    }
-  
+    },
   },
 
   Rider: {
