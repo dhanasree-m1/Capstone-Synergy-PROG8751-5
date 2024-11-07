@@ -59,7 +59,7 @@ const Login = () => {
         setMessage(result.errors[0].message); // Display error message
       } else {
         localStorage.setItem("token", result.data.login.token);
-        navigate("/");
+        navigate("/current-orders");
       }
     } catch (error) {
       setMessage("Error logging in");
