@@ -5,6 +5,8 @@ import { User } from '../../src/models/users.js';
 import  {Rider} from '../../src/models/riders.js';
 import { Chef } from '../../src/models/chefs.js';
 import { PaymentInfo } from '../../src/models/payment_info.js';
+import { Orders } from '../../src/models/orders.js'; 
+import { OrderItem } from '../../src/models/order_items.js';
 import { sendResetEmail } from '../../utils/emailService.js';
 // import { sendResetEmail } from "../utils/emailService.js";
 // Define the generateToken function
@@ -35,6 +37,30 @@ const resolvers = {
         async isEmailUnique(_, { email }) {
         const existingUser = await User.findOne({ email });
         return !existingUser; // true if no user found, false if exists
+      },
+      getCurrentOrders: async () => {
+        try {
+          return await Orders.find({ status: { $ne: "Completed" } })
+            .populate({
+              path: "customer_id",
+              select: "first_name last_name email address_line_1 address_line_2 city province postal_code country",
+            })
+            .populate({
+              path: "items",
+              populate: {
+                path: "product_id",
+                select: "name"
+              },
+              select: "quantity special_request unit_price",
+            })
+            .populate({
+              path: "payment", // Ensure that the payment reference is correct in your order model
+              select: "payment_method amount payment_status",
+            });
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+          throw new Error("Failed to fetch current orders.");
+        }
       },
   },
 
@@ -167,6 +193,20 @@ const resolvers = {
     createPaymentInfo: async (_, { input }) => {
       const paymentInfo = new PaymentInfo(input);
       return await paymentInfo.save();
+    },
+    updateOrderStatus: async (_, { orderId, status }) => {
+      try {
+        const order = await Orders.findById(orderId);
+        if (!order) {
+          throw new Error("Order not found");
+        }
+        order.status = status;
+        await order.save();
+        return { success: true, message: "Order status updated successfully" };
+      } catch (error) {
+        console.error("Error updating order status:", error);
+        return { success: false, message: "Failed to update order status" };
+      }
     },
   },
 
