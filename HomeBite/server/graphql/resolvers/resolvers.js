@@ -7,7 +7,9 @@ import { Chef } from '../../src/models/chefs.js';
 import { PaymentInfo } from '../../src/models/payment_info.js';
 import { sendResetEmail } from '../../utils/emailService.js';
 // import { sendResetEmail } from "../utils/emailService.js";import Order from "../models/orders";
-import OrderItem from "../models/order_items";
+import OrderItem from '../../src/models/order_items.js';
+import Order from '../../src/models/orders.js';
+
 
 
 const resolvers = {
@@ -170,16 +172,7 @@ const resolvers = {
         user, // include user data to populate the non-nullable field
       };
     },
-    createChef: async (_, { input }) => {  // Move createChef into Mutation
-      const user = await User.findById(input.user_id);
-      if (!user) throw new Error("User not found");
-      const newChef = new Chef(input);
-      return await newChef.save();
-      return {
-        ...newChef.toObject(),
-        user, // include user data to populate the non-nullable field
-      };
-    },
+    
     updateUser: async (_, { id, input }) => {
       return await User.findByIdAndUpdate(id, input, { new: true });
     },
