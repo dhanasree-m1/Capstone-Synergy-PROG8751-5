@@ -1,0 +1,125 @@
+/* CurrentOrders.scss */
+
+/* Global Layout */
+.orders-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #FFFFFF;
+    padding: 0px;
+  
+    .tabs {
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 0 80px;
+  
+      .tab {
+        font-family: 'Comfortaa', sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        padding: 10px 20px;
+        cursor: pointer;
+  
+        &.active {
+          color: #FF8A00;
+          border-bottom: 2px solid #FF8A00;
+        }
+      }
+    }
+  }
+  
+  /* Header */
+  .orders-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 16px 80px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #C1C7CD;
+  }
+  
+  /* Orders Table */
+  .orders-table {
+    width: 100%;
+    max-width: 1280px;
+    margin: 20px 80px;
+    border-collapse: collapse;
+  
+    th, td {
+      padding: 10px;
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      text-align: left;
+      color: #4A4A4A;
+    }
+  
+    th {
+      text-transform: uppercase;
+      border-bottom: 2px solid #DDE1E6;
+    }
+  
+    td {
+      border-bottom: 1px solid #DDE1E6;
+      line-height: 1.5;
+    }
+  }
+  
+  /* Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+  
+    .accept-button, .reject-button {
+      padding: 10px 16px;
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #FF8A00;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+  
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  
+    .accept-button {
+      color: #4CAF50; // Green for accept
+    }
+  
+    .reject-button {
+      color: #DA1E28; // Red for reject
+    }
+  }
+  
+  /* Footer */
+  .footer {
+    width: 100%;
+    padding: 48px 80px;
+    background: #0F161E;
+    color: #FFFFFF;
+    text-align: center;
+    font-family: 'Comfortaa', sans-serif;
+    font-size: 16px;
+  }
+  
+  /* Reusable Text Styles */
+  .text-uppercase {
+    text-transform: uppercase;
+  }
+  
+  .font-comfortaa {
+    font-family: 'Comfortaa', sans-serif;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .orders-table {
+      margin: 10px;
+      font-size: 12px;
+    }
+  }
+  
