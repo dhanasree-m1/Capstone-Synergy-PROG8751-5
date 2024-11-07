@@ -9,8 +9,8 @@ import { Orders } from '../../src/models/orders.js';
 import { OrderItem } from '../../src/models/order_items.js';
 import { sendResetEmail } from '../../utils/emailService.js';
 // import { sendResetEmail } from "../utils/emailService.js";import Order from "../models/orders";
-import OrderItem from '../../src/models/order_items.js';
-import Order from '../../src/models/orders.js';
+
+
 
 
 

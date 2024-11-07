@@ -23,7 +23,7 @@ app.use(express.json()); // Parse JSON payloads
 // Your other routes and logic will go here...
 
 // Connect to MongoDB  
-mongoose.connect('mongodb+srv://dhanasree01:Mongo123@cluster0.umw1frd.mongodb.net/HomeBite?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://Wijesinghe4777:admin@webapp.hmydtwm.mongodb.net/HomeBite?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverSelectionTimeoutMS: 10000, // Adjust the timeout duration
