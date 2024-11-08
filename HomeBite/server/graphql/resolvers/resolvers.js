@@ -5,9 +5,11 @@ import { User } from '../../src/models/users.js';
 import  {Rider} from '../../src/models/riders.js';
 import { Chef } from '../../src/models/chefs.js';
 import { PaymentInfo } from '../../src/models/payment_info.js';
-import { Orders } from '../../src/models/orders.js'; 
+import { Order } from '../../src/models/orders.js'; 
 import { OrderItem } from '../../src/models/order_items.js';
 import { sendResetEmail } from '../../utils/emailService.js';
+import { Payment } from '../../src/models/payments.js'; 
+import { Product } from '../../src/models/products.js'; 
 // import { sendResetEmail } from "../utils/emailService.js";
 // Define the generateToken function
 
@@ -41,25 +43,40 @@ const resolvers = {
       },
       getCurrentOrders: async () => {
         try {
-          return await Orders.find({ status: { $ne: "Completed" } })
-            .populate({
-              path: "customer_id",
-              select: "first_name last_name email address_line_1 address_line_2 city province postal_code country",
+          // Fetch all orders with status not equal to "Completed"
+          const orders = await Order.find({ status: { $ne: 'Completed' } })
+            .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
+            .populate('chef_id', 'specialty_cuisines type_of_meals')
+            .populate('rider_id', 'vehicle_type vehicle_registration_number')
+            .lean();
+          // For each order, find the associated OrderItems
+          const ordersWithDetails = await Promise.all(
+            orders.map(async (order) => {
+              // Fetch OrderItems for the current order
+              const items = await OrderItem.find({ order_id: order._id })
+              .populate({
+                path: 'product_id',
+                select: 'name'
+              }).lean();
+      
+              // Fetch Payment for the current order
+              const payment = await Payment.findOne({ order_id: order._id }).lean();
+      
+              // Return the order with populated items and payment details
+              return {
+                ...order,
+                items,   // Attach items array to the order
+                payment, // Attach payment details to the order
+              };
             })
-            .populate({
-              path: "items",
-              populate: {
-                path: "product_id",
-                select: "name"
-              },
-              select: "quantity special_request unit_price",
-            })
-            .populate({
-              path: "payment", // Ensure that the payment reference is correct in your order model
-              select: "payment_method amount payment_status",
-            });
+          );
+          console.log("Order with items")
+          console.log(ordersWithDetails);
+          return ordersWithDetails;
+         
+         
         } catch (error) {
-          console.error("Error fetching orders:", error);
+          console.error("Error fetching current orders:", error);
           throw new Error("Failed to fetch current orders.");
         }
       },
@@ -197,7 +214,7 @@ const resolvers = {
     },
     updateOrderStatus: async (_, { orderId, status }) => {
       try {
-        const order = await Orders.findById(orderId);
+        const order = await Order.findById(orderId);
         if (!order) {
           throw new Error("Order not found");
         }

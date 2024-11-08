@@ -58,6 +58,7 @@ const typeDefs = gql`
 type Order {
      _id: ID!
     status: String!
+    order_no: Int!
     customer_id: User
     items: [OrderItem]
     payment: Payment

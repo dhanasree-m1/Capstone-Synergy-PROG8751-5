@@ -8,5 +8,5 @@ const OrderItemSchema = new mongoose.Schema({
   unit_price: { type: Number, required: true }
 });
 
- export const OrderItem = mongoose.model('Order_Item', OrderItemSchema);
- //export default 
+ export const OrderItem = mongoose.model('OrderItem', OrderItemSchema);
+

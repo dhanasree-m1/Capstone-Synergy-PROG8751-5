@@ -2,7 +2,7 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import { User } from './src/models/users.js';
 import  {Product} from './src/models/products.js';
-import { Orders } from './src/models/orders.js';
+import { Order } from './src/models/orders.js';
 import { OrderItem } from './src/models/order_items.js';
 
 async function main() {
@@ -121,26 +121,26 @@ async function main() {
     //   const result2 = await collection3.insertMany(dummyOrder);
 
     // console.log(`${result2.insertedCount} order documents were inserted.`);
-    const collection4 = database.collection("order_items");
+    const collection4 = database.collection("orderitems");
     const dummyOrdItems=[
         {
-          "order_id": new ObjectId("672bab56afbccca14c12aa8b"),
-          "product_id": new ObjectId("672baf8b2a879a46a3b430ad"),
-          "quantity": 2,
+          "order_id": new ObjectId("672baf8b2a879a46a3b430ae"),
+          "product_id": new ObjectId("672baf8b2a879a46a3b430ab"),
+          "quantity": 3,
           "special_request": "Extra spicy",
           "unit_price": 12.99
         },
         {
-          "order_id": new ObjectId("672bab56afbccca14c12aa8c"),
-          "product_id":new ObjectId("672baf8b2a879a46a3b430ac"),
-          "quantity": 1,
+          "order_id": new ObjectId("672baf8b2a879a46a3b430ab"),
+          "product_id":new ObjectId("672bb086347a0380f536e108"),
+          "quantity": 2,
           "special_request": "No nuts",
           "unit_price": 8.99
         }
       ]
-      // const result3 = await collection4.insertMany(dummyOrdItems);
+      const result33 = await collection4.insertMany(dummyOrdItems);
 
-      // console.log(`${result3.insertedCount} order item documents were inserted.`);
+      console.log(`${result33.insertedCount} order item documents were inserted.`);
       const collection5 = database.collection("payments");
       const dummyPayment=[ {
         "order_id": new ObjectId("672bab56afbccca14c12aa8b"),
@@ -160,9 +160,9 @@ async function main() {
       }
     ]
 
- const result3 = await collection5.insertMany(dummyPayment);
+//  const result3 = await collection5.insertMany(dummyPayment);
 
-      console.log(`${result3.insertedCount} payment documents were inserted.`);
+//       console.log(`${result3.insertedCount} payment documents were inserted.`);
    
   } finally {
     await client.close();
