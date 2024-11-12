@@ -6,6 +6,10 @@ import ForgotPassword from "./Pages/Login/ForgotPassword";
 import ResetPassword from "./Pages/Login/ResetPassword";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Register from './Pages/Register/Register';
+import ChefDash from "./Pages/Chef/Dashboard";
+import Products from "./Pages/Chef/Product/Products";
+import AddProduct from "./Pages/Chef/Product/AddProduct";
+import EditProduct from "./Pages/Chef/Product/EditProduct";
 import CurrentOrders from "./Pages/Chef/CurrentOrders";
 
 function App() {
@@ -17,7 +21,16 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/current-orders" element={<CurrentOrders />} />
+       {/* Chef routes */}
+       {/* Chef Dashboard Layout with Nested Routes */}
+      <Route path="/chef" element={<ChefDash />}>
+        {/* <Route index element={<Dashboard />} /> This could be the main dashboard view */}
+        <Route path="orders" element={<CurrentOrders />} />
+        <Route path="products" element={<Products />} />
+        <Route path="product/add" element={<AddProduct />} />
+        <Route path="product/edit/:id" element={<EditProduct />} />
+      </Route>
+      
     </Routes>
   );
 }

@@ -60,7 +60,12 @@ const Login = () => {
         setMessage(result.errors[0].message); // Display error message
       } else {
         localStorage.setItem("token", result.data.login.token);
-        navigate("/current-orders");
+        localStorage.setItem("user_id", result.data.login.user.id);
+        localStorage.setItem("uname", result.data.login.user.first_name);
+        //console.log(result.data.login.token)
+        //console.log(result.data.login.user.id)
+        //console.log(localStorage.getItem("user_id"))
+        navigate("/chef");
       }
     } catch (error) {
       setMessage("Error logging in");

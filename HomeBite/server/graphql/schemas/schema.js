@@ -211,6 +211,39 @@ input CreateChefInput {
     success: Boolean!
     message: String!
   }
+  type Product {
+    id: ID!
+    chef_id: ID!
+    name: String!
+    description: String
+    price: Float!
+    quantity: Int
+    image_url: String
+    created_at: String
+    is_available: Boolean
+  }
+
+  input ProductInput {
+    name: String!
+    description: String
+    price: Float!
+    quantity: Int
+    image_url: String
+    is_available: Boolean
+  }
+
+  type Query {
+    getProductsByChef(chef_id: ID!): [Product]
+  }
+  type Query {
+    getProduct(id: ID!): Product
+  }
+  type Mutation {
+    addProduct(chef_id: ID!, input: ProductInput!): Product
+    updateProduct(id: ID!, input: ProductInput!): Product
+    deleteProduct(id: ID!): Boolean
+  }
+
 `;
 
 export default typeDefs;

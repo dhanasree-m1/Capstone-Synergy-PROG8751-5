@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Table, Button } from "react-bootstrap";
-import Header from '../../Components/Header/Header';
-import Logo from "../../assets/images/logo.svg";
-import "./CurrentOrders.scss"; // Import the SCSS file
+import { Container,  Table, Button } from "react-bootstrap";
+// import Header from '../../Components/Header/Header';
+import "./chef.scss"; // Import the SCSS file
 
 const CurrentOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -95,7 +94,7 @@ const CurrentOrders = () => {
 
   return (
     <Container fluid className="orders-page">
-        <Header />
+        {/* <Header /> */}
        <h2>Orders</h2>
         <div className="tab-selector">
           <button className="tab active">Current Orders</button>
@@ -152,7 +151,7 @@ const CurrentOrders = () => {
                 </td>
                
                 <td className="action-buttons">
-                {order.status == "Pending" ? (
+                {order.status === "Pending" ? (
                   <>
                   <Button
                     className="accept-button"

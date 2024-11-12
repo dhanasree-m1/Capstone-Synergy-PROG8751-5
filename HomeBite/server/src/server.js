@@ -1,6 +1,7 @@
 // Use ES module import syntax
 import express from 'express';
 import mongoose from 'mongoose';
+import multer from 'multer';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
@@ -9,7 +10,7 @@ import dotenv from 'dotenv';
 import { ApolloServer } from 'apollo-server-express';
 import typeDefs from '../graphql/schemas/schema.js'; // Import GraphQL schema
 import resolvers from '../graphql/resolvers/resolvers.js'; // Import GraphQL resolvers
-
+import path from 'path';
 // Load environment variables from .env file
 dotenv.config();
 
@@ -19,7 +20,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json()); // Parse JSON payloads
-
+app.use('/uploads', express.static(path.resolve('uploads')));
 // Your other routes and logic will go here...
 
 // Connect to MongoDB  
@@ -31,6 +32,27 @@ mongoose.connect('mongodb+srv://dhanasree01:Mongo123@cluster0.umw1frd.mongodb.ne
 })
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.resolve('uploads')); // Store images in the 'uploads' folder
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Create a unique filename
+  }
+});
+  
+  const upload = multer({ storage });
+  // Upload endpoint for handling image uploads
+app.post('/upload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  // Construct image URL based on server setup
+  const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+  res.json({ imageUrl }); // Return the image URL as JSON
+});
 // Set up Apollo Server
 async function startApolloServer() {
   const server = new ApolloServer({
@@ -50,6 +72,10 @@ async function startApolloServer() {
       return { user };
     },
   });
+  
+  
+  
+  
 
   await server.start();
   server.applyMiddleware({ app }); 

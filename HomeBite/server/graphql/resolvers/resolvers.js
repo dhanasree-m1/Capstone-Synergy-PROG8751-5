@@ -10,6 +10,7 @@ import { OrderItem } from '../../src/models/order_items.js';
 import { sendResetEmail } from '../../utils/emailService.js';
 import { Payment } from '../../src/models/payments.js'; 
 import { Product } from '../../src/models/products.js'; 
+
 // import { sendResetEmail } from "../utils/emailService.js";
 // Define the generateToken function
 
@@ -40,6 +41,9 @@ const resolvers = {
         async isEmailUnique(_, { email }) {
         const existingUser = await User.findOne({ email });
         return !existingUser; // true if no user found, false if exists
+      },
+      getProductsByChef: async (_, { chef_id }) => {
+        return await Product.find({ chef_id });
       },
       getCurrentOrders: async () => {
         try {
@@ -80,6 +84,19 @@ const resolvers = {
           throw new Error("Failed to fetch current orders.");
         }
       },
+      getProduct: async (_, { id }) => {
+        try {
+          // Find the product by ID and populate the chef_id field
+          const product = await Product.findById(id).populate("chef_id");
+          if (!product) {
+            throw new Error("Product not found");
+          }
+          return product;
+        } catch (error) {
+          throw new Error(`Error fetching product: ${error.message}`);
+        }
+      },
+      
   },
 
   Mutation: {
@@ -225,6 +242,17 @@ const resolvers = {
         console.error("Error updating order status:", error);
         return { success: false, message: "Failed to update order status" };
       }
+    },
+    addProduct: async (_, { chef_id, input }) => {
+      const newProduct = new Product({ chef_id, ...input });
+      return await newProduct.save();
+    },
+    updateProduct: async (_, { id, input }) => {
+      return await Product.findByIdAndUpdate(id, input, { new: true });
+    },
+    deleteProduct: async (_, { id }) => {
+      await Product.findByIdAndDelete(id);
+      return true;
     },
   },
 
