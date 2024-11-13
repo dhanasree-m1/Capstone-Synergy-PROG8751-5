@@ -1,38 +1,53 @@
 // OrderCompleted.js
 import React from 'react';
 import Header from '../../Components/Header/Header';
-
+import { useQuery, gql } from '@apollo/client';
 import Table from '../../Components/Table/Table';
 import TableRow from '../../Components/Table/TableRow';
 import TableCell from '../../Components/Table/TableCell';
 import './OrderCompleted.scss';
 
+const GET_COMPLETED_ORDERS = gql`
+  query GetCompletedOrders {
+    completedOrders {
+      _id
+      status
+      customer_id {
+        first_name
+        last_name
+        address_line_1
+        city
+      }
+      items {
+        product_id {
+          name
+        }
+        quantity
+        unit_price
+      }
+      payment {
+        payment_method
+        amount
+      }
+      total_amount
+      created_at
+    }
+  }
+`;
+
 const OrderCompleted = () => {
-  // Mock data for completed orders
-  const completedOrders = [
-    {
-      orderNo: "#1251",
-      orderPlacedTime: "Yesterday at 03:00 pm",
-      customerName: "John Smith",
-      deliveryAddress: "Campus Name 3",
-      items: [
-        { name: "Veg Sandwich", quantity: 1 },
-        { name: "Veg Frankie", quantity: 2 },
-        { name: "Veg Burger", quantity: 1 },
-        { name: "Margherita Pizza", quantity: 1 }
-      ],
-      paymentMethod: "Paid Online",
-      grandTotal: "$40.50",
-    },
-    // Add more completed orders if necessary
-  ];
+  const { loading, error, data } = useQuery(GET_COMPLETED_ORDERS);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  const completedOrders = data?.completedOrders || [];
 
   return (
     <div className="order-completed-page">
-      <Header /> {/* Adding Header at the top */}
-
+      <Header />
       <div className="order-completed">
-        <h2>Orders</h2>
+        <h2>Completed Orders</h2>
         <div className="tab-selector">
           <button className="tab">Current Orders</button>
           <button className="tab active">Order Completed</button>
@@ -51,29 +66,27 @@ const OrderCompleted = () => {
             {completedOrders.map((order, index) => (
               <TableRow key={index}>
                 <TableCell>
-                  <p className="order-id">Order No: {order.orderNo}</p>
-                  <p className="order-time">Order Placed Time: {order.orderPlacedTime}</p>
+                  <p className="order-id">Order No: {order._id}</p>
+                  <p className="order-time">Order Placed: {new Date(order.created_at).toLocaleString()}</p>
                 </TableCell>
                 <TableCell>
-                  <p>Customer Name: {order.customerName}</p>
-                  <p>Delivery Address: {order.deliveryAddress}</p>
+                  <p>Customer: {order.customer_id.first_name} {order.customer_id.last_name}</p>
+                  <p>Address: {order.customer_id.address_line_1}, {order.customer_id.city}</p>
                 </TableCell>
                 <TableCell>
                   {order.items.map((item, idx) => (
-                    <p key={idx}>{item.name} x{item.quantity}</p>
+                    <p key={idx}>{item.product_id.name} x{item.quantity} - ${item.unit_price}</p>
                   ))}
                 </TableCell>
                 <TableCell>
-                  <p>Payment Method: {order.paymentMethod}</p>
-                  <p>Grand Total: {order.grandTotal}</p>
+                  <p>Payment: {order.payment?.payment_method}</p>
+                  <p>Total: ${order.total_amount}</p>
                 </TableCell>
               </TableRow>
             ))}
           </tbody>
         </Table>
       </div>
-
-      
     </div>
   );
 };

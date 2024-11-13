@@ -63,6 +63,26 @@ const resolvers = {
           throw new Error("Failed to fetch current orders.");
         }
       },
+      completedOrders: async () => {
+        try {
+          const orders = await Orders.find({ status: 'Completed' })
+            .populate('customer_id', 'first_name last_name address_line_1 address_line_2 city province postal_code country')
+            .populate({
+              path: 'items',
+              populate: {
+                path: 'product_id',
+                select: 'name',
+              },
+              select: 'quantity special_request unit_price',
+            })
+            .populate('payment', 'payment_method amount payment_status');
+  
+          return orders;
+        } catch (error) {
+          console.error("Error fetching completed orders:", error);
+          throw new Error("Failed to fetch completed orders.");
+        }
+      },
   },
 
   Mutation: {

@@ -15,6 +15,9 @@ async function main() {
     // Specify the database and collection
     const database = client.db("HomeBite"); // e.g., "testDB"
     const collection = database.collection("users"); // e.g., "users"
+    const ordersCollection = database.collection("orders");
+    const orderItemsCollection = database.collection("order_items");
+    const paymentsCollection = database.collection("payments");
 
     // Insert some dummy data
     const dummyData = [
@@ -190,6 +193,55 @@ async function main() {
  const result8 = await collection5.insertMany(dummyPayment);
 
       console.log(`${result8.insertedCount} payment documents were inserted.`);
+
+
+// Insert Completed Order
+const completedOrder = {
+  customer_id: new ObjectId('672cfe51c8d4213b79aa6a90'), // Replace with valid user ID
+  chef_id: new ObjectId('672d04b948caaa711061a28b'), // Replace with valid chef ID
+  rider_id: new ObjectId('672d04b948caaa711061a28c'), // Replace with valid rider ID
+  total_amount: 31.98,
+  status: "Completed",
+  created_at: new Date("2023-07-20T15:03:23.000Z")
+};
+
+const orderResult = await ordersCollection.insertOne(completedOrder);
+console.log(`1 completed order document was inserted with ID: ${orderResult.insertedId}`);
+
+// Insert Associated Order Items for Completed Order
+const completedOrderItems = [
+  {
+    order_id: orderResult.insertedId,
+    product_id: new ObjectId("672d0836ef37899972c81317"), // Replace with valid product ID
+    quantity: 2,
+    special_request: "Extra spicy",
+    unit_price: 15.99
+  },
+  {
+    order_id: orderResult.insertedId,
+    product_id: new ObjectId("672d0836ef37899972c81318"), // Replace with valid product ID
+    quantity: 1,
+    special_request: "No nuts",
+    unit_price: 15.99
+  }
+];
+
+const orderItemsResult = await orderItemsCollection.insertMany(completedOrderItems);
+console.log(`${orderItemsResult.insertedCount} order items were inserted for completed order.`);
+
+// Insert Payment Information for Completed Order
+const completedOrderPayment = {
+  order_id: orderResult.insertedId,
+  payment_method: "Credit Card",
+  transaction_id: "TRANSACTION123",
+  amount: 31.98,
+  payment_status: "Successful",
+  payment_date: new Date("2023-07-20T15:05:23.000Z")
+};
+
+const paymentResult = await paymentsCollection.insertOne(completedOrderPayment);
+console.log(`1 payment document was inserted for completed order with ID: ${paymentResult.insertedId}`);
+
    
   } finally {
     await client.close();
