@@ -11,6 +11,7 @@ import Products from "./Pages/Chef/Product/Products";
 import AddProduct from "./Pages/Chef/Product/AddProduct";
 import EditProduct from "./Pages/Chef/Product/EditProduct";
 import CurrentOrders from "./Pages/Chef/CurrentOrders";
+import Profile from "./Pages/Chef/Profile";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="products" element={<Products />} />
         <Route path="product/add" element={<AddProduct />} />
         <Route path="product/edit/:id" element={<EditProduct />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
       
     </Routes>

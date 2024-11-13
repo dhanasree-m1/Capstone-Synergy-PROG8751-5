@@ -60,7 +60,7 @@ async function startApolloServer() {
     resolvers,
     context: ({ req }) => {
       // Optionally add authentication logic here
-      const token = req.headers.authorization || "";
+      const token = req.headers.authorization?.split(" ")[1] || "";
       let user = null;
       if (token) {
         try {

@@ -96,6 +96,21 @@ const resolvers = {
           throw new Error(`Error fetching product: ${error.message}`);
         }
       },
+      getUserProfile: async (_, __, { user }) => {
+        console.log("user :",user)
+
+        // Fetch user, chef, and rider details based on authenticated user ID
+        const userProfile = await User.findById(user.id);
+        const chefProfile = await Chef.findOne({ user_id: user.id });
+        const riderProfile = await Rider.findOne({ user_id: user.id });
+        console.log("userprofile : ",userProfile)
+  
+        return {
+          user: userProfile,
+          chef: chefProfile,
+          rider: riderProfile,
+        };
+      },
       
   },
 
@@ -104,9 +119,9 @@ const resolvers = {
       try {
         // Find user by email
         console.log("hii")
-        console.log(email)
+        //console.log(email)
         const user = await User.findOne({ email: email });
-       console.log(user);
+       //console.log(user);
         //const user = await User.findOne({ where: { email } });
         if (!user) {
          throw new Error("No user found with this email.");
@@ -175,7 +190,7 @@ const resolvers = {
         throw new Error("Invalid email format");
       }
       const user = await User.findOne({ email: input.email });
-      console.log("Found user:", user);
+      //console.log("Found user:", user);
       
       // Check if the user exists
       if (!user) {
@@ -253,6 +268,71 @@ const resolvers = {
     deleteProduct: async (_, { id }) => {
       await Product.findByIdAndDelete(id);
       return true;
+    },
+    updateUserProfile: async (_, { userInput, chefInput }, { user }) => {
+      // Update User Information
+      const updatedUser = await User.findByIdAndUpdate(
+        user.id,
+        {
+          first_name: userInput.first_name,
+          last_name: userInput.last_name,
+          email: userInput.email,
+          mobile_number: userInput.mobile_number,
+          gender: userInput.gender,
+          address_line_1: userInput.address_line_1,
+          address_line_2: userInput.address_line_2,
+          city: userInput.city,
+          province: userInput.province,
+          postal_code: userInput.postal_code,
+          country: userInput.country,
+          nearby_landmark: userInput.nearby_landmark,
+          role: userInput.role,
+          profile_image: userInput.profile_image,
+          ...(userInput.password && { password_hash: await bcrypt.hash(userInput.password, 10) }), // Hash new password if provided
+        },
+        { new: true }
+      );
+
+      // Update Chef Information (if the user is a chef)
+      let updatedChef = null;
+      if (chefInput) {
+        updatedChef = await Chef.findOneAndUpdate(
+          { user_id: user.id },
+          {
+            specialty_cuisines: chefInput.specialty_cuisines,
+            type_of_meals: chefInput.type_of_meals,
+            cooking_experience: chefInput.cooking_experience,
+            max_orders_per_day: chefInput.max_orders_per_day,
+            preferred_working_days: chefInput.preferred_working_days,
+          },
+          { new: true, upsert: true }
+        );
+      }
+
+      // Update Rider Information (if the user is a rider)
+      // let updatedRider = null;
+      // if (riderInput) {
+      //   updatedRider = await Rider.findOneAndUpdate(
+      //     { user_id: user.id },
+      //     {
+      //       vehicle_registration_number: riderInput.vehicle_registration_number,
+      //       vehicle_insurance_number: riderInput.vehicle_insurance_number,
+      //       insurance_expiry_date: riderInput.insurance_expiry_date,
+      //       driver_license_number: riderInput.driver_license_number,
+      //       license_expiry_date: riderInput.license_expiry_date,
+      //       document_upload_path: riderInput.document_upload_path,
+      //       preferred_delivery_radius: riderInput.preferred_delivery_radius,
+      //       preferred_working_days: riderInput.preferred_working_days,
+      //     },
+      //     { new: true, upsert: true }
+      //   );
+      // }
+
+      return {
+        user: updatedUser,
+        chef: updatedChef,
+        
+      };
     },
   },
 
