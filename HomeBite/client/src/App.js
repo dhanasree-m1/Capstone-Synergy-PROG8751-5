@@ -6,7 +6,7 @@ import ForgotPassword from "./Pages/Login/ForgotPassword";
 import ResetPassword from "./Pages/Login/ResetPassword";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Register from './Pages/Register/Register';
-import OrderCompleted from './Pages/Chef/OrderCompleted';
+import CurrentOrders from "./Pages/Chef/CurrentOrders";
 
 function App() {
   return (
@@ -17,8 +17,7 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/chef/order-completed" element={<OrderCompleted />} />
-      <Route path="*" element={<Navigate to="/chef/order-completed" />} />
+      <Route path="/current-orders" element={<CurrentOrders />} />
     </Routes>
   );
 }
