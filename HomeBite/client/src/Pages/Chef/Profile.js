@@ -25,7 +25,7 @@ const Profile = () => {
     country: '',
     nearby_landmark: '',
     profile_image: '',
-    password: '',
+    password_hash: '',
   });
 
   const [chefInfo, setChefInfo] = useState({
@@ -135,12 +135,15 @@ const Profile = () => {
     try {
         const result = await updateUserProfile({
           variables: {
+            id: localStorage.getItem("user_id"),
             userInput: {
               first_name: userInfo.first_name,
               last_name: userInfo.last_name,
               email: userInfo.email,
               mobile_number: userInfo.mobile_number,
+              role:userInfo.role[0],
               gender: userInfo.gender,
+              profile_image: profileImageUrl,
               address_line_1: userInfo.address_line_1,
               address_line_2: userInfo.address_line_2,
               city: userInfo.city,
@@ -148,8 +151,8 @@ const Profile = () => {
               postal_code: userInfo.postal_code,
               country: userInfo.country,
               nearby_landmark: userInfo.nearby_landmark,
-              profile_image: profileImageUrl,
-              password_hash: userInfo.password,
+             
+              password_hash: userInfo.password_hash,
             },
             chefInput: {
               specialty_cuisines: chefInfo.specialty_cuisines,

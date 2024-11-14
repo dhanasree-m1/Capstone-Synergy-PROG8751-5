@@ -252,7 +252,7 @@ input UpdateChefInput {
   type UserProfile {
     user: User
     chef: Chef
-    rider: Rider
+   
   }
 
   input UserInput {
@@ -268,14 +268,14 @@ input UpdateChefInput {
     postal_code: String
     country: String
     nearby_landmark: String
-    role: [String]
+    role: String
     profile_image: String
-    password: String
+    password_hash: String
   }
 
   input ChefInput {
-    specialty_cuisines: String
-    type_of_meals: String
+    specialty_cuisines: [String]
+    type_of_meals: [String]
     cooking_experience: String
     max_orders_per_day: Int
     preferred_working_days: [String]
@@ -292,7 +292,7 @@ input UpdateChefInput {
     preferred_working_days: [String]
   }
   type Mutation {
-    updateUserProfile(userInput: UserInput, chefInput: ChefInput): UserProfile
+    updateUserProfile(id: ID!,userInput: UserInput, chefInput: ChefInput): UserProfile
   }
 
   type Query {

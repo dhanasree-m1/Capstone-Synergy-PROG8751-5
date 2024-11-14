@@ -167,28 +167,7 @@ export const GET_RIDER_PROFILE = gql`
   }
 `;
 
-export const UPDATE_USER_PROFILE = gql`
-  mutation UpdateUserProfile($input: UserInput!) {
-    updateUserProfile(input: $input) {
-      id
-      first_name
-      last_name
-      email
-      mobile_number
-      role
-      gender
-      profile_image
-      status
-      address_line_1
-      address_line_2
-      city
-      province
-      postal_code
-      country
-      nearby_landmark
-    }
-  }
-`;
+
 
 
 export const UPDATE_CHEF = gql`
@@ -199,15 +178,14 @@ export const UPDATE_CHEF = gql`
   }
 `;
 export const UPDATE_USER_PROFILES = gql`
-  mutation UpdateUserProfile($userInput: UpdateUserInput!, $chefInput: UpdateChefInput!) {
-    updateUserProfile(userInput: $userInput, chefInput: $chefInput) {
+  mutation UpdateUserProfile($id: ID!,$userInput: UserInput!, $chefInput: ChefInput!) {
+    updateUserProfile(id: $id,userInput: $userInput, chefInput: $chefInput) {
       user {
         id
         first_name
         last_name
         email
         mobile_number
-        password_hash
         role
         gender
         profile_image
