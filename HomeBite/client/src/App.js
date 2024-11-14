@@ -11,7 +11,8 @@ import Products from "./Pages/Chef/Product/Products";
 import AddProduct from "./Pages/Chef/Product/AddProduct";
 import EditProduct from "./Pages/Chef/Product/EditProduct";
 import CurrentOrders from "./Pages/Chef/CurrentOrders";
-import Profile from "./Pages/Chef/Profile";
+import Profile from "./Pages/Chef/ProfileView";
+import EditProfile from "./Pages/Chef/Profile";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="product/add" element={<AddProduct />} />
         <Route path="product/edit/:id" element={<EditProduct />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="profile/edit" element={<EditProfile />} />
       </Route>
       
     </Routes>
