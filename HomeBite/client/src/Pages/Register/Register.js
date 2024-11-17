@@ -100,10 +100,6 @@ const Register = () => {
         [name]: value,
       }));
     }
-    // setRegisterData((prevData) => ({
-    //   ...prevData,
-    //   [name]: value,
-    // }));
     setMessage("");
   };
 
@@ -135,12 +131,17 @@ const Register = () => {
   //   { label: "Sunday", value: "Sunday" },
   // ];
   // Validation helper functions
-  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-  const validatePhoneNumber = (mobile) => /^\d{10}$/.test(mobile);
+  const validateEmail = (email) => /^(?!.*\.\.)(?!.*@.*@)(?!.*\s)(?!.*[,'`])([a-zA-Z0-9._%+-]+)@[a-zA-Z0-9.-]+\.(com|org|net|gov|edu|mil|info|biz|name|us|uk|ca|au|in|de|fr|cn|jp|br|ru|za|mx|nl|es|it|app|blog|shop|online|site|tech|io|ai|co|xyz|photography|travel|museum|jobs|health)$/.test(email);
+  const validatePhoneNumber = (mobile) => /^[0-9]{10}$/.test(mobile.trim());
   const validatePostalCode = (postalCode) =>
     /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postalCode); // Canadian format
   const validateFutureDate = (date) => new Date(date) >= new Date();
 
+  const validatePasswordStrength = (password) =>
+    /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(password); // At least 8 chars, 1 letter, 1 number
+  
+  const validateName = (name) => /^[a-zA-Z\s]+$/.test(name);
+  
   const validateStep1 = async () => {
     const {
       firstName,
@@ -152,6 +153,7 @@ const Register = () => {
       confirmPassword,
       roles,
     } = registerData;
+    
     let isValid = true;
 
     if (
@@ -165,12 +167,23 @@ const Register = () => {
     ) {
       setMessage("Please fill in all fields.");
       isValid = false;
-    } else if (!validateEmail(email)) {
+    } else if (!validateName(firstName)) {
+      setMessage("First name must only contain letters and spaces.");
+      isValid = false;
+    } else if (!validateName(lastName)) {
+      setMessage("Last name must only contain letters and spaces.");
+      isValid = false;
+    }else if (!validateEmail(email)) {
       setMessage("Please enter a valid email.");
       isValid = false;
     } else if (!validatePhoneNumber(mobile)) {
-      setMessage("Please enter a valid mobile number.");
+      setMessage("Please enter a valid 10-digit mobile number.");
       isValid = false;
+    } else if (!validatePasswordStrength(password)) {
+        setMessage(
+          "Password must be at least 8 characters long and include at least one number."
+        );
+        isValid = false;
     } else if (password !== confirmPassword) {
       setMessage("Passwords do not match.");
       isValid = false;
@@ -552,37 +565,6 @@ const validateChef = () => {
         await handleFormSubmission(); // Save and navigate for all roles
       }
     }
-    // if (step === 1) {
-    //   // Await validateStep1 to complete before proceeding
-    //   const isValidStep1 = await validateStep1();
-    //   if (isValidStep1) {
-    //     setStep(2); // Proceed to the customer form if Step 1 validation passes
-    //   }
-    // } else if (step === 2) {
-    //   // Validate Step 2 and handle customer submission
-    //   if (validateStep2()) {
-    //     // If only customer role is selected, complete the registration and navigate to "/"
-    //     if (customer && !chef && !rider) {
-    //       await handleFormSubmission(); // Save and redirect
-    //     } else {
-    //       // If Rider or Chef role is selected with Customer, move to the next step for additional details
-    //       if (rider) setStep(3); // Move to Rider fields
-    //       else if (chef) setStep(4); // Move to Chef fields
-    //     }
-    //   }
-    // } else if (step === 3 && rider) {
-    //   // Validate and save Rider-specific fields
-    //   if (validateRider()) {
-    //     await createRiderAccount(registerData.user_id); // Save Rider
-    //     navigate("/"); // Redirect to initial path
-    //   }
-    // } else if (step === 4 && chef) {
-    //   // Validate and save Chef-specific fields
-    //   if (validateChef()) {
-    //     await createChefAccount(registerData.user_id); // Save Chef
-    //     navigate("/"); // Redirect to initial path
-    //   }
-    // }
   };
   
 
@@ -645,14 +627,14 @@ const validateChef = () => {
               {message && <Alert variant="danger">{message}</Alert>}
               {step === 1 && (
                 <>
-                  <h2 className="form-title mb-2">Get Started with HomeBite</h2>
+                  <h2 className="form-title mb-2">Get Started</h2>
                   <p className="mb-4">
                     Enjoy the best home-cooked meals delivered to your doorstep.
                   </p>
                 </>
               )}
 
-              <form onSubmit={handleSubmit} className="row p-0 mt-3">
+              <form onSubmit={handleSubmit} className="row p-0 mt-3" noValidate>
                 {step === 1 && (
                   <>
                     <Col md={6}>
@@ -1143,96 +1125,6 @@ const validateChef = () => {
                         </Form.Control>
                       </Form.Group>
                     </Col>
-                    {/* <Col md={12}>
-                      <label>Specialty Cuisines</label>
-                      <div className="d-flex flex-wrap">
-                        {[
-                          "Indian",
-                          "Italian",
-                          "Mexican",
-                          "Chinese",
-                          "Other",
-                        ].map((cuisine) => (
-                          <Checkbox
-                            key={cuisine}
-                            label={cuisine}
-                            name="specialtyCuisines"
-                            value={cuisine}
-                            checked={registerData.specialtyCuisines.includes(
-                              cuisine
-                            )}
-                            onChange={(e) =>
-                              handleCheckboxChange(e, "specialtyCuisines")
-                            }
-                          />
-                        ))}
-                      </div>
-                    </Col> */}
-                    {/* <Col md={12}>
-                      <label>Type of Meals</label>
-                      <div className="d-flex flex-wrap">
-                        {["Breakfast", "Lunch", "Dinner", "Snacks"].map(
-                          (meal) => (
-                            <Checkbox
-                              key={meal}
-                              label={meal}
-                              name="typeOfMeals"
-                              value={meal}
-                              checked={registerData.typeOfMeals.includes(meal)}
-                              onChange={(e) =>
-                                handleCheckboxChange(e, "typeOfMeals")
-                              }
-                            />
-                          )
-                        )}
-                      </div>
-                    </Col> */}
-                    {/* <Col md={12}>
-                      <label>Experience in Cooking</label>
-                      <div className="d-flex flex-wrap">
-                        {[
-                          "Less than 1 year",
-                          "1-3 years",
-                          "3-5 years",
-                          "5+ years",
-                        ].map((experience) => (
-                          <Checkbox
-                            key={experience}
-                            label={experience}
-                            name="cookingExperience"
-                            value={experience}
-                            checked={
-                              registerData.cookingExperience === experience
-                            }
-                            onChange={(e) =>
-                              setRegisterData({
-                                ...registerData,
-                                cookingExperience: e.target.value,
-                              })
-                            }
-                          />
-                        ))}
-                      </div>
-                    </Col> */}
-
-                    {/* <Col md={12}>
-                      <h5>Availability</h5>
-                      <div className="d-flex flex-wrap">
-                        {workingDaysOptions.map((option) => (
-                          <Checkbox
-                            key={option.value}
-                            label={option.label}
-                            name="preferredWorkingDays"
-                            value={option.value}
-                            checked={registerData.preferredWorkingDays.includes(
-                              option.value
-                            )}
-                            onChange={handleWorkingDaysChange}
-                          />
-                        ))}
-                      </div>
-                    </Col> */}
-
                     <Col md={12}>
                      
                       <AvailabilityOptions
