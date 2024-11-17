@@ -24,7 +24,7 @@ app.use('/uploads', express.static(path.resolve('uploads')));
 // Your other routes and logic will go here...
 
 // Connect to MongoDB  
-mongoose.connect('mongodb+srv://dhanasree01:Mongo123@cluster0.umw1frd.mongodb.net/HomeBite?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://jayalekshmivj08:Harmony2024@cluster0.rifewjx.mongodb.net/HomeBite?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverSelectionTimeoutMS: 10000, // Adjust the timeout duration
@@ -73,10 +73,6 @@ async function startApolloServer() {
     },
   });
   
-  
-  
-  
-
   await server.start();
   server.applyMiddleware({ app }); 
 

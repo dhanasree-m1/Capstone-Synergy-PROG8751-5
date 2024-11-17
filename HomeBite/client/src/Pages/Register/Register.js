@@ -386,7 +386,7 @@ const validateChef = () => {
       province: registerData.province || "",
       postal_code: registerData.postalCode || "",
       country: registerData.country || "",
-      nearby_landmark: registerData.nearby_landmark || "",
+      nearby_landmark: registerData.addressLine1 || "",
     };
     console.log("User input for mutation:", userInput);
     const { data } = await createUser({ variables: { input: userInput } });
@@ -788,7 +788,16 @@ const validateChef = () => {
                         setRegisterData={setRegisterData}
                       />
                     </Col>
-                    {/* Add more fields for address, rider, and chef specifics here */}
+                    
+                    <Col md={12}>
+                      <InputField
+                        label="Addressline 1"
+                        name="landmark"
+                        placeholder="Address Line 1"
+                        value={registerData.addressLine1}
+                        onChange={handleChange}
+                      />
+                    </Col>
                     <Col md={12}>
                       <InputField
                         label="Building Name/ Block Name"
@@ -834,15 +843,7 @@ const validateChef = () => {
                         readOnly
                       />
                     </Col>
-                    <Col md={12}>
-                      <InputField
-                        label="Nearby Landmark (optional)"
-                        name="landmark"
-                        placeholder="Nearby Landmark (optional)"
-                        value={registerData.nearby_landmark}
-                        onChange={handleChange}
-                      />
-                    </Col>
+                    
                     <Col md={6}>
                       <div className="d-flex justify-content-between mb-3 mt-3">
                         <Button
@@ -857,7 +858,7 @@ const validateChef = () => {
 
                     <Col md={6}>
                       <Button type="submit" className="btn-primary w-100 mt-3">
-                        Complete Registration
+                      Proceed Registration
                       </Button>
                     </Col>
                   </>
@@ -1296,7 +1297,7 @@ const validateChef = () => {
                     </Col>
                     <Col md={6}>
                       <Button type="submit" className="btn-primary w-100">
-                        Complete Registration
+                        Proceed Registration
                       </Button>
                     </Col>
                   </>

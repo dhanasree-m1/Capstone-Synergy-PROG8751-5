@@ -37,6 +37,7 @@ const typeDefs = gql`
     preferred_end_time: String
     long_distance_preference: Boolean
   }
+
   type Chef {
     id: ID!
     user: User
@@ -49,14 +50,15 @@ const typeDefs = gql`
     preferred_end_time: String
     created_at: String
   }
+
   type PaymentInfo {
-  id: ID!
-  user: User!
-  bank_account_number: String
-  transit_number: String
-}
-type Order {
-     _id: ID!
+    id: ID!
+    user: User!
+    bank_account_number: String
+    transit_number: String
+  }
+  type Order {
+    _id: ID!
     status: String!
     order_no: Int!
     customer_id: User
@@ -64,10 +66,6 @@ type Order {
     payment: Payment
     total_amount: Float
     created_at: String
-  }
-  type Product {
-    id: ID!
-    name: String!
   }
 
   type OrderItem {
@@ -83,21 +81,18 @@ type Order {
     payment_status: String
   }
 
+  type ForgotPasswordResponse {
+    message: String
+  }
 
-
-type ForgotPasswordResponse {
-  message: String
-}
-
-
-type ResetPasswordResponse {
-  message: String
-}
-input CreatePaymentInfoInput {
-  user_id: ID!
-  bank_account_number: String
-  transit_number: String
-}
+  type ResetPasswordResponse {
+    message: String
+  }
+  input CreatePaymentInfoInput {
+    user_id: ID!
+    bank_account_number: String
+    transit_number: String
+  }
   input CreateUserInput {
     first_name: String!
     last_name: String!
@@ -166,38 +161,37 @@ input CreatePaymentInfoInput {
     long_distance_preference: Boolean
   }
 
-input LoginInput {
-  email: String!
-  password: String!
-}
+  input LoginInput {
+    email: String!
+    password: String!
+  }
 
-type LoginResponse {
-  token: String!
-  user: User!
-}
-input CreateChefInput {
-  user_id: ID!
-  specialty_cuisines: [String]
-  type_of_meals: [String]
-  cooking_experience: String
-  max_orders_per_day: Int
-  preferred_working_days: [String!]
-  preferred_start_time: String
-  preferred_end_time: String
-}
-input UpdateChefInput {
-  specialty_cuisines: [String]
-  type_of_meals: [String]
-  cooking_experience: String
-  max_orders_per_day: Int
-  preferred_working_days: [String]
-}
+  type LoginResponse {
+    token: String!
+    user: User!
+  }
+  input CreateChefInput {
+    user_id: ID!
+    specialty_cuisines: [String]
+    type_of_meals: [String]
+    cooking_experience: String
+    max_orders_per_day: Int
+    preferred_working_days: [String!]
+    preferred_start_time: String
+    preferred_end_time: String
+  }
+  input UpdateChefInput {
+    specialty_cuisines: [String]
+    type_of_meals: [String]
+    cooking_experience: String
+    max_orders_per_day: Int
+    preferred_working_days: [String]
+  }
   type Query {
     getUser(id: ID!): User
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
     getCurrentOrders: [Order]
-    
     isEmailUnique(email: String!): Boolean!
   }
 
@@ -205,7 +199,7 @@ input UpdateChefInput {
     login(input: LoginInput): LoginResponse
     createUser(input: CreateUserInput!): User
     createRider(input: CreateRiderInput!): Rider
-    createChef(input: CreateChefInput!): Chef 
+    createChef(input: CreateChefInput!): Chef
     updateUser(id: ID!, input: UpdateUserInput!): User
     updateRider(id: ID!, input: UpdateRiderInput!): Rider
     forgotPassword(email: String!): ForgotPasswordResponse
@@ -227,6 +221,7 @@ input UpdateChefInput {
     image_url: String
     created_at: String
     is_available: Boolean
+    user: User
   }
 
   input ProductInput {
@@ -242,6 +237,8 @@ input UpdateChefInput {
     getProductsByChef(chef_id: ID!): [Product]
   }
   type Query {
+    getAllProducts(campus: String): [Product]
+    getAllChefs: [Chef]
     getProduct(id: ID!): Product
   }
   type Mutation {
@@ -252,7 +249,6 @@ input UpdateChefInput {
   type UserProfile {
     user: User
     chef: Chef
-   
   }
 
   input UserInput {
@@ -292,13 +288,16 @@ input UpdateChefInput {
     preferred_working_days: [String]
   }
   type Mutation {
-    updateUserProfile(id: ID!,userInput: UserInput, chefInput: ChefInput): UserProfile
+    updateUserProfile(
+      id: ID!
+      userInput: UserInput
+      chefInput: ChefInput
+    ): UserProfile
   }
 
   type Query {
     getUserProfile: UserProfile
   }
-
 `;
 
 export default typeDefs;
