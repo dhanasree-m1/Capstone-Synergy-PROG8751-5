@@ -62,12 +62,11 @@ export default function Header({
                   <Nav className="d-flex gap-2 justify-content-between">
                     <Nav.Link
                       href="/"
-                      className={`btn-link ${
-                        currentRole === "home" ||
-                        ["customer", "chef", "rider"].includes(currentRole)
+                      className={`btn-link ${currentRole === "home" ||
+                          ["customer", "chef", "rider"].includes(currentRole)
                           ? "active"
                           : ""
-                      }`}
+                        }`}
                     >
                       Home
                     </Nav.Link>
@@ -107,15 +106,14 @@ export default function Header({
                           )} */}
                           {urole === "chef" && (
                             <Nav.Link
-                              className={`cart-icon d-flex p-0 align-items-baseline ${
-                                currentRole === "chef" ? "active" : " "
-                              }`}
+                              className={`cart-icon d-flex p-0 align-items-baseline ${currentRole === "chef" ? "active" : " "
+                                }`}
                               href="/chef/orders"
                               onClick={() => onRoleSelect("chef")}
                             >
-                              <div className="position-relative">
+                              <div className="position-relative header-icon">
                                 <span className="material-icons align-middle">
-                                room_service
+                                  room_service
                                 </span>
                               </div>
                               <h6 className="mb-0 mx-2 btn-link">
@@ -140,8 +138,10 @@ export default function Header({
                       className="cart-icon d-flex gap-2"
                       onClick={showCartSummary}
                     >
-                      <div className="position-relative ">
-                        <FaShoppingCart size={18} className="btn-link" />
+                      <div className="position-relative  header-icon">
+                        <span className="material-icons align-middle">
+                          shopping_cart
+                        </span>
                         {totalItems > 0 && (
                           <Badge bg="danger" pill className="position-absolute">
                             {totalItems}

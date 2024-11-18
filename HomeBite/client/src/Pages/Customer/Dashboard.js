@@ -12,6 +12,7 @@ import { campuses } from "../../Components/data/Campuses";
 import CartSummary from "../Customer/CartSummary";
 import Homebg from "../../assets/images/home-bg.jpeg";
 import "./Dashboard.scss";
+import Loader from "../../Components/Loader/Loader"
 
 export default function Dashboard() {
   const [selectedCampus, setSelectedCampus] = useState(null);
@@ -30,7 +31,7 @@ export default function Dashboard() {
   const handleShowCart = () => setShowCart(true);
   const handleCloseCart = () => setShowCart(false);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loader />;
   if (error) return <Alert variant="danger">{error.message}</Alert>;
 
   const handleCampusSelect = (campus) => {
