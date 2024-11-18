@@ -56,23 +56,26 @@ export default function Header({
               <Navbar.Brand href="/">
                 <img src={Logo} className="logo" alt="Logo" />
               </Navbar.Brand>
-              <div className="d-flex align-items-center justify-content-between">
+              <div className="d-flex align-items-center justify-content-between    mobile-header m-w-100">
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
+               
+              </div>
+              <Navbar.Collapse id="basic-navbar-nav" className="m-w-100 flex-none">
                   <Nav className="d-flex gap-2 justify-content-between">
                     <Nav.Link
                       href="/"
-                      className={`btn-link ${currentRole === "home" ||
+                      className={`m-0 btn-link ${currentRole === "home" ||
                           ["customer", "chef", "rider"].includes(currentRole)
                           ? "active"
                           : ""
                         }`}
                     >
+                      
                       Home
                     </Nav.Link>
                     {urole && (
-                      <div className="cart-icon d-flex gap-2">
-                        <Nav className=" b-0">
+                      <div className="cart-icon d-flex gap-2 m-w-100">
+                        <Nav className=" b-0 ">
                           {urole === "customer" && (
                             <Nav.Link
                               href="/customer/dashboard"
@@ -106,7 +109,7 @@ export default function Header({
                           )} */}
                           {urole === "chef" && (
                             <Nav.Link
-                              className={`cart-icon d-flex p-0 align-items-baseline ${currentRole === "chef" ? "active" : " "
+                              className={`m-w-100 cart-icon d-flex p-0 align-items-baseline ${currentRole === "chef" ? "active" : " "
                                 }`}
                               href="/chef/orders"
                               onClick={() => onRoleSelect("chef")}
@@ -135,10 +138,10 @@ export default function Header({
                       </div>
                     )}
                     <div
-                      className="cart-icon d-flex gap-2"
+                      className="cart-icon d-flex m-w-100"
                       onClick={showCartSummary}
                     >
-                      <div className="position-relative  header-icon">
+                      <div className="position-relative  header-icon ">
                         <span className="material-icons align-middle">
                           shopping_cart
                         </span>
@@ -150,12 +153,11 @@ export default function Header({
                       </div>
                       <h6 className="mb-0 mx-2 btn-link">Cart</h6>
                     </div>
-                    <Nav.Link onClick={handleLoginLogout} className="btn-link">
+                    <Nav.Link onClick={handleLoginLogout} className="btn-link m-0">
                       {isLoggedIn ? "Logout" : "Login"}
                     </Nav.Link>
                   </Nav>
                 </Navbar.Collapse>
-              </div>
             </Col>
           </Row>
         </Container>

@@ -20,7 +20,6 @@
     }
   }
   .cart-icon{
-    
     line-height: 32px;
     margin-right: 20px;
     align-items: center;
@@ -28,8 +27,8 @@
     margin: 0 auto;
   }
   .badge{
-    top: 0px;
-    right: -15px;
+    top: -6px;
+    right: -6px;
   }
   .logo{
     height: 16px;
@@ -56,11 +55,30 @@
   .site-header .btn-link, .site-header .btn-link .material-icons{
     color: $text-color;
   }
-  .site-header .btn-link.active,  .site-header .btn-link.active .material-icons , .site-header .btn-link:hover,.site-header .nav-link:hover,.cart-icon:hover .btn-link{
+  .site-header .btn-link.active,  .site-header .btn-link.active .material-icons , .site-header .btn-link:hover,.site-header .nav-link:hover,.cart-icon:hover .btn-link,.cart-icon:hover .header-icon,.nav-link:hover{
     color: $link-color;
     font-weight: bold;
+    text-decoration: none !important;
   }
   .header-icon{
     color: $text-color;
     margin-top: -3px;
+  }
+  .header-icon .material-icons{
+    font-size: 18px;
+  }
+  .flex-none{
+    flex: none;
+  }
+
+  @media (max-width: 991px){
+    .mobile-header{
+      flex-direction: column;
+    }
+    .mobile-menu-list{
+      flex-direction: row;
+    }
+    .m-w-100{
+      width: 100%;
+    }
   }

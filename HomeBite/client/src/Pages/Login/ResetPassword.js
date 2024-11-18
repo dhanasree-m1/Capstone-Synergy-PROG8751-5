@@ -65,7 +65,7 @@ console.log(`token${token}`)
         <Col md={7} className="p-0">
         <div className="login-container">
         <div className="login-box">
-        <img src={Logo} className="logo" alt="Logo" />
+        <a href="/"><img src={Logo} className="logo" alt="Logo" /></a>
         <h2 className="form-title mt-5 mb-2">Reset Password </h2>
       {message && <Alert variant="success">{message}</Alert>}
       {error && <Alert variant="danger">{error}</Alert>}

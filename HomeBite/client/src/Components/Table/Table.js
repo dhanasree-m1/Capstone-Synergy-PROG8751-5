@@ -3,11 +3,9 @@ import './Table.scss';
 
 const Table = ({ children }) => {
   return (
-    <div className="table-container">
-      <table className="custom-table">
-        {children}
-      </table>
-    </div>
+    <table className="table">
+    {children}
+  </table>
   );
 };
 

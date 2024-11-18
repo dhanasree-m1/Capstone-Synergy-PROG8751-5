@@ -57,8 +57,8 @@ const ForgotPassword = () => {
         <Col md={7} className="p-0">
     <div className="login-container">
     <div className="login-box">
-    <img src={Logo} className="logo" alt="Logo" />
-    <h2 className="form-title mt-5 mb-2">Forgot Password </h2>
+    <a href="/"><img src={Logo} className="logo" alt="Logo" /></a>
+    <h4 className="mt-5 mb-2">Forgot Password </h4>
       {message && <Alert variant="danger">{message}</Alert>}
       <form onSubmit={handleSubmit}>
         <InputField
@@ -72,6 +72,12 @@ const ForgotPassword = () => {
         <Button type="submit" className="btn-primary w-100 mt-3">
           Send Reset Link
         </Button>
+        <p className="text-center d-grid d-lg-flex mb-3 gap-2 mt-3">
+                        Already Have an Account?{" "}
+                        <a href="/login" className="btn-link">
+                          Sign in here
+                        </a>
+                      </p>
       </form>
     </div>
     </div>
