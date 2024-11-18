@@ -11,6 +11,7 @@ import Products from "./Pages/Chef/Product/Products";
 import AddProduct from "./Pages/Chef/Product/AddProduct";
 import EditProduct from "./Pages/Chef/Product/EditProduct";
 import CurrentOrders from "./Pages/Chef/CurrentOrders";
+import CompletedOrders from "./Pages/Chef/OrderCompleted";
 import Profile from "./Pages/Chef/ProfileView";
 import EditProfile from "./Pages/Chef/Profile";
 
@@ -28,6 +29,7 @@ function App() {
       <Route path="/chef" element={<ChefDash />}>
         {/* <Route index element={<Dashboard />} /> This could be the main dashboard view */}
         <Route path="orders" element={<CurrentOrders />} />
+        <Route path="orders/completed" element={<CompletedOrders />} />
         <Route path="products" element={<Products />} />
         <Route path="product/add" element={<AddProduct />} />
         <Route path="product/edit/:id" element={<EditProduct />} />

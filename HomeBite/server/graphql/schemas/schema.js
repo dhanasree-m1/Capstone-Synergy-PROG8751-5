@@ -197,7 +197,7 @@ input UpdateChefInput {
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
     getCurrentOrders: [Order]
-    
+    getCompletedOrders: [Order]
     isEmailUnique(email: String!): Boolean!
   }
 
