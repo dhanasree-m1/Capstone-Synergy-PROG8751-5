@@ -84,7 +84,7 @@ const Products = () => {
         {products.map(product => (
           <div className='col-lg-3'>
             <Card className="product-card mb-3" key={product.id}>
-              <Card.Img variant="top" src={product.imageUrl} alt={product.name} />
+              <Card.Img variant="top" src={product.image_url} alt={product.name} />
               <Card.Body className="pb-0">
                 <Card.Title className="justify-content-between d-flex">{product.name}
                   {/* <img className="align-bottom" src={veg} /> */}
@@ -108,7 +108,7 @@ const Products = () => {
         ))}
       </div>
 
-      <table>
+      {/* <table>
         <thead>
           <tr>
             <th>Name</th>
@@ -134,7 +134,7 @@ const Products = () => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> */}
     </Container>
   );
 };
