@@ -52,7 +52,7 @@ export default function Header({
       <Navbar expand="lg" className="bg-body-tertiary site-header">
         <Container fluid>
           <Row className="w-100">
-            <Col className="d-flex justify-content-between align-items-center">
+            <Col className="d-flex justify-content-between align-items-center mobile-header">
               <Navbar.Brand href="/">
                 <img src={Logo} className="logo" alt="Logo" />
               </Navbar.Brand>
