@@ -28,6 +28,8 @@ const Products = () => {
               price
               quantity
               is_available
+              image_url
+              dietary
             }
           }
         `,
@@ -68,6 +70,8 @@ const Products = () => {
             <th>Name</th>
             <th>Price</th>
             <th>Quantity</th>
+            
+            <th></th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -76,7 +80,10 @@ const Products = () => {
             <tr key={product.id}>
               <td>{product.name}</td>
               <td>{product.price}</td>
+             
               <td>{product.quantity}</td>
+              
+              <td><img src={product.image_url} alt="Profile" className="img-fluid rounded" style={{ maxWidth: "150px" }} /></td>
               <td>
                 <Button className="btn-primary  mb-3"  onClick={() =>  handleEdit(product.id)}>Edit</Button>
                 <Button className="btn-primary  mb-3" onClick={() => handleDelete(product.id)}>Delete</Button>

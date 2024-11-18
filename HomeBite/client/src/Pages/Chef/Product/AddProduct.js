@@ -11,6 +11,7 @@ const AddProduct = () => {
       description: '',
       price: 0,
       quantity: 0,
+      dietary:"Veg",
       image_url: '',
       is_available: true,
     });
