@@ -78,14 +78,17 @@ nav ul {
       border: none;
       outline: none;
       transition: color 0.3s ease;
+      text-decoration: none;
 
       &:hover {
         color: $secondary-color;
+        text-decoration: none;
       }
 
       &.active {
         color: $secondary-color;
         border-bottom: 3px solid $secondary-color;
+        text-decoration: none;
       }
     }
   }

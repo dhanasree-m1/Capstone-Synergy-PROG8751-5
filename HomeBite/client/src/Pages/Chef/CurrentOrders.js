@@ -137,8 +137,9 @@ const CurrentOrders = () => {
       {/* <Header /> */}
       <h2>Orders</h2>
       <div className="tab-selector">
-        <button className="tab active">Current Orders</button>
-        <button className="tab ">Order Completed</button>
+        <Link to="/chef/orders" className="tab active">Current Orders</Link>
+        <Link to="/chef/orders/Completed" className="tab">Order Completed</Link>
+        
       </div>
 
 
