@@ -10,6 +10,8 @@ import ProductCard from "../../Components/ProductCard/ProductCard";
 import { useLocation } from "react-router-dom";
 import { campuses } from "../../Components/data/Campuses";
 import CartSummary from "../Customer/CartSummary";
+import Homebg from "../../assets/images/home-bg.jpeg";
+import "./Dashboard.scss";
 
 export default function Dashboard() {
   const [selectedCampus, setSelectedCampus] = useState(null);
@@ -42,30 +44,30 @@ export default function Dashboard() {
   // Filter chefs and products based on the selected campus
   const filteredChefs = selectedCampus
     ? data.getAllChefs.filter((chef) => {
-        console.log(
-          `Filtering chef campus: ${chef.user.address_line_1} against selected campus: ${selectedCampus}`
-        );
-        return chef.user.address_line_1 === selectedCampus;
-      })
+      console.log(
+        `Filtering chef campus: ${chef.user.address_line_1} against selected campus: ${selectedCampus}`
+      );
+      return chef.user.address_line_1 === selectedCampus;
+    })
     : data.getAllChefs; // If no campus is selected, show all chefs
 
   const filteredProducts = selectedCampus
     ? data.getAllProducts.filter((product) => {
-        const address = product.chef?.user?.address_line_1 || "Unknown";
-        console.log(
-          `Filtering product: ${address} against campus: ${selectedCampus}`
-        );
-        return address === selectedCampus;
-      })
+      const address = product.chef?.user?.address_line_1 || "Unknown";
+      console.log(
+        `Filtering product: ${address} against campus: ${selectedCampus}`
+      );
+      return address === selectedCampus;
+    })
     : data.getAllProducts;
 
-    const searchedProducts = filteredProducts
+  const searchedProducts = filteredProducts
     ? filteredProducts.filter(
-        (product) =>
-          product &&
-          product.name &&
-          product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      (product) =>
+        product &&
+        product.name &&
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : [];
 
   console.log("Selected Campus:", selectedCampus);
@@ -100,7 +102,56 @@ export default function Dashboard() {
   return (
     <>
       <MainLayout cart={cart} handleShowCart={handleShowCart} />
-      <Container fluid className="dashboard-container">
+      <Container fluid  className="home-bg mb-5">
+        <div className="overlay"></div>
+        <Row>
+          <Col md={12} className="p-0">
+            <section className="pt-5 pb-5 position-relative home-search text-center">
+
+              <Container>
+                <Row className="align-items-center">
+                  <Col lg={12} className="col-12">
+                    <div className="homepage-search-title">
+                      <h1 className="mb-2"><b>Enjoy Fresh, Homemade Meals on Campus</b></h1>
+                      <h5 className="mb-5 text-secondary font-weight-normal">Order delicious, home-cooked food made by students, delivered straight to you!</h5>
+                    </div>
+                    <div className="homepage-search-form">
+                      <Form className="form-noborder">
+                        <div className="form-row row justify-content-center">
+                          <Form.Group className='col-12 col-md-3 col-lg-2 mb-3'>
+                            <Dropdown onSelect={handleCampusSelect}>
+                              <Dropdown.Toggle variant="secondary" id="dropdown-campus" className="w-100">
+                                {selectedCampus || "Select Campus"}
+                              </Dropdown.Toggle>
+                              <Dropdown.Menu>
+                                {campuses.map((campus) => (
+                                  <Dropdown.Item key={campus.address} eventKey={campus.address}>
+                                    {campus.address}
+                                  </Dropdown.Item>
+                                ))}
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          </Form.Group>
+                          <div className='col-md-4 col-12'>
+                            <Form.Control
+                              type="text"
+                              placeholder="Search for products"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </Form>
+                    </div>
+                  </Col>
+                </Row>
+              </Container>
+            </section>
+
+          </Col>
+        </Row>
+      </Container>
+      <Container fluid >
         <Row>
           {successMessage && (
             <Col md={12}>
@@ -109,10 +160,10 @@ export default function Dashboard() {
               </Alert>
             </Col>
           )}
-          <Col md={12} className="mb-4">
-            <Carousel />
-          </Col>
-          <Col md={6} className="mb-4">
+        </Row>
+
+        <Row>
+          {/* <Col md={6} className="mb-4">
             <Dropdown onSelect={handleCampusSelect}>
               <Dropdown.Toggle variant="secondary" id="dropdown-campus">
                 {selectedCampus || "Select Campus"}
@@ -128,84 +179,108 @@ export default function Dashboard() {
             <Button className="btn-secondary ms-2" onClick={handleResetCampus}>
               Reset
             </Button>
-          </Col>
-          <Col md={6} className="mb-4">
+          </Col> */}
+          {/* <Col md={6} className="mb-4">
             <Form.Control
               type="text"
               placeholder="Search for products"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </Col>
+          </Col> */}
 
           {searchQuery ? (
             <Col md={12}>
-              <h3>Search results for "{searchQuery}"</h3>
-              <div className="product-list d-flex flex-wrap justify-content-center">
-              {searchedProducts.length > 0 ? (
-            searchedProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                cart={cart}
-                addToCart={addToCart}
-                incrementQuantity={incrementQuantity}
-                decrementQuantity={decrementQuantity} />
-                  ))
-                ) : (
-                  <p>No products found.</p>
-                )}
-              </div>
-            </Col>
-          ) : (
-            <>
-              <Col md={12} className="top-picks-section mb-5">
-                <h3>Top Picks</h3>
-                <p>
-                  Discover our most-loved homemade dishes at{" "}
-                  {selectedCampus || "all campuses"}
-                </p>
-                <div className="product-list d-flex flex-wrap justify-content-center">
-                  {data?.getAllProducts?.length > 0 ? (
-                    data.getAllProducts.map((product) => (
+              <h6><b>Search results for "{searchQuery}"</b></h6>
+              <div className="product-list row">
+                {searchedProducts.length > 0 ? (
+                  searchedProducts.map((product) => (
+                    <div className="col-md-3">
                       <ProductCard
                         key={product.id}
                         product={product}
                         cart={cart}
                         addToCart={addToCart}
                         incrementQuantity={incrementQuantity}
-                        decrementQuantity={decrementQuantity}
-                      />
+                        decrementQuantity={decrementQuantity} /></div>
+                  ))
+                ) : (
+                  <div className="col-12">
+                    <div class="alert alert-warning" role="alert">
+                      No products found.
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Col>
+          ) : (
+            <>
+              <Col md={12} className="mb-5">
+                <div className="d-flex justify-content-between align-items-baseline">
+                  <div>
+                    <h5>Top Picks</h5>
+                    <p className="d-none d-lg-block">
+                      Discover our most-loved homemade dishes at{" "}
+                      {selectedCampus || "all campuses"}
+                    </p>
+                  </div>
+                  <a className="btn-link" onClick={() => setViewAllProducts(!viewAllProducts)}>
+                    {viewAllProducts ? "Show Less" : "View All"}
+                  </a>
+                </div>
+                <hr className="mt-0" />
+                <div className="row">
+                  {data?.getAllProducts?.length > 0 ? (
+                    data.getAllProducts.map((product) => (
+                      <div className="col-md-3">
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          cart={cart}
+                          addToCart={addToCart}
+                          incrementQuantity={incrementQuantity}
+                          decrementQuantity={decrementQuantity}
+                        />
+                      </div>
                     ))
                   ) : (
-                    <p>No products available for the selected campus.</p>
+                    <div className="col-12">
+                      <div class="alert alert-warning" role="alert">
+                        No products available for the selected campus.
+                      </div>
+                    </div>
                   )}
                 </div>
-                <Button
-                  className="btn-primary"
-                  onClick={() => setViewAllProducts(!viewAllProducts)}
-                >
-                  {viewAllProducts ? "Show Less" : "View All"}
-                </Button>
+
               </Col>
-              <Col md={12} className="chefs-around-section mb-5">
-                <h3>Chefs Around You</h3>
-                <p>Connect with chefs at {selectedCampus || "all campuses"}</p>
-                <div className="chef-list d-flex flex-wrap justify-content-center">
+              <Col md={12} className="mb-5">
+                <div className="d-flex justify-content-between align-items-baseline">
+                  <div>
+                    <h5>Chefs Around You</h5>
+                    <p className="d-none d-lg-block">
+                      Connect with chefs at {selectedCampus || "all campuses"}
+                    </p>
+                  </div>
+                  <a className="btn-link" onClick={() => setViewAllChefs(!viewAllChefs)}>
+                    {viewAllChefs ? "Show Less" : "View All"}
+                  </a>
+                </div>
+                <hr className="mt-0" />
+
+                <div className="row">
                   {filteredChefs.length > 0 ? (
                     filteredChefs
                       .slice(0, viewAllChefs ? filteredChefs.length : 4)
-                      .map((chef) => <ChefCard key={chef.id} chef={chef} />)
+                      .map((chef) => <div className="col-md-3"><ChefCard key={chef.id} chef={chef} /></div>)
                   ) : (
-                    <p>No chefs available for the selected campus.</p>
+                    <div className="col-12">
+                      <div class="alert alert-warning" role="alert">
+                      No chefs available for the selected campus.
+                      </div>
+                    </div>
                   )}
                 </div>
-                <Button
-                  className="btn-primary"
-                  onClick={() => setViewAllChefs(!viewAllChefs)}
-                >
-                  {viewAllChefs ? "Show Less" : "View All"}
-                </Button>
+
               </Col>
             </>
           )}

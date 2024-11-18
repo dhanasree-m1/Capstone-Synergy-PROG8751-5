@@ -1,7 +1,19 @@
+@import '../../App.scss';
 .product-card {
-    width: 300px;
+    padding: 20px;
+    background-color: $card-bg;
     .price {
       font-weight: bold;
-      color: #f08;
+      color: $secondary-color;
+      font-size: 16px;
     }
   }
+  .card-img-top{
+    height: 250px;
+    object-fit: cover;
+  }
+  .campus-name .material-icons{
+    color: $secondary-color;
+    vertical-align: middle;
+    font-size: 19px;
+}

@@ -1,3 +1,37 @@
 .custom-dropdown .dropdown-toggle::after {
     display: none; /* Hides the default caret */
   }
+  .navbar {
+    width: 100%;
+  }
+  
+  
+  .role-navbar {
+    background-color: #f8f9fa;
+    padding: 0.5rem 0;
+  }
+  
+  .nav-link {
+    margin: 0 1rem;
+    color: #000;
+    &:hover {
+      color: #007bff;
+    }
+  }
+  .cart-icon{
+    
+    line-height: 32px;
+    margin-right: 20px;
+    align-items: center;
+    cursor: pointer;
+    margin: 0 auto;
+  }
+  .badge{
+    top: 0px;
+    right: -15px;
+  }
+  .logo{
+    height: 16px;
+  }
+  
+  

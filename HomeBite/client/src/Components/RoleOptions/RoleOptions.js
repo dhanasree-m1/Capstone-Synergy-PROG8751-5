@@ -23,8 +23,8 @@ const RoleOptions = ({ roles, onRoleChange }) => {
 
   return (
     <>
-      <h5 className="form-sub-title">What would you like to do?</h5>
-      <div className="fat-options d-flex mb-3">
+      <h5 className="mt-5 mb-3">What would you like to do?</h5>
+      <div className="fat-options d-grid d-lg-flex mb-3 gap-2">
         {roleData.map((role) => (
           <label className={`option ${roles[role.name] ? "checked" : ""}`} key={role.name}>
             <input

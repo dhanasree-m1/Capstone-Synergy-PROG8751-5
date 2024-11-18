@@ -2,7 +2,7 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import './InputField.scss';
 
-const InputField = ({ id, label, type, name, value, onChange, placeholder, readOnly, required, options = [],multiple = false }) => {
+const InputField = ({ id, label, type, name, value, onChange, placeholder, readOnly, required, options = [],multiple = false, disabled = false }) => {
   return (
     <Form.Group className="input-field mb-3">
       <Form.Label htmlFor={id}>{label}</Form.Label>
@@ -32,6 +32,7 @@ const InputField = ({ id, label, type, name, value, onChange, placeholder, readO
           onChange={onChange}
           placeholder={placeholder}
           required={required}
+          disabled={disabled}
           readOnly={readOnly}
         />
       )}
