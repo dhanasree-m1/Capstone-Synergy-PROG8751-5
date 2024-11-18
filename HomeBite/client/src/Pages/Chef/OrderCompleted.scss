@@ -1,0 +1,119 @@
+// OrderCompleted.scss
+
+.order-completed {
+    padding: 20px;
+  
+    h2 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+  
+    .tab-selector {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #FF8A00;
+      
+      .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #666;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        transition: color 0.3s ease;
+  
+        &:hover {
+          color: #ff8a00;
+        }
+        
+        &.active {
+          color: #ff8a00;
+          border-bottom: 3px solid #ff8a00;
+        }
+      }
+    }
+  
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+  
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+  
+    .table-header {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      color: #666;
+      text-align: left;
+      border-bottom: 2px solid #FF8A00;
+    }
+  
+    .table-row {
+      border-bottom: 1px solid #ddd;
+  
+      &:hover {
+        background-color: #f3faf3;
+      }
+    }
+  
+    .table-cell {
+      padding: 15px;
+      text-align: left;
+      font-size: 16px;
+      color: #333;
+      border-right: 1px solid #ddd;
+  
+      &:last-child {
+        border-right: none;
+      }
+  
+      p {
+        margin: 5px 0;
+      }
+    }
+  
+    .order-details {
+      font-size: 14px;
+      color: #333;
+  
+      .order-id {
+        font-weight: bold;
+      }
+  
+      .order-time {
+        font-size: 14px;
+        color: #666;
+      }
+    }
+  
+    .customer-details,
+    .payment-details {
+      font-size: 14px;
+      color: #333;
+  
+      p {
+        margin: 3px 0;
+      }
+    }
+  
+    .item-details {
+      font-size: 14px;
+      color: #333;
+  
+      p {
+        margin: 3px 0;
+      }
+    }
+  }
+  

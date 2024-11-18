@@ -49,6 +49,7 @@ const Login = () => {
                   first_name
                   last_name
                   email
+                  role
                 }
               }
             }
@@ -63,6 +64,7 @@ const Login = () => {
         localStorage.setItem("token", result.data.login.token);
         localStorage.setItem("user_id", result.data.login.user.id);
         localStorage.setItem("uname", result.data.login.user.first_name);
+        localStorage.setItem("urole", result.data.login.user.role);
         //console.log(result.data.login.token)
         //console.log(result.data.login.user.id)
         //console.log(localStorage.getItem("user_id"))

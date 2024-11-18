@@ -7,7 +7,7 @@ const typeDefs = gql`
     last_name: String!
     email: String!
     mobile_number: String!
-    role: String!
+    role: [String!]
     gender: String
     profile_image: String
     status: String
@@ -99,7 +99,7 @@ const typeDefs = gql`
     email: String!
     mobile_number: String!
     password_hash: String!
-    role: String!
+    role: [String!]
     gender: String
     profile_image: String
     status: String
@@ -118,7 +118,7 @@ const typeDefs = gql`
     email: String
     mobile_number: String
     password_hash: String
-    role: String
+    role: [String!]
     gender: String
     profile_image: String
     status: String
@@ -192,6 +192,7 @@ const typeDefs = gql`
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
     getCurrentOrders: [Order]
+    getCompletedOrders: [Order]
     isEmailUnique(email: String!): Boolean!
   }
 
@@ -264,7 +265,7 @@ const typeDefs = gql`
     postal_code: String
     country: String
     nearby_landmark: String
-    role: String
+    role: [String!]
     profile_image: String
     password_hash: String
   }

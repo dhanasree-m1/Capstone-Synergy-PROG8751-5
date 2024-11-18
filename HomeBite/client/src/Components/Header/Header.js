@@ -27,9 +27,9 @@ export default function Header({
 
   const navigate = useNavigate();
   const shouldShowRoleNavbar = roles.chef || roles.rider || roles.customer;
-
+  const urole = localStorage.getItem("urole");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+console.log("login urole",urole)
   useEffect(() => {
     const userId = localStorage.getItem("user_id");
     setIsLoggedIn(!!userId);
@@ -86,10 +86,10 @@ export default function Header({
       </Navbar>
 
       {/* Conditional Role Navbar */}
-      {shouldShowRoleNavbar && (
+      {urole && (
         <div className="role-navbar">
           <Nav className="justify-content-center">
-            {roles.customer && (
+            {urole === "customer" && (
               <Nav.Link
                 href="/customer/dashboard"
                 active={currentRole === "customer"}
@@ -98,7 +98,7 @@ export default function Header({
                 Customer
               </Nav.Link>
             )}
-            {roles.chef && (
+            {urole === "chef" && (
               <Nav.Link
                 href="/chef/dashboard"
                 active={currentRole === "chef"}
@@ -107,7 +107,7 @@ export default function Header({
                 Chef
               </Nav.Link>
             )}
-            {roles.rider && (
+            {urole === "rider" && (
               <Nav.Link
                 href="/rider/dashboard"
                 active={currentRole === "rider"}
