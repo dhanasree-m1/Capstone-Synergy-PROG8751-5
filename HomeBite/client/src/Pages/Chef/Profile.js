@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import InputField from '../../Components/InputField/InputField';
 import ImageUpload from '../../Components/ImageUpload/ImageUpload';
 import Button from "../../Components/Button/Button";
@@ -37,6 +37,7 @@ const Profile = () => {
   });
 
   const [profileImageUrl, setProfileImageUrl] = useState(null);
+  const [message, setMessage] = useState(""); // State to store feedback messages
   const [updateUserProfile] = useMutation(UPDATE_USER_PROFILES);
 
   const fetchData = async () => {
@@ -77,6 +78,39 @@ const Profile = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const validateInputs = () => {
+    const errors = [];
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    const emailRegex = /^(?!.*\.\.)(?!.*@.*@)(?!.*\s)(?!.*[,'`])([a-zA-Z0-9._%+-]+)@[a-zA-Z0-9.-]+\.(com|org|net|gov|edu|mil|info|biz|name|us|uk|ca|au|in|de|fr|cn|jp|br|ru|za|mx|nl|es|it|app|blog|shop|online|site|tech|io|ai|co|xyz|photography|travel|museum|jobs|health)$/;
+    const phoneRegex = /^[0-9]{10}$/;
+    const postalCodeRegex = /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/;
+
+    if (!userInfo.first_name || !nameRegex.test(userInfo.first_name)) {
+      errors.push("First name is required and must contain only letters.");
+    }
+    if (!userInfo.last_name || !nameRegex.test(userInfo.last_name)) {
+      errors.push("Last name is required and must contain only letters.");
+    }
+    if (!userInfo.email || !emailRegex.test(userInfo.email)) {
+      errors.push("A valid email address is required.");
+    }
+    if (!userInfo.mobile_number || !phoneRegex.test(userInfo.mobile_number)) {
+      errors.push("A valid 10-digit mobile number is required.");
+    }
+    if (userInfo.postal_code && !postalCodeRegex.test(userInfo.postal_code)) {
+      errors.push("Postal code can only contain letters, numbers, and dashes.");
+    }
+    if (!chefInfo.cooking_experience) {
+      errors.push("Cooking experience is required for chefs.");
+    }
+
+    if (errors.length > 0) {
+      setMessage(errors.join(" "));
+      return false;
+    }
+    return true;
+  };
 
   const handleInputChange = (e, stateSetter) => {
     const { name, value, type, checked } = e.target;
@@ -123,61 +157,44 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure max_orders_per_day is parsed as an integer
+    if (!validateInputs()) {
+      return;
+    }
+
     const chefData = {
       ...chefInfo,
       max_orders_per_day: parseInt(chefInfo.max_orders_per_day, 10) || 0,
     };
 
-    console.log("User input for mutation:", userInfo);
-    console.log("Chef input for mutation:", chefData);
-
     try {
-        const result = await updateUserProfile({
-          variables: {
-            id: localStorage.getItem("user_id"),
-            userInput: {
-              first_name: userInfo.first_name,
-              last_name: userInfo.last_name,
-              email: userInfo.email,
-              mobile_number: userInfo.mobile_number,
-              role:userInfo.role[0],
-              gender: userInfo.gender,
-              profile_image: profileImageUrl,
-              address_line_1: userInfo.address_line_1,
-              address_line_2: userInfo.address_line_2,
-              city: userInfo.city,
-              province: userInfo.province,
-              postal_code: userInfo.postal_code,
-              country: userInfo.country,
-              nearby_landmark: userInfo.nearby_landmark,
-             
-              password_hash: userInfo.password_hash,
-            },
-            chefInput: {
-              specialty_cuisines: chefInfo.specialty_cuisines,
-              type_of_meals: chefInfo.type_of_meals,
-              cooking_experience: chefInfo.cooking_experience,
-              max_orders_per_day: parseInt(chefInfo.max_orders_per_day, 10),
-              preferred_working_days: chefInfo.preferred_working_days,
-            },
+      const result = await updateUserProfile({
+        variables: {
+          id: localStorage.getItem("user_id"),
+          userInput: {
+            ...userInfo,
+            profile_image: profileImageUrl,
+            //role: userInfo.role ? userInfo.role[0] : undefined,
           },
-        });
-      
-        console.log("Mutation result:", result);
-        alert("Profile updated successfully!");
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        alert("Error updating profile.");
-      }
-      
+          chefInput: chefData,
+        },
+      });
+      setMessage("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setMessage("Error updating profile. Please try again.");
+    }
   };
 
   return (
     <Container>
       <h2>Profile</h2>
+      {message && (
+        // <Alert variant={message.includes("Error") ? "danger" : "success"}>
+        <Alert variant= "danger" >
+          {message}
+        </Alert>
+      )}
       <form onSubmit={handleSubmit}>
-        {/* User Information */}
         <Row>
           <Col md={6}>
             <InputField label="First Name" name="first_name" value={userInfo.first_name || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
@@ -202,8 +219,6 @@ const Profile = () => {
           </Col>
         </Row>
         <ImageUpload label="Profile Image" currentImageUrl={profileImageUrl} onImageUpload={handleProfileImageUpload} />
-
-        {/* Chef Information */}
         <div>
           <h4>Chef Information</h4>
           <SpecialtyCuisinesOptions cuisines={chefInfo.specialty_cuisines} onCuisineChange={handleCuisineChange} />
@@ -212,10 +227,7 @@ const Profile = () => {
           <InputField label="Max Orders Per Day" name="max_orders_per_day" value={chefInfo.max_orders_per_day || ''} onChange={(e) => handleInputChange(e, setChefInfo)} />
           <AvailabilityOptions selectedDays={chefInfo.preferred_working_days} onDayChange={handleWorkingDaysChange} />
         </div>
-
-        {/* Password Change */}
         <InputField label="New Password" name="password" type="password" placeholder="Enter new password" value={userInfo.password || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-
         <Button className="btn-primary mb-3" type="submit">Save Changes</Button>
       </form>
     </Container>

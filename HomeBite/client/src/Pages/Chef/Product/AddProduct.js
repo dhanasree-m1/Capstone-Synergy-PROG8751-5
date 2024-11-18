@@ -10,25 +10,26 @@ import { Card } from "react-bootstrap";
 import "../chef.scss";
 
 const AddProduct = () => {
-  const [product, setProduct] = useState({
-    name: '',
-    description: '',
-    price: 0,
-    quantity: 0,
-    image_url: '',
-    is_available: true,
-  });
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setProduct({
-      ...product,
-      [name]: type === 'checkbox' ? checked : value,
+    const [product, setProduct] = useState({
+      name: '',
+      description: '',
+      price: 0,
+      quantity: 0,
+      dietary:"Veg",
+      image_url: '',
+      is_available: true,
     });
-  };
-  // Handle the image URL received from ImageUpload component
-  const handleImageUpload = (imageData) => {
+    const navigate = useNavigate();
+  
+    const handleChange = (e) => {
+      const { name, value, type, checked } = e.target;
+      setProduct({
+        ...product,
+        [name]: type === 'checkbox' ? checked : value,
+      });
+    };
+   // Handle the image URL received from ImageUpload component
+   const handleImageUpload = (imageData) => {
     setProduct({
       ...product,
       image_url: imageData,

@@ -220,6 +220,7 @@ const typeDefs = gql`
     price: Float!
     quantity: Int
     image_url: String
+    dietary: String
     created_at: String
     is_available: Boolean
     user: User
@@ -231,6 +232,7 @@ const typeDefs = gql`
     price: Float!
     quantity: Int
     image_url: String
+    dietary: String
     is_available: Boolean
   }
 
