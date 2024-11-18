@@ -38,6 +38,7 @@ console.log("login urole",urole)
   const handleLoginLogout = () => {
     if (isLoggedIn) {
       localStorage.removeItem("user_id");
+      localStorage.removeItem("urole"); // Clear the urole value
       setIsLoggedIn(false);
       navigate("/");
     } else {
