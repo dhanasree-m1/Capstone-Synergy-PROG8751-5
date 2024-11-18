@@ -1,260 +1,268 @@
 /* dashboard page */
+@import '../../App.scss';
+
 .dashboard-container {
   display: flex;
 }
 
 .sidebar {
-  width: 250px;
-  background-color: #f8f9fa;
-  padding: 20px;
-  height: auto;
-  position: fixed;
-  left: 0;
-//  top:0;
-  bottom: 0;
+  max-width: 200px;
+  min-height: 100vh;
+  border-right: 1px solid $border-color;
+  padding: 30px;
+}
 
-  // .logo {
-  //   font-size: 1.5em;
-  //   font-weight: bold;
-  //   margin-bottom: 2em;
-  // }
+nav ul {
+  list-style: none;
+  padding: 0;
 
-  nav ul {
-    list-style: none;
-    padding: 0;
+  li {
+    margin-bottom: 1em;
 
-    li {
-      margin-bottom: 1em;
-      
-      a {
-        color: #333;
+    a {
+      background: none;
+      border: none;
+      color: $text-color;
+      font-size: $btn-link-font-size;
+      text-decoration: none;
+      cursor: pointer;
+
+      &:hover {
         text-decoration: none;
-        font-size: 1.1em;
-        display: block;
-        
-        &:hover {
-          color: #007bff;
-        }
+        color: $btn-link-color;
+      }
+
+      .material-icons {
+        vertical-align: middle;
+        font-size: 16px;
+        margin-right: 0.5em;
       }
     }
   }
 }
 
 .content {
-  margin-left: 250px; /* Sidebar width */
+  /* Sidebar width */
   padding: 20px;
-  width: calc(100% - 250px);
+  .material-icons {
+    font-size: 16px;
+    vertical-align: middle;
+  }
 }
 
 /* Global Layout */
 .orders-page {
-    padding: 20px;
-    
-    h2 {
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 20px;
-    }
+  padding: 0px;
+
   
-    .tab-selector {
-      display: flex;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #FF8A00;
-      
-      .tab {
-        padding: 10px 20px;
-        cursor: pointer;
-        font-weight: bold;
-        color: #666;
-        background-color: transparent;
-        border: none;
-        outline: none;
-        transition: color 0.3s ease;
-  
-        &:hover {
-          color: #ff8a00;
-        }
-        
-        &.active {
-          color: #ff8a00;
-          border-bottom: 3px solid #ff8a00;
-        }
-      }
-    }
-  
-    .table-container {
-      width: 100%;
-      overflow-x: auto;
-      margin-top: 20px;
-    }
-  
-    .custom-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: Arial, sans-serif;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-  
-    .table-header {
-      background-color: #f4f4f4;
+
+  h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  .tab-selector {
+    display: flex;
+    margin-bottom: 20px;
+    padding: 0;
+    border-bottom: 2px solid $secondary-color;
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
       font-weight: bold;
       color: #666;
-      text-align: left;
-      border-bottom: 2px solid #FF8A00;
-    }
-  
-    .table-row {
-      border-bottom: 1px solid #ddd;
-  
-      &:hover {
-        background-color: #f3faf3;
-      }
-    }
-  
-    .table-cell {
-      padding: 15px;
-      text-align: left;
-      font-size: 16px;
-      color: #333;
-      border-right: 1px solid #ddd;
-  
-      &:last-child {
-        border-right: none;
-      }
-  
-      p {
-        margin: 5px 0;
-      }
-    }
-  
-    .order-details {
-      font-size: 14px;
-      color: #333;
-  
-      .order-id {
-        font-weight: bold;
-      }
-  
-      .order-time {
-        font-size: 14px;
-        color: #666;
-      }
-    }
-  
-    .customer-details,
-    .payment-details {
-      font-size: 14px;
-      color: #333;
-  
-      p {
-        margin: 3px 0;
-      }
-    }
-  
-    .item-details {
-      font-size: 14px;
-      color: #333;
-  
-      p {
-        margin: 3px 0;
-      }
-    }
-  }
-  
-  /* Header */
-  .orders-header {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 16px 80px;
-    background: #FFFFFF;
-    border-bottom: 1px solid #C1C7CD;
-  }
-  
-  /* Orders Table */
-  .orders-table {
-    width: 100%;
-    max-width: 1280px;
-    margin: 20px 80px;
-    border-collapse: collapse;
-  
-    th, td {
-      padding: 10px;
-      font-family: 'Comfortaa', sans-serif;
-      font-weight: 500;
-      font-size: 14px;
-      text-align: left;
-      color: #4A4A4A;
-    }
-  
-    th {
-      text-transform: uppercase;
-      border-bottom: 2px solid #DDE1E6;
-    }
-  
-    td {
-      border-bottom: 1px solid #DDE1E6;
-      line-height: 1.5;
-    }
-  }
-  
-  /* Buttons */
-  .action-buttons {
-    display: flex;
-    gap: 10px;
-  
-    .accept-button, .reject-button {
-      padding: 10px 16px;
-      font-family: 'Comfortaa', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      color: #FF8A00;
+      background-color: transparent;
       border: none;
-      cursor: pointer;
-      background: transparent;
-  
+      outline: none;
+      transition: color 0.3s ease;
+
       &:hover {
-        text-decoration: underline;
+        color: $secondary-color;
+      }
+
+      &.active {
+        color: $secondary-color;
+        border-bottom: 3px solid $secondary-color;
       }
     }
-  
-    .accept-button {
-      color: #4CAF50; // Green for accept
-    }
-  
-    .reject-button {
-      color: #DA1E28; // Red for reject
-    }
   }
-  
-  /* Footer */
-  .footer {
+
+  .table-container {
     width: 100%;
-    padding: 48px 80px;
-    background: #0F161E;
-    color: #FFFFFF;
-    text-align: center;
-    font-family: 'Comfortaa', sans-serif;
-    font-size: 16px;
+    overflow-x: auto;
+    margin-top: 20px;
   }
-  
-  /* Reusable Text Styles */
-  .text-uppercase {
-    text-transform: uppercase;
+
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
-  
-  .font-comfortaa {
-    font-family: 'Comfortaa', sans-serif;
+
+  .table-header {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #666;
+    text-align: left;
+    border-bottom: 2px solid $secondary-color;
   }
-  
-  /* Responsive Styles */
-  @media (max-width: 768px) {
-    .orders-table {
-      margin: 10px;
-      font-size: 12px;
+
+  .table-row {
+    border-bottom: 1px solid #ddd;
+
+    &:hover {
+      background-color: #f3faf3;
     }
   }
-  
+
+  .table-cell {
+    padding: 15px;
+    text-align: left;
+    font-size: 16px;
+    color: #333;
+    border-right: 1px solid #ddd;
+
+    &:last-child {
+      border-right: none;
+    }
+
+    p {
+      margin: 5px 0;
+    }
+  }
+
+  .order-details {
+    font-size: 14px;
+    color: #333;
+
+    .order-id {
+      font-weight: bold;
+    }
+
+    .order-time {
+      font-size: 14px;
+      color: #666;
+    }
+  }
+
+  .customer-details,
+  .payment-details {
+    font-size: 14px;
+    color: #333;
+
+    p {
+      margin: 3px 0;
+    }
+  }
+
+  .item-details {
+    font-size: 14px;
+    color: #333;
+
+    p {
+      margin: 3px 0;
+    }
+  }
+}
+
+/* Header */
+.orders-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 16px 80px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #C1C7CD;
+}
+
+/* Orders Table */
+.orders-table {
+  width: 100%;
+  max-width: 1280px;
+  margin: 20px 80px;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 10px;
+    font-family: 'Comfortaa', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    text-align: left;
+    color: #4A4A4A;
+  }
+
+  th {
+    text-transform: uppercase;
+    border-bottom: 2px solid #DDE1E6;
+  }
+
+  td {
+    border-bottom: 1px solid #DDE1E6;
+    line-height: 1.5;
+  }
+}
+
+/* Buttons */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+
+  .accept-button,
+  .reject-button {
+    padding: 10px 16px;
+    font-family: 'Comfortaa', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: $secondary-color;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .accept-button {
+    color: #4CAF50; // Green for accept
+  }
+
+  .reject-button {
+    color: #DA1E28; // Red for reject
+  }
+}
+
+/* Footer */
+.footer {
+  width: 100%;
+  padding: 48px 80px;
+  background: #0F161E;
+  color: #FFFFFF;
+  text-align: center;
+  font-family: 'Comfortaa', sans-serif;
+  font-size: 16px;
+}
+
+/* Reusable Text Styles */
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.font-comfortaa {
+  font-family: 'Comfortaa', sans-serif;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .orders-table {
+    margin: 10px;
+    font-size: 12px;
+  }
+}

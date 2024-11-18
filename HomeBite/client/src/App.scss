@@ -34,15 +34,7 @@ h1, h2, h3, h4, h5, h6 {
   h6 { font-size: 16px; font-weight: 400; line-height: 1.6; }
 }
 
-// Responsive Typography
-@media (max-width: 768px) {
-  h1 { font-size: 28px; }
-  h2 { font-size: 24px; }
-  h3 { font-size: 22px; }
-  h4 { font-size: 20px; }
-  h5 { font-size: 16px; }
-  h6 { font-size: 14px; }
-}
+
 
 // Styles
 .App {
@@ -114,12 +106,18 @@ footer {
 }
 
 // General styling for the container
+.ht{
+  height: 200px;
+}
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #fff;
+  background-color: $card-bg;
+}
+.login-container .logo{
+  height: auto;
 }
 
 // Styling for the login/register box
@@ -127,8 +125,10 @@ footer {
   background-color: white;
   padding: 30px;
   border-radius: 10px;
-  width: 100%;
+  width: 70%;
   max-width: 90%;
+  border: 1px solid $border-color;
+  margin: 30px 0;
 }
 
 // Title for the form
@@ -252,4 +252,26 @@ select.form-control{
 }
 .form-check-input:checked[type=checkbox]{
   background-image: url("assets/images/check.svg");
+}
+// Responsive Typography
+@media (max-width: 1200px) {
+  .login-box{
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  h1 { font-size: 28px; }
+  h2 { font-size: 24px; }
+  h3 { font-size: 22px; }
+  h4 { font-size: 20px; }
+  h5 { font-size: 16px; }
+  h6 { font-size: 14px; }
+  .login-container{
+    align-items: flex-start;
+    background-color: $card-bg;
+  }
+  .login-box{
+    width: 100%;
+    margin-top: 2em;
+  }
 }

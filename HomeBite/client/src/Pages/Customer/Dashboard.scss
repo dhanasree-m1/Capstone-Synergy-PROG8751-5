@@ -19,3 +19,19 @@
 .home-search{
     z-index: 2;
 }
+.dropdown-toggle{
+    padding: 10px;
+    text-align: left;
+}
+.icon-btn,.icon-btn:hover{
+    position: absolute;
+    right: 0;
+    background: none;
+    top: 8px;
+}
+.icon-btn .material-icons{
+    font-size: 16px;
+}
+.right-10{
+    right: 10px;
+}

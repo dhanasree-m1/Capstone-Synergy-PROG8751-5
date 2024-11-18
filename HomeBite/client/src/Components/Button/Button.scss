@@ -37,7 +37,11 @@
   padding: 5px 10px;
   font-size: 12px;
 }
-
+.btn.show{
+  background: #fff;
+  border: 1px solid $primary-color;
+  color: $text-color;
+}
 .btn-link,
 a.btn-link {
   background: none;

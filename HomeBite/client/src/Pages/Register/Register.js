@@ -634,7 +634,7 @@ const Register = () => {
               {message && <Alert variant="danger">{message}</Alert>}
               {step === 1 && (
                 <>
-                  <h4 className="mt-5 mb-2">Get Started</h4>
+                  <h4 className="mb-2">Get Started</h4>
                   <p className="mb-4">
                     Enjoy the best home-cooked meals delivered to your doorstep.
                   </p>

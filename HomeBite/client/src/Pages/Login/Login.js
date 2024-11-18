@@ -66,7 +66,7 @@ const Login = () => {
         //console.log(result.data.login.token)
         //console.log(result.data.login.user.id)
         //console.log(localStorage.getItem("user_id"))
-        navigate("/chef");
+        navigate("/chef/orders");
       }
     } catch (error) {
       setMessage("Error logging in");
@@ -76,6 +76,9 @@ const Login = () => {
   return (
     <Container fluid>
       <Row>
+        <Col className="home-bg col-12 d-lg-none ht">
+        <div className="overlay"></div>
+        </Col>
         <Col lg={7} className="p-0">
           <div className="login-container">
             <div className="login-box">

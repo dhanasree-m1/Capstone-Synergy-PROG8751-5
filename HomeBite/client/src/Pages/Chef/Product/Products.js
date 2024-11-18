@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Table } from "react-bootstrap";
 import Button from "../../../Components/Button/Button";
+import ProductCard from "../../../Components/ProductCard/ProductCard";
+import { Card } from "react-bootstrap";
+import { Link } from 'react-router-dom';
+
 
 import "../chef.scss";
 
@@ -14,7 +18,7 @@ const Products = () => {
   }, []);
 
   const fetchProducts = async () => {
-    const userId=localStorage.getItem("user_id");
+    const userId = localStorage.getItem("user_id");
     console.log(userId)
     const response = await fetch('http://localhost:5000/graphql', {
       method: 'POST',
@@ -38,19 +42,19 @@ const Products = () => {
   };
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-    await fetch('http://localhost:5000/graphql', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `
+      await fetch('http://localhost:5000/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `
           mutation {
             deleteProduct(id: "${productId}")
           }
         `,
-      }),
-    });
-    fetchProducts();
-   } // Refresh product list
+        }),
+      });
+      fetchProducts();
+    } // Refresh product list
   };
   const handleEdit = (productId) => {
     // Confirm before editing
@@ -59,10 +63,50 @@ const Products = () => {
     }
   };
   return (
-    <Container fluid className="orders-page" >
-       
-      <Button className="btn-primary  mb-3" onClick={() => navigate('/chef/product/add')}>Add Food</Button>
-      <Table>
+    <Container fluid className="orders-page mt-5" >
+      <div className='row'>
+        <div className='col-12 d-flex justify-content-between'>
+          <div>
+            <h5>Menu</h5>
+            <p>Manage your menu listing</p>
+          </div>
+          <div>
+            <Button variant='secondary small' className="mb-3" onClick={() => navigate('/chef/product/add')}>Add Food</Button>
+          </div>
+        </div>
+        <div className='col-12'>
+          <hr className="mt-0" />
+        </div>
+      </div>
+      <div className='row'>
+        {products.map(product => (
+          <div className='col-lg-3'>
+            <Card className="product-card mb-3" key={product.id}>
+              <Card.Img variant="top" src={product.imageUrl} alt={product.name} />
+              <Card.Body className="pb-0">
+                <Card.Title className="justify-content-between d-flex">{product.name}
+                  {/* <img className="align-bottom" src={veg} /> */}
+                </Card.Title>
+                {/* <Card.Text>{product.description}</Card.Text> */}
+
+                {/* <Card.Text className="campus-name"><span class="material-icons">location_on</span> {campusName}</Card.Text> */}
+               
+                <div className="d-flex justify-content-between align-center">
+                  <p className="price mb-0">${product.price}</p>
+                  <p className="price mb-0">Qty: {product.quantity}</p>
+                </div>
+                <hr />
+                <div className='d-flex gap-2 justify-content-between'>
+                <Link className="btn-link  mb-3" to={`/chef/product/edit/${product.id}`}><span className='material-icons'>edit</span> Edit</Link>
+                <Link className="btn-link  mb-3" onClick={() => handleDelete(product.id)}><span className='material-icons'>delete_outline</span>Delete</Link>
+                </div>
+              </Card.Body>
+            </Card>
+          </div>
+        ))}
+      </div>
+
+      <table>
         <thead>
           <tr>
             <th>Name</th>
@@ -78,13 +122,12 @@ const Products = () => {
               <td>{product.price}</td>
               <td>{product.quantity}</td>
               <td>
-                <Button className="btn-primary  mb-3"  onClick={() =>  handleEdit(product.id)}>Edit</Button>
-                <Button className="btn-primary  mb-3" onClick={() => handleDelete(product.id)}>Delete</Button>
+                
               </td>
             </tr>
           ))}
         </tbody>
-      </Table>
+      </table>
     </Container>
   );
 };

@@ -8,25 +8,30 @@ import "./chef.scss";
 
 const Dashboard = () => {
   return (
-    <Container fluid  >
-    <Header/>
-      <aside className="sidebar">
-        {/* <div className="logo">HomeBite</div> */}
-        <nav>
-          <ul>
-            <li><Link to="">Dashboard</Link></li>
-            <li><Link to="orders">Orders</Link></li>
-            <li><Link to="products">Foods</Link></li>
-            <li><Link to="profile">Profile</Link></li>
-          </ul>
-        </nav>
-      </aside>
-      <main className="content">
-        <h2>Hello {localStorage.getItem('uname')},</h2>
-        <Outlet /> {/* This will render the selected page */}
-      </main>
-    
-    </Container>
+    <>
+      <Container fluid className='p-0' >
+        <Header />
+      </Container>
+      <Container fluid >
+        <div className='row'>
+          <div className="col-2 sidebar">
+            {/* <div className="logo">HomeBite</div> */}
+            <nav>
+              <ul>
+                <li><Link to="orders" className='btn-link'><span class="material-icons">home</span>Dashboard</Link></li>
+                <li><Link to="products" className='btn-link'><span class="material-icons">coffee</span>Menu</Link></li>
+                <li><Link to="profile" className='btn-link'><span class="material-icons">person</span>Profile Details</Link></li>
+              </ul>
+            </nav>
+          </div>
+          <div className="col-10 content">
+            
+
+            <Outlet /> {/* This will render the selected page */}
+          </div>
+        </div>
+      </Container>
+    </>
   );
 };
 

@@ -62,14 +62,14 @@ export default function Header({
                     <Nav.Link href="/" className="btn-link">Home</Nav.Link>
                     <div className="cart-icon d-flex gap-2" onClick={showCartSummary}>
                       <div className="position-relative mx-1">
-                      <FaShoppingCart size={18} />
+                      <FaShoppingCart size={18} className="btn-link" />
                       {totalItems > 0 && (
                         <Badge bg="danger" pill className="position-absolute">
                           {totalItems}
                         </Badge>
                       )}
                       </div>
-                      <h6 className="mb-0 mx-2">Cart</h6>
+                      <h6 className="mb-0 mx-2 btn-link">Cart</h6>
                     </div>
                     <Nav.Link
                       onClick={handleLoginLogout}

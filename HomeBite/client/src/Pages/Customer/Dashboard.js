@@ -102,7 +102,7 @@ export default function Dashboard() {
   return (
     <>
       <MainLayout cart={cart} handleShowCart={handleShowCart} />
-      <Container fluid  className="home-bg mb-5">
+      <Container fluid className="home-bg mb-5">
         <div className="overlay"></div>
         <Row>
           <Col md={12} className="p-0">
@@ -124,22 +124,35 @@ export default function Dashboard() {
                                 {selectedCampus || "Select Campus"}
                               </Dropdown.Toggle>
                               <Dropdown.Menu>
+                                
                                 {campuses.map((campus) => (
                                   <Dropdown.Item key={campus.address} eventKey={campus.address}>
                                     {campus.address}
                                   </Dropdown.Item>
                                 ))}
                               </Dropdown.Menu>
+                              <Button className={`small icon-btn ${!selectedCampus ? "d-none" : "d-inline-block"}`} onClick={handleResetCampus}>
+                            <span class="material-icons">close</span>
+                            </Button>
                             </Dropdown>
                           </Form.Group>
-                          <div className='col-md-4 col-12'>
-                            <Form.Control
-                              type="text"
-                              placeholder="Search for products"
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                          </div>
+                          <div className="col-md-4 col-12 position-relative">
+  <Form.Control
+    type="text"
+    placeholder="Search for products"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+  />
+  {searchQuery && ( // Show the close button only if there is a search query
+    <Button
+      className="small icon-btn pl-2 right-10"
+      onClick={() => setSearchQuery("")}
+    >
+      <span className="material-icons">close</span>
+    </Button>
+  )}
+</div>
+
                         </div>
                       </Form>
                     </div>
@@ -275,7 +288,7 @@ export default function Dashboard() {
                   ) : (
                     <div className="col-12">
                       <div class="alert alert-warning" role="alert">
-                      No chefs available for the selected campus.
+                        No chefs available for the selected campus.
                       </div>
                     </div>
                   )}
