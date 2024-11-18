@@ -2,11 +2,15 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import { User } from './src/models/users.js';
 import  {Product} from './src/models/products.js';
-import { Orders } from './src/models/orders.js';
+import { Order } from './src/models/orders.js';
 import { OrderItem } from './src/models/order_items.js';
 
 async function main() {
   const uri = "mongodb+srv://Wijesinghe4777:admin@webapp.hmydtwm.mongodb.net/HomeBite?retryWrites=true&w=majority"; // Replace with your Atlas connection string
+
+
+
+
   const client = new MongoClient(uri);
 
   try {
@@ -76,35 +80,12 @@ async function main() {
         }
       ]
 
-
-
-    //const result = await collection.insertMany(dummyData);
-    //console.log(`${result.insertedCount} user documents were inserted.`);
-
-    const collection6 = database.collection("chefs");
-    const dummyChef= [   {    user_id: new ObjectId("672cfe51c8d4213b79aa6a90"),     
-      specialty_cuisines: ["Indian", "Chinese"],     
-      ype_of_meals: ["Breakfast", "Dinner"],     
-      cooking_experience: "3-5 years",     
-      max_orders_per_day: 15,     
-      preferred_working_days: ["Monday", "Wednesday", "Friday"],     
-      preferred_start_time: "08:00",     
-      preferred_end_time: "16:00",     
-      created_at: new Date()   },  ]
-
-      //const result4 = await collection6.insertMany(dummyChef);
-    //console.log(`${result4.insertedCount} chef documents were inserted.`);
-
-    const collection7 = database.collection("riders");
-    const dummyRider= [{   user_id: new ObjectId("672cfe51c8d4213b79aa6a92"),   vehicle_type: "Motorcycle",   vehicle_registration_number: "MH12AB1234",   vehicle_insurance_number: "INS123456789",   insurance_expiry_date: new Date("2025-08-15"),   driver_license_number: "DL987654321",   license_expiry_date: new Date("2026-03-20"),   preferred_delivery_radius: "10 km",   preferred_working_days: ["Monday", "Wednesday", "Friday"],   preferred_start_time: "09:00", preferred_end_time: "18:00", long_distance_preference: true }]
-
-      //const result5 = await collection7.insertMany(dummyRider);
-    //console.log(`${result5.insertedCount} Rider documents were inserted.`);
-
+    // const result = await collection.insertMany(dummyData);
+    // console.log(`${result.insertedCount} user documents were inserted.`);
     const collection1 = database.collection("products");
     const dummyProduct=[
         {
-          "chef_id": new ObjectId('672d04b948caaa711061a28b'),
+          "chef_id": new ObjectId('672ba8bfc68841c229204f60'),
           "name": "Vegan Burger",
           "description": "A delicious plant-based burger",
           "price": 12.99,
@@ -113,7 +94,7 @@ async function main() {
           "is_available": true
         },
         {
-          "chef_id": new ObjectId('672d04b948caaa711061a28b'),
+          "chef_id": new ObjectId('672ba8bfc68841c229204f60'),
           "name": "Chocolate Cake",
           "description": "Rich and creamy chocolate cake",
           "price": 8.99,
@@ -124,56 +105,53 @@ async function main() {
       ]
       //const result1 = await collection1.insertMany(dummyProduct);
 
-     //console.log(`${result1.insertedCount} product documents were inserted.`);
-
-    const collection3 = database.collection("orders");
-
+    // console.log(`${result1.insertedCount} product documents were inserted.`);
+    
+    // const collection3 = database.collection("orders");
     const dummyOrder=[
         {
-          "customer_id": new ObjectId('672cfe51c8d4213b79aa6a90'),
-          "chef_id": new ObjectId('672d04b948caaa711061a28b'),
-          "rider_id": new ObjectId('672d04b948caaa711061a28c'),
+          "customer_id": new ObjectId('6729653bfb23f4a3579c5cd2'),
+          "chef_id": new ObjectId('672ba8bfc68841c229204f60'),
+          "rider_id": new ObjectId('671f060b32c0ef3a13225dc2'),
           "total_amount": 25.98,
           "status": "Pending",
           "created_at": "2024-11-06T00:00:00Z"
         },
         {
-          "customer_id": new ObjectId('672cfe51c8d4213b79aa6a90'),
-          "chef_id": new ObjectId('672d04b948caaa711061a28b'),
-          "rider_id": new ObjectId('672d04b948caaa711061a28c'),
+          "customer_id": new ObjectId('6729653bfb23f4a3579c5cd2'),
+          "chef_id": new ObjectId('672ba8bfc68841c229204f60'),
+          "rider_id": new ObjectId('671f060b32c0ef3a13225dc2'),
           "total_amount": 8.99,
           "status": "In Progress",
           "created_at": "2024-11-06T00:00:00Z"
         }
       ]
-    //const result2 = await collection3.insertMany(dummyOrder);
+    //   const result2 = await collection3.insertMany(dummyOrder);
 
-    //console.log(`${result2.insertedCount} order documents were inserted.`);
-
+    // console.log(`${result2.insertedCount} order documents were inserted.`);
     const collection4 = database.collection("order_items");
     const dummyOrdItems=[
         {
-          "order_id": new ObjectId("672d0837ef37899972c81319"),
-          "product_id": new ObjectId("672d0836ef37899972c81317"),
-          "quantity": 2,
+          "order_id": new ObjectId("672baf8b2a879a46a3b430ae"),
+          "product_id": new ObjectId("672baf8b2a879a46a3b430ab"),
+          "quantity": 3,
           "special_request": "Extra spicy",
           "unit_price": 12.99
         },
         {
-          "order_id": new ObjectId("672d0837ef37899972c8131a"),
-          "product_id":new ObjectId("672d0836ef37899972c81318"),
-          "quantity": 1,
+          "order_id": new ObjectId("672baf8b2a879a46a3b430ab"),
+          "product_id":new ObjectId("672bb086347a0380f536e108"),
+          "quantity": 2,
           "special_request": "No nuts",
           "unit_price": 8.99
         }
       ]
-       const result3 = await collection4.insertMany(dummyOrdItems);
+      const result33 = await collection4.insertMany(dummyOrdItems);
 
-       console.log(`${result3.insertedCount} order item documents were inserted.`);
-
+      console.log(`${result33.insertedCount} order item documents were inserted.`);
       const collection5 = database.collection("payments");
       const dummyPayment=[ {
-        "order_id": new ObjectId("672d0837ef37899972c81319"),
+        "order_id": new ObjectId("672bab56afbccca14c12aa8b"),
         "payment_method":"COD",
         "transaction_id": "12345",
         "amount": 25.98,
@@ -181,7 +159,7 @@ async function main() {
         "payment_date":"05-11-2024"
       },
       {
-        "order_id": new ObjectId("672d0837ef37899972c8131a"),
+        "order_id": new ObjectId("672bab56afbccca14c12aa8c"),
         "payment_method":"COD",
         "transaction_id": "12345",
         "amount": 8.99,
@@ -190,62 +168,53 @@ async function main() {
       }
     ]
 
- const result8 = await collection5.insertMany(dummyPayment);
+//  const result3 = await collection5.insertMany(dummyPayment);
 
-      console.log(`${result8.insertedCount} payment documents were inserted.`);
+//       console.log(`${result3.insertedCount} payment documents were inserted.`);
 
 
-// Insert Completed Order
-const completedOrder = {
-  customer_id: new ObjectId('672cfe51c8d4213b79aa6a90'), // Replace with valid user ID
-  chef_id: new ObjectId('672d04b948caaa711061a28b'), // Replace with valid chef ID
-  rider_id: new ObjectId('672d04b948caaa711061a28c'), // Replace with valid rider ID
-  total_amount: 31.98,
-  status: "Completed",
-  created_at: new Date("2023-07-20T15:03:23.000Z")
-};
+   // Insert completed orders
+   const dummyOrders = [
+    {
+      _id: new ObjectId(),
+      order_no: 101, // Ensure this is not null
+      customer_id: new ObjectId("672cfe51c8d4213b79aa6a90"), // Reference valid customer
+      chef_id: new ObjectId("672d04b948caaa711061a28b"), // Reference valid chef
+      rider_id: new ObjectId("672d04b948caaa711061a28c"),
+      total_amount: 50.99,
+      status: "Completed",
+      created_at: new Date().toISOString(),
+      payment: new ObjectId("672bab56afbccca14c12aa8b"), // Reference valid payment
+    },
+  ];
+  
 
-const orderResult = await ordersCollection.insertOne(completedOrder);
-console.log(`1 completed order document was inserted with ID: ${orderResult.insertedId}`);
+  const resultOrders = await ordersCollection.insertMany(dummyOrders);
+  console.log(`${resultOrders.insertedCount} completed orders inserted.`);
 
-// Insert Associated Order Items for Completed Order
-const completedOrderItems = [
-  {
-    order_id: orderResult.insertedId,
-    product_id: new ObjectId("672d0836ef37899972c81317"), // Replace with valid product ID
-    quantity: 2,
-    special_request: "Extra spicy",
-    unit_price: 15.99
-  },
-  {
-    order_id: orderResult.insertedId,
-    product_id: new ObjectId("672d0836ef37899972c81318"), // Replace with valid product ID
-    quantity: 1,
-    special_request: "No nuts",
-    unit_price: 15.99
-  }
-];
-
-const orderItemsResult = await orderItemsCollection.insertMany(completedOrderItems);
-console.log(`${orderItemsResult.insertedCount} order items were inserted for completed order.`);
-
-// Insert Payment Information for Completed Order
-const completedOrderPayment = {
-  order_id: orderResult.insertedId,
-  payment_method: "Credit Card",
-  transaction_id: "TRANSACTION123",
-  amount: 31.98,
-  payment_status: "Successful",
-  payment_date: new Date("2023-07-20T15:05:23.000Z")
-};
-
-const paymentResult = await paymentsCollection.insertOne(completedOrderPayment);
-console.log(`1 payment document was inserted for completed order with ID: ${paymentResult.insertedId}`);
-
-   
-  } finally {
-    await client.close();
-  }
+  // Insert items for completed orders
+  const dummyOrderItems = [
+    {
+      order_id: new ObjectId("6737fac129e6a6cd421926bc"),
+      product_id: new ObjectId("672d0836ef37899972c81317"),
+      quantity: 2,
+      special_request: 'No onions',
+      unit_price: 12.99,
+    },
+    {
+      order_id: new ObjectId("6737f4092d27bbe6ef773e59"),
+      product_id: new ObjectId("672d0836ef37899972c81318"),
+      quantity: 1,
+      special_request: 'Extra spicy',
+      unit_price: 15.99,
+    },
+  ];
+  
+  await database.collection('order_items').insertMany(dummyOrderItems);
+  console.log(`${resultOrder.insertedCount} order items inserted.`);
+} finally {
+  await client.close();
+}
 }
 
 main().catch(console.error);

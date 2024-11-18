@@ -57,13 +57,13 @@ const typeDefs = gql`
 }
 type Order {
      _id: ID!
-    status: String!
-    order_no: Int!
-    customer_id: User
-    items: [OrderItem]
-    payment: Payment
-    total_amount: Float
-    created_at: String
+  order_no: Int
+  customer_id: User!
+  payment: Payment
+  items: [OrderItem] 
+  status: String
+  total_amount: Float
+  created_at: String
   }
   type Product {
     id: ID!
@@ -71,10 +71,12 @@ type Order {
   }
 
   type OrderItem {
-    product_id: Product!
-    quantity: Int!
-    special_request: String
-    unit_price: Float
+  _id: ID!
+  order_id: ID!
+  product_id: Product
+  quantity: Int
+  special_request: String
+  unit_price: Float
   }
 
   type Payment {
@@ -194,6 +196,7 @@ input CreateChefInput {
     
     isEmailUnique(email: String!): Boolean!
     completedOrders: [Order]
+    orderItems: [OrderItem]
   }
 
   type Mutation {

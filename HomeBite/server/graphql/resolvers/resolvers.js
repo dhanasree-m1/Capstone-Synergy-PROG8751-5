@@ -82,25 +82,37 @@ const resolvers = {
       },
       completedOrders: async () => {
         try {
-          const orders = await Orders.find({ status: 'Completed' })
-            .populate('customer_id', 'first_name last_name address_line_1 address_line_2 city province postal_code country')
-            .populate({
-              path: 'items',
-              populate: {
-                path: 'product_id',
-                select: 'name',
-              },
-              select: 'quantity special_request unit_price',
+          const orders = await Order.find({ status: 'Completed' })
+            .populate('customer_id', 'first_name last_name address_line_1 city province')
+            .populate('payment', 'payment_method amount payment_status')
+            .lean();
+      
+          const ordersWithDetails = await Promise.all(
+            orders.map(async (order) => {
+              const items = await OrderItem.find({ order_id: order._id })
+                .populate('product_id', 'name')
+                .lean();
+      
+              return {
+                ...order,
+                customer_id: order.customer_id || null,
+                payment: order.payment || null,
+                items: items || [], // Ensure items are attached
+              };
             })
-            .populate('payment', 'payment_method amount payment_status');
-  
-          return orders;
+          );
+      
+          return ordersWithDetails;
         } catch (error) {
-          console.error("Error fetching completed orders:", error);
-          throw new Error("Failed to fetch completed orders.");
+          console.error('Error fetching completed orders:', error);
+          throw new Error('Failed to fetch completed orders.');
         }
       },
-  },
+      
+      
+      
+    },
+  
 
   Mutation: {
     async forgotPassword(parent, { email }, context) {
@@ -233,14 +245,14 @@ const resolvers = {
       try {
         const order = await Order.findById(orderId);
         if (!order) {
-          throw new Error("Order not found");
+          throw new Error('Order not found');
         }
         order.status = status;
         await order.save();
-        return { success: true, message: "Order status updated successfully" };
+        return { success: true, message: 'Order status updated successfully' };
       } catch (error) {
-        console.error("Error updating order status:", error);
-        return { success: false, message: "Failed to update order status" };
+        console.error('Error updating order status:', error);
+        return { success: false, message: 'Failed to update order status' };
       }
     },
   },
