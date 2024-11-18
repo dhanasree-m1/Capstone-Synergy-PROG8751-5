@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Container,  Table, Button } from "react-bootstrap";
+import { Link } from 'react-router-dom';
 // import Header from '../../Components/Header/Header';
 import "./chef.scss"; // Import the SCSS file
 
 const CurrentOrders = () => {
   const [orders, setOrders] = useState([]);
 
-  // Fetch orders from the server on component mount
+  
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -97,8 +98,8 @@ const CurrentOrders = () => {
         {/* <Header /> */}
        <h2>Orders</h2>
         <div className="tab-selector">
-          <button className="tab active">Current Orders</button>
-          <button className="tab ">Order Completed</button>
+          <Link className="tab active">Current Orders</Link>
+          <Link to="completed" className="tab ">Order Completed</Link>
         </div>
 
       
