@@ -1,3 +1,4 @@
+@import '../../App.scss';
 .custom-dropdown .dropdown-toggle::after {
     display: none; /* Hides the default caret */
   }
@@ -34,4 +35,28 @@
     height: 16px;
   }
   
-  
+  // .role-navbar{
+  //   background-color: $card-bg;
+  //   padding-bottom: 0;
+  //   padding-top: 0;
+  // }
+  // .role-navbar .nav-link.active{
+  //   border: none;
+  //   border-radius: 0;
+  //   border-top: 4px solid $primary-color;
+  //   font-weight: bold;
+  //   text-decoration: none;
+  // }
+  // .role-navbar .nav-link.active:hover{
+  //   text-decoration: none !important;
+  // }
+  // .bg-body-tertiary{
+  //   background-color: $header-bg !important;
+  // }
+  .site-header .btn-link, .site-header .btn-link .material-icons{
+    color: $text-color;
+  }
+  .site-header .btn-link.active,  .site-header .btn-link.active .material-icons , .site-header .btn-link:hover,.site-header .nav-link:hover,.cart-icon:hover .btn-link{
+    color: $link-color;
+    font-weight: bold;
+  }

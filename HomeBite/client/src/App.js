@@ -1,4 +1,4 @@
-import "./App.scss";
+
 import { Route, Routes } from "react-router-dom";
 //import Home from "./Pages/Home/Home";
 import Login from "./Pages/Login/Login";
@@ -14,6 +14,7 @@ import CurrentOrders from "./Pages/Chef/CurrentOrders";
 import CompletedOrders from "./Pages/Chef/OrderCompleted";
 import Profile from "./Pages/Chef/ProfileView";
 import EditProfile from "./Pages/Chef/Profile";
+import "./App.scss";
 
 function App() {
   return (

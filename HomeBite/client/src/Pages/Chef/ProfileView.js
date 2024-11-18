@@ -47,7 +47,20 @@ const ProfileView = () => {
   }, []);
 
   return (
+    <>
     <Container>
+      <Row>
+        <Col>
+          <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span class="material-icons">
+            arrow_forward
+          </span><span>Profile Details</span>
+        </Col>
+        <Col md={12} className='mt-5'><h5>Profile Details</h5><hr /></Col>
+      </Row>
+      </Container>
+     
+      <Container>
+ 
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Profile</h2>
         <Link to="edit" className="btn-primary mb-3">Edit</Link>
@@ -92,7 +105,9 @@ const ProfileView = () => {
           <p><strong>Preferred Working Days:</strong> {chefInfo.preferred_working_days?.join(', ')}</p>
         </div>
       )}
+    
     </Container>
+    </>
   );
 };
 

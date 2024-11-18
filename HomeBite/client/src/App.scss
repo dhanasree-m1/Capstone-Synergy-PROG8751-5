@@ -21,6 +21,8 @@ $border-color:#DDE1E6;
 $homepage-search-block-bg:#EEF0EF;
 $card-bg:#F0FFF4;
 $chef-card: #F8F8F8;
+$header-bg:#F5F5F5;
+$null:0;
 // Typography
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-family;
@@ -237,6 +239,11 @@ input:-internal-autofill-selected {
   margin-top: 20px;
 }
 
+.b-0{
+  border: $null;
+}
+.link-color{
+  color:$link-color;}
 //Dropdown
 select.form-control{
   background: url("assets/images/chevron-down.svg") no-repeat right 1rem center/20px 20px;

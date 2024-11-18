@@ -1,6 +1,5 @@
 import { FaSearch, FaShoppingCart } from "react-icons/fa";
 import Button from "react-bootstrap/esm/Button";
-import "./Header.scss";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/logo.svg";
 import { useEffect, useState } from "react";
@@ -13,6 +12,7 @@ import {
   Col,
   Row,
 } from "react-bootstrap";
+import "./Header.scss";
 
 export default function Header({
   cart = {},
@@ -29,7 +29,7 @@ export default function Header({
   const shouldShowRoleNavbar = roles.chef || roles.rider || roles.customer;
   const urole = localStorage.getItem("urole");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-console.log("login urole",urole)
+  console.log("login urole", urole);
   useEffect(() => {
     const userId = localStorage.getItem("user_id");
     setIsLoggedIn(!!userId);
@@ -49,8 +49,8 @@ console.log("login urole",urole)
   return (
     <>
       {/* Primary Navbar */}
-      <Navbar expand="lg" className="bg-body-tertiary">
-        <Container fluid >
+      <Navbar expand="lg" className="bg-body-tertiary site-header">
+        <Container fluid>
           <Row className="w-100">
             <Col className="d-flex justify-content-between align-items-center">
               <Navbar.Brand href="/">
@@ -60,22 +60,97 @@ console.log("login urole",urole)
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                   <Nav className="d-flex gap-2 justify-content-between">
-                    <Nav.Link href="/" className="btn-link">Home</Nav.Link>
-                    <div className="cart-icon d-flex gap-2" onClick={showCartSummary}>
-                      <div className="position-relative mx-1">
-                      <FaShoppingCart size={18} className="btn-link" />
-                      {totalItems > 0 && (
-                        <Badge bg="danger" pill className="position-absolute">
-                          {totalItems}
-                        </Badge>
-                      )}
+                    <Nav.Link
+                      href="/"
+                      className={`btn-link ${
+                        currentRole === "home" ||
+                        ["customer", "chef", "rider"].includes(currentRole)
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      Home
+                    </Nav.Link>
+                    {urole && (
+                      <div className="cart-icon d-flex gap-2">
+                        <Nav className=" b-0">
+                          {urole === "customer" && (
+                            <Nav.Link
+                              href="/customer/dashboard"
+                              active={currentRole === "customer"}
+                              onClick={() => onRoleSelect("customer")}
+                            >
+                              Customer
+                            </Nav.Link>
+                          )}
+                          {/* {urole === "chef" && (
+                            <Nav.Link
+                            className={`cart-icon d-flex p-0 align-items-baseline ${
+                              currentRole === "chef"
+                                ? "active"
+                                : ""
+                            }`}
+                              
+                              href="/chef/orders"
+                              active={currentRole === "chef"}
+                              onClick={() => onRoleSelect("chef")}
+                            >
+                              <div className="position-relative ">
+                                <span className="material-icons align-middle">
+                                  coffee
+                                </span>
+                              </div>
+                              <h6 className="mb-0 mx-2 btn-link">
+                                Chef Dashboard
+                              </h6>
+                            </Nav.Link>
+                          )} */}
+                          {urole === "chef" && (
+                            <Nav.Link
+                              className={`cart-icon d-flex p-0 align-items-baseline ${
+                                currentRole === "chef" ? "active" : " "
+                              }`}
+                              href="/chef/orders"
+                              onClick={() => onRoleSelect("chef")}
+                            >
+                              <div className="position-relative">
+                                <span className="material-icons align-middle">
+                                room_service
+                                </span>
+                              </div>
+                              <h6 className="mb-0 mx-2 btn-link">
+                                Chef Dashboard
+                              </h6>
+                            </Nav.Link>
+                          )}
+
+                          {urole === "rider" && (
+                            <Nav.Link
+                              href="/rider/dashboard"
+                              active={currentRole === "rider"}
+                              onClick={() => onRoleSelect("rider")}
+                            >
+                              Rider
+                            </Nav.Link>
+                          )}
+                        </Nav>
+                      </div>
+                    )}
+                    <div
+                      className="cart-icon d-flex gap-2"
+                      onClick={showCartSummary}
+                    >
+                      <div className="position-relative ">
+                        <FaShoppingCart size={18} className="btn-link" />
+                        {totalItems > 0 && (
+                          <Badge bg="danger" pill className="position-absolute">
+                            {totalItems}
+                          </Badge>
+                        )}
                       </div>
                       <h6 className="mb-0 mx-2 btn-link">Cart</h6>
                     </div>
-                    <Nav.Link
-                      onClick={handleLoginLogout}
-                      className="btn-link"
-                    >
+                    <Nav.Link onClick={handleLoginLogout} className="btn-link">
                       {isLoggedIn ? "Logout" : "Login"}
                     </Nav.Link>
                   </Nav>
@@ -87,9 +162,9 @@ console.log("login urole",urole)
       </Navbar>
 
       {/* Conditional Role Navbar */}
-      {urole && (
+      {/* {urole && (
         <div className="role-navbar">
-          <Nav className="justify-content-center">
+          <Nav className="nav nav-tabs">
             {urole === "customer" && (
               <Nav.Link
                 href="/customer/dashboard"
@@ -105,7 +180,7 @@ console.log("login urole",urole)
                 active={currentRole === "chef"}
                 onClick={() => onRoleSelect("chef")}
               >
-                Chef
+                <span class="material-icons">coffee</span> Chef Dashboard
               </Nav.Link>
             )}
             {urole === "rider" && (
@@ -119,7 +194,7 @@ console.log("login urole",urole)
             )}
           </Nav>
         </div>
-      )}
+      )} */}
     </>
   );
 }

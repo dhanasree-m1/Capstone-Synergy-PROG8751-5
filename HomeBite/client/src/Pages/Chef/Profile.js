@@ -9,6 +9,7 @@ import TypeOfMealsOptions from "../../Components/TypeOfMealsOptions/TypeOfMealsO
 import AvailabilityOptions from "../../Components/AvailabilityOptions/AvailabilityOptions";
 import { UPDATE_USER_PROFILES } from "../../queries";
 import { useMutation } from "@apollo/client";
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const [userInfo, setUserInfo] = useState({
@@ -187,6 +188,14 @@ const Profile = () => {
 
   return (
     <Container>
+      <Row>
+        <Col>
+          <Link className="btn-link  mb-3" to="/chef/products">Menu</Link><span class="material-icons">
+            arrow_forward
+          </span><span>Add Menu</span>
+        </Col>
+        <Col md={12} className='mt-5'><h5>Profile Details</h5><hr /></Col>
+      </Row>
       <h2>Profile</h2>
       {message && (
         // <Alert variant={message.includes("Error") ? "danger" : "success"}>
