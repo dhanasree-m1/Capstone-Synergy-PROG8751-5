@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Table, Button } from "react-bootstrap";
-import Header from '../../Components/Header/Header';
-import Logo from "../../assets/images/logo.svg";
-import "./CurrentOrders.scss"; // Import the SCSS file
+import { Container,  Table, Button } from "react-bootstrap";
+import { Link } from 'react-router-dom';
+// import Header from '../../Components/Header/Header';
+import "./chef.scss"; // Import the SCSS file
 
 const CurrentOrders = () => {
   const [orders, setOrders] = useState([]);
 
-  // Fetch orders from the server on component mount
+  
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -95,11 +95,11 @@ const CurrentOrders = () => {
 
   return (
     <Container fluid className="orders-page">
-        <Header />
+        {/* <Header /> */}
        <h2>Orders</h2>
         <div className="tab-selector">
-          <button className="tab active">Current Orders</button>
-          <button className="tab ">Order Completed</button>
+          <Link className="tab active">Current Orders</Link>
+          <Link to="completed" className="tab ">Order Completed</Link>
         </div>
 
       
@@ -152,7 +152,7 @@ const CurrentOrders = () => {
                 </td>
                
                 <td className="action-buttons">
-                {order.status == "Pending" ? (
+                {order.status === "Pending" ? (
                   <>
                   <Button
                     className="accept-button"

@@ -10,6 +10,7 @@ import { OrderItem } from '../../src/models/order_items.js';
 import { sendResetEmail } from '../../utils/emailService.js';
 import { Payment } from '../../src/models/payments.js'; 
 import { Product } from '../../src/models/products.js'; 
+
 // import { sendResetEmail } from "../utils/emailService.js";
 // Define the generateToken function
 
@@ -40,6 +41,9 @@ const resolvers = {
         async isEmailUnique(_, { email }) {
         const existingUser = await User.findOne({ email });
         return !existingUser; // true if no user found, false if exists
+      },
+      getProductsByChef: async (_, { chef_id }) => {
+        return await Product.find({ chef_id });
       },
       getCurrentOrders: async () => {
         try {
@@ -80,61 +84,83 @@ const resolvers = {
           throw new Error("Failed to fetch current orders.");
         }
       },
-      completedOrders: async () => {
+      getCompletedOrders: async () => {
         try {
-          console.log("Fetching completed orders...", order._id);
-          const items = await OrderItem.find({ order_id: order._id })
-  .populate("product_id", "name")
-  .lean();
-      
+          // Fetch all orders with status not equal to "Completed"
           const orders = await Order.find({ status: "Completed" })
-            .populate("customer_id", "first_name last_name address_line_1 city province")
-            .populate({
-              path: "payment",
-              select: "payment_method amount payment_status",
-            })
+            .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
+            .populate('chef_id', 'specialty_cuisines type_of_meals')
+            .populate('rider_id', 'vehicle_type vehicle_registration_number')
             .lean();
-      
-          if (!orders || orders.length === 0) {
-            console.log("No completed orders found.");
-            return [];
-          }
-      
+          // For each order, find the associated OrderItems
           const ordersWithDetails = await Promise.all(
             orders.map(async (order) => {
+              // Fetch OrderItems for the current order
               const items = await OrderItem.find({ order_id: order._id })
-                .populate("product_id", "name")
-                .lean();
+              .populate({
+                path: 'product_id',
+                select: 'name'
+              }).lean();
       
+              // Fetch Payment for the current order
+              const payment = await Payment.findOne({ order_id: order._id }).lean();
+      
+              // Return the order with populated items and payment details
               return {
                 ...order,
-                items: items || [], // Attach items
-                payment: order.payment || null,
+                items,   // Attach items array to the order
+                payment, // Attach payment details to the order
               };
             })
           );
-      
-          console.log("Completed orders fetched successfully:", ordersWithDetails);
+          console.log("Order with items")
+          console.log(ordersWithDetails);
           return ordersWithDetails;
+         
+         
         } catch (error) {
-          console.error("Error fetching completed orders:", error);
-          throw new Error("Failed to fetch completed orders.");
+          console.error("Error fetching current orders:", error);
+          throw new Error("Failed to fetch current orders.");
         }
       },
+      getProduct: async (_, { id }) => {
+        try {
+          // Find the product by ID and populate the chef_id field
+          const product = await Product.findById(id).populate("chef_id");
+          if (!product) {
+            throw new Error("Product not found");
+          }
+          return product;
+        } catch (error) {
+          throw new Error(`Error fetching product: ${error.message}`);
+        }
+      },
+      getUserProfile: async (_, __, { user }) => {
       
-      
-      
-    },
+
+        // Fetch user, chef, and rider details based on authenticated user ID
+        const userProfile = await User.findById(user.id);
+        const chefProfile = await Chef.findOne({ user_id: user.id });
+        
+        console.log("userprofile : ",userProfile)
   
+        return {
+          user: userProfile,
+          chef: chefProfile,
+          
+        };
+      },
+      
+  },
 
   Mutation: {
     async forgotPassword(parent, { email }, context) {
       try {
         // Find user by email
         console.log("hii")
-        console.log(email)
+        //console.log(email)
         const user = await User.findOne({ email: email });
-       console.log(user);
+       //console.log(user);
         //const user = await User.findOne({ where: { email } });
         if (!user) {
          throw new Error("No user found with this email.");
@@ -198,7 +224,7 @@ const resolvers = {
         throw new Error("Invalid email format");
       }
       const user = await User.findOne({ email: input.email });
-      console.log("Found user:", user);
+      //console.log("Found user:", user);
       
       // Check if the user exists
       if (!user) {
@@ -264,9 +290,71 @@ const resolvers = {
         await order.save();
         return { success: true, message: 'Order status updated successfully' };
       } catch (error) {
-        console.error('Error updating order status:', error);
-        return { success: false, message: 'Failed to update order status' };
+        console.error("Error updating order status:", error);
+        return { success: false, message: "Failed to update order status" };
       }
+    },
+    addProduct: async (_, { chef_id, input }) => {
+      const newProduct = new Product({ chef_id, ...input });
+      return await newProduct.save();
+    },
+    updateProduct: async (_, { id, input }) => {
+      return await Product.findByIdAndUpdate(id, input, { new: true });
+    },
+    deleteProduct: async (_, { id }) => {
+      await Product.findByIdAndDelete(id);
+      return true;
+    },
+    updateUserProfile: async (_, {id, userInput, chefInput }) => {
+      if (!id) {
+        throw new Error("User not authenticated");
+      }
+      console.log("userrrr:",id)
+      try {
+      const updatedUserData = {
+        ...userInput,
+        ...(userInput.password_hash && { password_hash: await bcrypt.hash(userInput.password_hash, 10) })
+      };
+      // Update User Information
+      const updatedUser = await User.findByIdAndUpdate(id, updatedUserData, { new: true });
+
+      // Update Chef Information (if the user is a chef)
+      let updatedChef = null;
+      if (chefInput) {
+        updatedChef = await Chef.findOneAndUpdate(
+          { user_id: id },
+          chefInput,
+          { new: true, upsert: true }
+        );
+      }
+      // Update Rider Information (if the user is a rider)
+      // let updatedRider = null;
+      // if (riderInput) {
+      //   updatedRider = await Rider.findOneAndUpdate(
+      //     { user_id: user.id },
+      //     {
+      //       vehicle_registration_number: riderInput.vehicle_registration_number,
+      //       vehicle_insurance_number: riderInput.vehicle_insurance_number,
+      //       insurance_expiry_date: riderInput.insurance_expiry_date,
+      //       driver_license_number: riderInput.driver_license_number,
+      //       license_expiry_date: riderInput.license_expiry_date,
+      //       document_upload_path: riderInput.document_upload_path,
+      //       preferred_delivery_radius: riderInput.preferred_delivery_radius,
+      //       preferred_working_days: riderInput.preferred_working_days,
+      //     },
+      //     { new: true, upsert: true }
+      //   );
+      // }
+
+      return {
+        user: updatedUser,
+        chef: updatedChef,
+        
+      };
+    } catch (error) {
+      console.error("Error in updateUserProfile resolver:", error);
+      throw new Error("Failed to update profile");
+   }
     },
   },
 

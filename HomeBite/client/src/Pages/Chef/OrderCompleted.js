@@ -1,18 +1,16 @@
 // OrderCompleted.js
-
-import Header from '../../Components/Header/Header';
-import { useQuery, gql } from '@apollo/client';
-
-import TableRow from '../../Components/Table/TableRow';
-import TableCell from '../../Components/Table/TableCell';
-import './OrderCompleted.scss';
-import React, { useState, useEffect } from "react"; // Add useState and useEffect here
-import { Container, Table } from "react-bootstrap"; // Add Container and Table imports
+import React, { useEffect, useState } from "react";
+import { Container } from "react-bootstrap";
+import { Link } from 'react-router-dom';
+import Header from "../../Components/Header/Header";
+import Table from "../../Components/Table/Table";
+import TableRow from "../../Components/Table/TableRow";
+import TableCell from "../../Components/Table/TableCell";
+import "./OrderCompleted.scss";
 
 const OrderCompleted = () => {
   const [orders, setOrders] = useState([]);
 
-  // Fetch completed orders from the server on component mount
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -27,7 +25,7 @@ const OrderCompleted = () => {
         body: JSON.stringify({
           query: `
             query {
-              completedOrders {
+              getCompletedOrders {
                 _id
                 order_no
                 status
@@ -36,6 +34,7 @@ const OrderCompleted = () => {
                 customer_id {
                   first_name
                   last_name
+                  email
                   address_line_1
                   address_line_2
                   city
@@ -62,78 +61,93 @@ const OrderCompleted = () => {
         }),
       });
       const json = await response.json();
-      console.log("GraphQL response:", json); // Debugging response
+      console.log("GraphQL response:", json); // Log the response for debugging
       if (json.errors) {
         throw new Error(json.errors[0].message);
       }
-      setOrders(json.data.completedOrders);
+      setOrders(json.data.getCompletedOrders || []); // Ensure orders is an array
     } catch (error) {
-      console.error("Error loading completed orders:", error);
+      console.error("Error fetching orders:", error);
     }
   };
 
   return (
-    <Container fluid className="orders-page">
-      <Header />
-      <h2>Completed Orders</h2>
-      <div className="tab-selector">
-        <button className="tab">Current Orders</button>
-        <button className="tab active">Order Completed</button>
-      </div>
+    <Container fluid className="order-completed-page">
+       
+      <div className="order-completed">
+        <h2>Orders</h2>
+        <div className="tab-selector">
+        <Link to="/chef/orders" className="tab ">Current Orders</Link>
+        <Link to="" className="tab active">Order Completed</Link>
+         
+        </div>
 
-      <Table>
-        <thead>
-          <tr>
-            <th>Order Details</th>
-            <th>Customer Details</th>
-            <th>Item Details</th>
-            <th>Payment Details</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <tr key={order._id}>
-                <td>
-                  <p><b>Order No: # {order.order_no}</b></p>
-                  <p>Order Placed Time: {new Date(order.created_at).toLocaleString()}</p>
-                </td>
-                <td>
-                  <p><b>Name:</b> {order.customer_id?.first_name} {order.customer_id?.last_name}</p>
-                  <p>
-                    <b>Delivery Address:</b> {order.customer_id?.address_line_1}, {order.customer_id?.city}, {order.customer_id?.province}
-                  </p>
-                </td>
-                <td>
-                  {order.items && order.items.length > 0 ? (
-                    order.items.map((item, index) => (
-                      <p key={index}>
-                        {item.product_id?.name || "Product not available"} (QNT: {item.quantity})
-                      </p>
-                    ))
-                  ) : (
-                    <p>No items available</p>
-                  )}
-                </td>
-                <td>
-                  {order.payment ? (
-                    <>
-                      <p>Payment Method: {order.payment.payment_method}</p>
-                      <p>Grand Total: ${order.payment.amount}</p>
-                    </>
-                  ) : (
-                    <p>Payment information not available</p>
-                  )}
+        <Table>
+          <thead>
+            <TableRow>
+              <TableCell className="table-header-cell">ORDER DETAILS</TableCell>
+              <TableCell className="table-header-cell">CUSTOMER DETAILS</TableCell>
+              <TableCell className="table-header-cell">ITEM DETAILS</TableCell>
+              <TableCell className="table-header-cell">PAYMENT DETAILS</TableCell>
+            </TableRow>
+          </thead>
+          <tbody>
+            {orders.length > 0 ? (
+              orders.map((order) => (
+                <TableRow key={order._id}>
+                  <TableCell>
+                    <p className="order-id">Order No: {order.order_no}</p>
+                    <p className="order-time">
+                      Order Placed Time:{" "}
+                      {new Date(order.created_at).toLocaleString()}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    <p>
+                      Customer Name: {order.customer_id?.first_name}{" "}
+                      {order.customer_id?.last_name}
+                    </p>
+                    <p>
+                      Delivery Address:{" "}
+                      {order.customer_id?.address_line_1 || "N/A"},{" "}
+                      {order.customer_id?.city || "N/A"},{" "}
+                      {order.customer_id?.province || "N/A"}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    {Array.isArray(order.items) && order.items.length > 0 ? (
+                      order.items.map((item, index) => (
+                        <p key={index}>
+                          {item.product_id?.name || "Unknown Product"} x
+                          {item.quantity}
+                        </p>
+                      ))
+                    ) : (
+                      <p>No items available</p>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {order.payment ? (
+                      <>
+                        <p>Payment Method: {order.payment.payment_method}</p>
+                        <p>Grand Total: ${order.payment.amount.toFixed(2)}</p>
+                      </>
+                    ) : (
+                      <p>Payment information not available</p>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center">
+                  No completed orders available.
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="text-center">No completed orders available.</td>
-            </tr>
-          )}
-        </tbody>
-      </Table>
+            )}
+          </tbody>
+        </Table>
+      </div>
     </Container>
   );
 };

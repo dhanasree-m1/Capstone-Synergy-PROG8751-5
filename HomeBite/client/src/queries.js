@@ -127,46 +127,84 @@ export const CREATE_PAYMENT_INFO = gql`
   }
 `;
 
-// Query for fetching completed orders
-export const GET_COMPLETED_ORDERS = gql`
-  query GetCompletedOrders {
-    completedOrders {
-      order_id
-      customer {
+
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile($userId: ID!) {
+    getUserProfile(userId: $userId) {
+      id
+      first_name
+      last_name
+      email
+      mobile_number
+      
+    }
+  }
+`;
+
+export const GET_CHEF_PROFILE = gql`
+  query GetChefProfile($userId: ID!) {
+    getChefProfile(userId: $userId) {
+      specialty_cuisines
+      type_of_meals
+      cooking_experience
+      max_orders_per_day
+      preferred_working_days
+    }
+  }
+`;
+
+export const GET_RIDER_PROFILE = gql`
+  query GetRiderProfile($userId: ID!) {
+    getRiderProfile(userId: $userId) {
+      vehicle_registration_number
+      driver_license_number
+      preferred_delivery_radius
+      preferred_working_days
+      preferred_start_time
+      preferred_end_time
+      long_distance_preference
+    }
+  }
+`;
+
+
+
+
+export const UPDATE_CHEF = gql`
+  mutation UpdateChef($input: ChefInput!) {
+    updateChef(input: $input) {
+      id
+    }
+  }
+`;
+export const UPDATE_USER_PROFILES = gql`
+  mutation UpdateUserProfile($id: ID!,$userInput: UserInput!, $chefInput: ChefInput!) {
+    updateUserProfile(id: $id,userInput: $userInput, chefInput: $chefInput) {
+      user {
+        id
         first_name
         last_name
+        email
+        mobile_number
+        role
+        gender
+        profile_image
+        status
         address_line_1
         address_line_2
         city
         province
         postal_code
         country
+        nearby_landmark
       }
-      items {
-        product_name
-        quantity
-        special_request
-        unit_price
+      chef {
+        specialty_cuisines
+        type_of_meals
+        cooking_experience
+        max_orders_per_day
+        preferred_working_days
       }
-      total_amount
-      status
-      created_at
-      completion_time
-      delivery_agent {
-        first_name
-        last_name
-      }
-    }
-  }
-`;
-
-// Mutation for marking an order as completed
-export const MARK_ORDER_COMPLETED = gql`
-  mutation MarkOrderCompleted($order_id: ID!) {
-    markOrderCompleted(order_id: $order_id) {
-      order_id
-      status
-      completion_time
     }
   }
 `;

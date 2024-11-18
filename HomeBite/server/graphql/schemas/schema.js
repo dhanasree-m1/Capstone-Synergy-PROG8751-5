@@ -187,13 +187,19 @@ input CreateChefInput {
   preferred_start_time: String
   preferred_end_time: String
 }
-
+input UpdateChefInput {
+  specialty_cuisines: [String]
+  type_of_meals: [String]
+  cooking_experience: String
+  max_orders_per_day: Int
+  preferred_working_days: [String]
+}
   type Query {
     getUser(id: ID!): User
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
     getCurrentOrders: [Order]
-    
+    getCompletedOrders: [Order]
     isEmailUnique(email: String!): Boolean!
     completedOrders: [Order]
     orderItems: [OrderItem]
@@ -215,6 +221,90 @@ input CreateChefInput {
     success: Boolean!
     message: String!
   }
+  type Product {
+    id: ID!
+    chef_id: ID!
+    name: String!
+    description: String
+    price: Float!
+    quantity: Int
+    image_url: String
+    dietary: String
+    created_at: String
+    is_available: Boolean
+  }
+
+  input ProductInput {
+    name: String!
+    description: String
+    price: Float!
+    quantity: Int
+    image_url: String
+    dietary: String
+    is_available: Boolean
+  }
+
+  type Query {
+    getProductsByChef(chef_id: ID!): [Product]
+  }
+  type Query {
+    getProduct(id: ID!): Product
+  }
+  type Mutation {
+    addProduct(chef_id: ID!, input: ProductInput!): Product
+    updateProduct(id: ID!, input: ProductInput!): Product
+    deleteProduct(id: ID!): Boolean
+  }
+  type UserProfile {
+    user: User
+    chef: Chef
+   
+  }
+
+  input UserInput {
+    first_name: String!
+    last_name: String!
+    email: String!
+    mobile_number: String
+    gender: String
+    address_line_1: String
+    address_line_2: String
+    city: String
+    province: String
+    postal_code: String
+    country: String
+    nearby_landmark: String
+    role: String
+    profile_image: String
+    password_hash: String
+  }
+
+  input ChefInput {
+    specialty_cuisines: [String]
+    type_of_meals: [String]
+    cooking_experience: String
+    max_orders_per_day: Int
+    preferred_working_days: [String]
+  }
+
+  input RiderInput {
+    vehicle_registration_number: String
+    vehicle_insurance_number: String
+    insurance_expiry_date: String
+    driver_license_number: String
+    license_expiry_date: String
+    document_upload_path: String
+    preferred_delivery_radius: Int
+    preferred_working_days: [String]
+  }
+  type Mutation {
+    updateUserProfile(id: ID!,userInput: UserInput, chefInput: ChefInput): UserProfile
+  }
+
+  type Query {
+    getUserProfile: UserProfile
+  }
+
 `;
 
 export default typeDefs;

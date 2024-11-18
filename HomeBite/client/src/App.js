@@ -6,8 +6,14 @@ import ForgotPassword from "./Pages/Login/ForgotPassword";
 import ResetPassword from "./Pages/Login/ResetPassword";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Register from './Pages/Register/Register';
-import OrderCompleted from './Pages/Chef/OrderCompleted';
+import ChefDash from "./Pages/Chef/Dashboard";
+import Products from "./Pages/Chef/Product/Products";
+import AddProduct from "./Pages/Chef/Product/AddProduct";
+import EditProduct from "./Pages/Chef/Product/EditProduct";
 import CurrentOrders from "./Pages/Chef/CurrentOrders";
+import CompletedOrders from "./Pages/Chef/OrderCompleted";
+import Profile from "./Pages/Chef/ProfileView";
+import EditProfile from "./Pages/Chef/Profile";
 
 function App() {
   return (
@@ -18,9 +24,19 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/chef/order-completed" element={<OrderCompleted />} />
-      <Route path="*" element={<Navigate to="/chef/order-completed" />} />
-      <Route path="/current-orders" element={<CurrentOrders />} />
+       {/* Chef routes */}
+       {/* Chef Dashboard Layout with Nested Routes */}
+      <Route path="/chef" element={<ChefDash />}>
+        {/* <Route index element={<Dashboard />} /> This could be the main dashboard view */}
+        <Route path="orders" element={<CurrentOrders />} />
+        <Route path="orders/completed" element={<CompletedOrders />} />
+        <Route path="products" element={<Products />} />
+        <Route path="product/add" element={<AddProduct />} />
+        <Route path="product/edit/:id" element={<EditProduct />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="profile/edit" element={<EditProfile />} />
+      </Route>
+      
     </Routes>
   );
 }
