@@ -37,8 +37,11 @@ const OrderCompleted = () => {
                   first_name
                   last_name
                   address_line_1
+                  address_line_2
                   city
                   province
+                  postal_code
+                  country
                 }
                 items {
                   product_id {
@@ -77,6 +80,7 @@ const OrderCompleted = () => {
         <button className="tab">Current Orders</button>
         <button className="tab active">Order Completed</button>
       </div>
+
       <Table>
         <thead>
           <tr>
@@ -96,23 +100,30 @@ const OrderCompleted = () => {
                 </td>
                 <td>
                   <p><b>Name:</b> {order.customer_id?.first_name} {order.customer_id?.last_name}</p>
-                  <p><b>Address:</b> {order.customer_id?.address_line_1}, {order.customer_id?.city}</p>
+                  <p>
+                    <b>Delivery Address:</b> {order.customer_id?.address_line_1}, {order.customer_id?.city}, {order.customer_id?.province}
+                  </p>
                 </td>
                 <td>
-  {order.items?.length > 0 ? (
-    order.items.map((item, idx) => (
-      <p key={idx}>
-        {item.product_id?.name || "Product not available"} x{item.quantity} - ${item.unit_price}
-      </p>
-    ))
-  ) : (
-    <p>No items available</p>
-  )}
-</td>
-
+                  {order.items && order.items.length > 0 ? (
+                    order.items.map((item, index) => (
+                      <p key={index}>
+                        {item.product_id?.name || "Product not available"} (QNT: {item.quantity})
+                      </p>
+                    ))
+                  ) : (
+                    <p>No items available</p>
+                  )}
+                </td>
                 <td>
-                  <p>Payment Method: {order.payment?.payment_method}</p>
-                  <p>Total: ${order.payment?.amount}</p>
+                  {order.payment ? (
+                    <>
+                      <p>Payment Method: {order.payment.payment_method}</p>
+                      <p>Grand Total: ${order.payment.amount}</p>
+                    </>
+                  ) : (
+                    <p>Payment information not available</p>
+                  )}
                 </td>
               </tr>
             ))

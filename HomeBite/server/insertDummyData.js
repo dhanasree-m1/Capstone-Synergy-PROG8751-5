@@ -165,12 +165,23 @@ async function main() {
         "amount": 8.99,
         "payment_status": "successful",
         "payment_date":"05-11-2024"
+      },
+      {
+        "order_id": new ObjectId("673ac7b3dcbddbc9b0122165"),
+        "payment_method":"Credit Card",
+        "transaction_id": "12347",
+        "amount": 8.99,
+        "payment_status": "successful",
+        "payment_date":"12-11-2024"
       }
+
+      
+     
     ]
 
-//  const result3 = await collection5.insertMany(dummyPayment);
+const result3 = await collection5.insertMany(dummyPayment);
 
-//       console.log(`${result3.insertedCount} payment documents were inserted.`);
+console.log(`${result3.insertedCount} payment documents were inserted.`);
 
 
    // Insert completed orders
@@ -178,13 +189,24 @@ async function main() {
     {
       _id: new ObjectId(),
       order_no: 101, // Ensure this is not null
-      customer_id: new ObjectId("672cfe51c8d4213b79aa6a90"), // Reference valid customer
+      customer_id: new ObjectId("672ba8bfc68841c229204f60"), // Reference valid customer
       chef_id: new ObjectId("672d04b948caaa711061a28b"), // Reference valid chef
       rider_id: new ObjectId("672d04b948caaa711061a28c"),
       total_amount: 50.99,
       status: "Completed",
       created_at: new Date().toISOString(),
-      payment: new ObjectId("672bab56afbccca14c12aa8b"), // Reference valid payment
+      payment: new ObjectId("6732b636376834cb6c0aad69"), // Reference valid payment
+    },
+    {
+      _id: new ObjectId(),
+      order_no: 102, // Increment this value
+      customer_id: new ObjectId("672cfe51c8d4213b79aa6a90"),
+      chef_id: new ObjectId("672d04b948caaa711061a28b"),
+      rider_id: new ObjectId("672d04b948caaa711061a28c"),
+      total_amount: 30.00,
+      status: "Completed",
+      created_at: new Date().toISOString(),
+      payment: new ObjectId("672bab56afbccca14c12aa8c"),
     },
   ];
   
@@ -195,11 +217,11 @@ async function main() {
   // Insert items for completed orders
   const dummyOrderItems = [
     {
-      order_id: new ObjectId("6737fac129e6a6cd421926bc"),
-      product_id: new ObjectId("672d0836ef37899972c81317"),
-      quantity: 2,
-      special_request: 'No onions',
-      unit_price: 12.99,
+      "order_id": new ObjectId("672baf8b2a879a46a3b430ae"),
+      "product_id": new ObjectId("672baf8b2a879a46a3b430ab"),
+      "quantity": 3,
+      "special_request": "Extra spicy",
+      "unit_price": 12.99
     },
     {
       order_id: new ObjectId("6737f4092d27bbe6ef773e59"),

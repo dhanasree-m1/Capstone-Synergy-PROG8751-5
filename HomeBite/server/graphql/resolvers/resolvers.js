@@ -82,30 +82,43 @@ const resolvers = {
       },
       completedOrders: async () => {
         try {
-          const orders = await Order.find({ status: 'Completed' })
-            .populate('customer_id', 'first_name last_name address_line_1 city province')
-            .populate('payment', 'payment_method amount payment_status')
+          console.log("Fetching completed orders...", order._id);
+          const items = await OrderItem.find({ order_id: order._id })
+  .populate("product_id", "name")
+  .lean();
+      
+          const orders = await Order.find({ status: "Completed" })
+            .populate("customer_id", "first_name last_name address_line_1 city province")
+            .populate({
+              path: "payment",
+              select: "payment_method amount payment_status",
+            })
             .lean();
+      
+          if (!orders || orders.length === 0) {
+            console.log("No completed orders found.");
+            return [];
+          }
       
           const ordersWithDetails = await Promise.all(
             orders.map(async (order) => {
               const items = await OrderItem.find({ order_id: order._id })
-                .populate('product_id', 'name')
+                .populate("product_id", "name")
                 .lean();
       
               return {
                 ...order,
-                customer_id: order.customer_id || null,
+                items: items || [], // Attach items
                 payment: order.payment || null,
-                items: items || [], // Ensure items are attached
               };
             })
           );
       
+          console.log("Completed orders fetched successfully:", ordersWithDetails);
           return ordersWithDetails;
         } catch (error) {
-          console.error('Error fetching completed orders:', error);
-          throw new Error('Failed to fetch completed orders.');
+          console.error("Error fetching completed orders:", error);
+          throw new Error("Failed to fetch completed orders.");
         }
       },
       
