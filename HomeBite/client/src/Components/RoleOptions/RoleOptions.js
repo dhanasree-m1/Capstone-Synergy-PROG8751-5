@@ -30,7 +30,7 @@ const RoleOptions = ({ roles, onRoleChange }) => {
             <input
               type="checkbox"
               name={role.name}
-              checked={roles[role.name]}
+              checked={roles.includes(role.name)}
               onChange={onRoleChange}
             />
             <p className="mb-0">
@@ -46,11 +46,7 @@ const RoleOptions = ({ roles, onRoleChange }) => {
 };
 
 RoleOptions.propTypes = {
-  roles: PropTypes.shape({
-    customer: PropTypes.bool.isRequired,
-    chef: PropTypes.bool.isRequired,
-    rider: PropTypes.bool.isRequired,
-  }).isRequired,
+  roles: PropTypes.arrayOf(PropTypes.string).isRequired,
   onRoleChange: PropTypes.func.isRequired,
 };
 

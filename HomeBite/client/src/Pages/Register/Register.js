@@ -41,11 +41,7 @@ const Register = () => {
     postalCode: "",
     country: "",
     gender: "Other",
-    roles: {
-      customer: false,
-      chef: false,
-      rider: false,
-    },
+    roles: [],
     nearby_landmark: "",
     // Rider-specific fields
     vehicleType: "",
@@ -188,7 +184,7 @@ const Register = () => {
     } else if (password !== confirmPassword) {
       setMessage("Passwords do not match.");
       isValid = false;
-    } else if (!roles.customer && !roles.chef && !roles.rider) {
+    } else if (!registerData.roles || registerData.roles.length === 0) {
       setMessage("Please select at least one role.");
       isValid = false;
     } else {
@@ -371,15 +367,51 @@ const Register = () => {
     return true;
   };
 
+  // const handleRoleChange = (e) => {
+  //   const { name, checked } = e.target;
+  //   setRegisterData((prevData) => ({
+  //     ...prevData,
+  //     roles: {
+  //       ...prevData.roles,
+  //       [name]: checked,
+  //     },
+  //   }));
+  //   setMessage("");
+  // };
+
+  // const handleRoleChange = (e) => {
+  //   console.log("Roles before validation:", registerData.roles);
+  //   const { name, checked } = e.target;
+  //   setRegisterData((prevData) => {
+  //     const roles = prevData.roles || [];
+  //     return {
+  //       ...prevData,
+  //       roles: checked
+  //         ? [...roles, name] // Add role if checked
+  //         : roles.filter((role) => role !== name), // Remove role if unchecked
+  //     };
+  //   });
+  //   setMessage("");
+  // };
+  
   const handleRoleChange = (e) => {
     const { name, checked } = e.target;
-    setRegisterData((prevData) => ({
-      ...prevData,
-      roles: {
-        ...prevData.roles,
-        [name]: checked,
-      },
-    }));
+  
+    setRegisterData((prevData) => {
+      const roles = prevData.roles || [];
+      const updatedRoles = checked
+        ? [...roles, name] // Add role if checked
+        : roles.filter((role) => role !== name); // Remove role if unchecked
+  
+      console.log(`Role change: ${name}, Checked: ${checked}`);
+      console.log("Updated roles:", updatedRoles);
+  
+      return {
+        ...prevData,
+        roles: updatedRoles,
+      };
+    });
+  
     setMessage("");
   };
 
@@ -390,7 +422,7 @@ const Register = () => {
       email: registerData.email || "",
       mobile_number: registerData.mobile || "",
       password_hash: registerData.password || "",
-      role: "customer",
+      role: registerData.roles || [],
       gender: registerData.gender || "Other", // Set a default gender value if none selected
       profile_image: registerData.profilePicture || "",
       status: "active",
@@ -505,8 +537,14 @@ const Register = () => {
   //   };
 
   const handleSubmit = async (e) => {
+    console.log("Step1:", step);
     e.preventDefault();
-    const { customer, chef, rider } = registerData.roles;
+    //const { customer, chef, rider } = registerData.roles;
+  const  roles = registerData.roles;
+  const customer = roles.includes("customer");
+  const chef = roles.includes("chef");
+  const rider = roles.includes("rider");
+
 
     if (step === 1) {
       console.log("A1");
@@ -524,20 +562,28 @@ const Register = () => {
           console.log("A4 - Customer only");
           await handleFormSubmission(); // Save and navigate for Customer only
         } else if (rider && chef) {
+          console.log("Step2:", step);
           console.log("A5 - Customer, Rider, and Chef");
           setStep(3); // Move to Rider form, then Chef form after Rider
         } else if (rider) {
+          console.log("Step3:", step);
           console.log("A6 - Customer and Rider only");
           setStep(3); // Move to Rider form if Customer and Rider are selected
         } else if (chef) {
+          console.log("Step4:", step);
           console.log("A7 - Customer and Chef only");
           setStep(4); // Move to Chef form if Customer and Chef are selected
         }
       }
     } else if (step === 3 && rider) {
+      console.log("Step5:", step);
+      console.log("Roles:", registerData.roles);
+      console.log("Rider selected:", registerData.roles.includes("rider"));
+      console.log("Chef selected:", registerData.roles.includes("chef"));
       console.log("A8 - Rider step");
       // Rider-specific validation at step 3
       if (validateRider()) {
+        console.log("Step6:", step);
         if (chef) {
           console.log("A9 - Proceed to Chef after Rider");
           setStep(4); // Move to Chef form after completing Rider form
@@ -547,6 +593,7 @@ const Register = () => {
         }
       }
     } else if (step === 4 && chef) {
+      console.log("Step7:", step);
       console.log("A11 - Chef step");
       // Chef-specific validation at step 4
       if (validateChef()) {
@@ -554,6 +601,7 @@ const Register = () => {
         await handleFormSubmission(); // Save and complete for Chef or all roles
       }
     } else if (customer && chef && rider) {
+      console.log("Step8:", step);
       console.log("A13 - All roles selected");
       // All validations at once for Customer, Rider, and Chef
       if (
@@ -860,7 +908,7 @@ const Register = () => {
                     </Col>
                   </>
                 )}
-                {step === 3 && registerData.roles.rider && (
+                {step === 3 && registerData.roles.includes("rider") && (
                   <>
                     <Col md={12}>
                     <h4 className="mb-2">Additional Information</h4>
@@ -995,7 +1043,7 @@ const Register = () => {
                   </>
                 )}
                 {/* Step 4 - Chef-Specific Fields */}
-                {step === 4 && registerData.roles.chef && (
+                {step === 4 && registerData.roles.includes("chef") && (
                   <>
                     <Col md={12}>
                     <h4 className="mb-2">Additional Information</h4>
