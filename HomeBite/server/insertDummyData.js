@@ -6,7 +6,7 @@ import { Order } from './src/models/orders.js';
 import { OrderItem } from './src/models/order_items.js';
 
 async function main() {
-  const uri = "mongodb+srv://dhanasree01:Mongo123@cluster0.umw1frd.mongodb.net/HomeBite?retryWrites=true&w=majority"; // Replace with your Atlas connection string
+  const uri = "mongodb+srv://jayalekshmivj08:Harmony2024@cluster0.rifewjx.mongodb.net/HomeBite?retryWrites=true&w=majority"; // Replace with your Atlas connection string
   const client = new MongoClient(uri);
 
   try {
@@ -99,11 +99,11 @@ async function main() {
       //const result1 = await collection1.insertMany(dummyProduct);
 
     // console.log(`${result1.insertedCount} product documents were inserted.`);
-    // const collection3 = database.collection("orders");
+    const collection3 = database.collection("orders");
     const dummyOrder=[
         {
           "customer_id": new ObjectId('6729653bfb23f4a3579c5cd2'),
-          "chef_id": new ObjectId('672ba8bfc68841c229204f60'),
+          "chef_id": new ObjectId('67356b6c5fb8631563503160'),
           "rider_id": new ObjectId('671f060b32c0ef3a13225dc2'),
           "total_amount": 25.98,
           "status": "Pending",
@@ -111,39 +111,39 @@ async function main() {
         },
         {
           "customer_id": new ObjectId('6729653bfb23f4a3579c5cd2'),
-          "chef_id": new ObjectId('672ba8bfc68841c229204f60'),
+          "chef_id": new ObjectId('67356b6c5fb8631563503160'),
           "rider_id": new ObjectId('671f060b32c0ef3a13225dc2'),
           "total_amount": 8.99,
           "status": "In Progress",
           "created_at": "2024-11-06T00:00:00Z"
         }
       ]
-    //   const result2 = await collection3.insertMany(dummyOrder);
+      //const result2 = await collection3.insertMany(dummyOrder);
 
-    // console.log(`${result2.insertedCount} order documents were inserted.`);
+    //console.log(`${result2.insertedCount} order documents were inserted.`);
     const collection4 = database.collection("orderitems");
     const dummyOrdItems=[
         {
-          "order_id": new ObjectId("672baf8b2a879a46a3b430ae"),
+          "order_id": new ObjectId("673b90fa120284643fbc98f2"),
           "product_id": new ObjectId("672baf8b2a879a46a3b430ab"),
           "quantity": 3,
           "special_request": "Extra spicy",
           "unit_price": 12.99
         },
         {
-          "order_id": new ObjectId("672baf8b2a879a46a3b430ab"),
+          "order_id": new ObjectId("673b90fa120284643fbc98f3"),
           "product_id":new ObjectId("672bb086347a0380f536e108"),
           "quantity": 2,
           "special_request": "No nuts",
           "unit_price": 8.99
         }
       ]
-      const result33 = await collection4.insertMany(dummyOrdItems);
+      //const result33 = await collection4.insertMany(dummyOrdItems);
 
-      console.log(`${result33.insertedCount} order item documents were inserted.`);
+      // console.log(`${result33.insertedCount} order item documents were inserted.`);
       const collection5 = database.collection("payments");
       const dummyPayment=[ {
-        "order_id": new ObjectId("672bab56afbccca14c12aa8b"),
+        "order_id": new ObjectId("673b90fa120284643fbc98f2"),
         "payment_method":"COD",
         "transaction_id": "12345",
         "amount": 25.98,
@@ -151,16 +151,16 @@ async function main() {
         "payment_date":"05-11-2024"
       },
       {
-        "order_id": new ObjectId("672bab56afbccca14c12aa8c"),
+        "order_id": new ObjectId("673b90fa120284643fbc98f3"),
         "payment_method":"COD",
-        "transaction_id": "12345",
+        "transaction_id": "12346",
         "amount": 8.99,
         "payment_status": "successful",
         "payment_date":"05-11-2024"
       }
     ]
 
-//  const result3 = await collection5.insertMany(dummyPayment);
+  const result3 = await collection5.insertMany(dummyPayment);
 
 //       console.log(`${result3.insertedCount} payment documents were inserted.`);
    
