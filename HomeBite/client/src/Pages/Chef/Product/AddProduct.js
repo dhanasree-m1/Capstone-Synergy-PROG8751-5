@@ -123,15 +123,9 @@ const AddProduct = () => {
     <Container fluid>
       <Row>
         <Col>
-<<<<<<< HEAD
-          <Link className="btn-link  mb-3" to="/chef/products">Menu</Link><span className="material-icons">
-            arrow_forward
-          </span><span>Add Menu</span>
-=======
           <Link className="btn-link mb-3" to="/chef/products">Menu</Link>
           <span className="material-icons">arrow_forward</span>
           <span>Add Menu</span>
->>>>>>> origin/dhanasree
         </Col>
         <Col md={12} className='mt-5'><h5>Menu</h5><hr /></Col>
       </Row>
