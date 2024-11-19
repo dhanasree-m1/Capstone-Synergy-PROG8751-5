@@ -7,7 +7,7 @@ const ProductSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   quantity: { type: Number },
   image_url: { type: String },
-  dietary:{ type: String, enum: ['Veg', 'Non Veg'], default: 'active' },
+  dietary:{ type: String, enum: ['Veg', 'Non Veg', 'Gluten Free'], default: 'Veg' },
   created_at: { type: Date, default: Date.now },
   is_available: { type: Boolean, default: true }
 });
