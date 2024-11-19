@@ -5,6 +5,7 @@ import loginbg from "../../assets/images/login-bg.jpg";
 import Logo from "../../assets/images/logo.svg";
 import InputField from "../../Components/InputField/InputField";
 import Button from "../../Components/Button/Button";
+import CarouselComponent from "../../Components/CarouselComponent/CarouselComponent";
 import { Container, Row, Col, Alert } from "react-bootstrap";
 
 const Login = () => {
@@ -19,19 +20,19 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-     // Client-side validation
-  if (!loginData.email || !loginData.password) {
-    setMessage("Please fill in both email and password.");
-    return;
-  }
- // const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
- // const emailPattern=/^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
- const emailPattern= /^(?!.*\.\.)(?!.*@.*@)(?!.*\s)(?!.*[,'`])([a-zA-Z0-9._%+-]+)@[a-zA-Z0-9.-]+\.(com|org|net|gov|edu|mil|info|biz|name|us|uk|ca|au|in|de|fr|cn|jp|br|ru|za|mx|nl|es|it|app|blog|shop|online|site|tech|io|ai|co|xyz|photography|travel|museum|jobs|health)$/;
- if (!emailPattern.test(loginData.email)) {
-    setMessage("Please enter a valid email address.");
-    return;
-  }
-    
+    // Client-side validation
+    if (!loginData.email || !loginData.password) {
+      setMessage("Please fill in both email and password.");
+      return;
+    }
+    // const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // const emailPattern=/^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
+    const emailPattern = /^(?!.*\.\.)(?!.*@.*@)(?!.*\s)(?!.*[,'`])([a-zA-Z0-9._%+-]+)@[a-zA-Z0-9.-]+\.(com|org|net|gov|edu|mil|info|biz|name|us|uk|ca|au|in|de|fr|cn|jp|br|ru|za|mx|nl|es|it|app|blog|shop|online|site|tech|io|ai|co|xyz|photography|travel|museum|jobs|health)$/;
+    if (!emailPattern.test(loginData.email)) {
+      setMessage("Please enter a valid email address.");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:5000/graphql", {
         method: "POST",
@@ -48,6 +49,7 @@ const Login = () => {
                   first_name
                   last_name
                   email
+                  role
                 }
               }
             }
@@ -62,10 +64,11 @@ const Login = () => {
         localStorage.setItem("token", result.data.login.token);
         localStorage.setItem("user_id", result.data.login.user.id);
         localStorage.setItem("uname", result.data.login.user.first_name);
+        localStorage.setItem("urole", result.data.login.user.role);
         //console.log(result.data.login.token)
         //console.log(result.data.login.user.id)
         //console.log(localStorage.getItem("user_id"))
-        navigate("/chef");
+        navigate("/chef/orders");
       }
     } catch (error) {
       setMessage("Error logging in");
@@ -75,12 +78,15 @@ const Login = () => {
   return (
     <Container fluid>
       <Row>
-        <Col md={7} className="p-0">
+        <Col className="home-bg col-12 d-lg-none ht">
+        <div className="overlay"></div>
+        </Col>
+        <Col lg={7} className="p-0">
           <div className="login-container">
             <div className="login-box">
               <img src={Logo} className="logo" alt="Logo" />
-              <h2 className="form-title mt-5 mb-2">Sign In </h2>
-              <h4 className="form-sub-title mb-3">
+              <h4 className="mt-5 mb-2">Sign In </h4>
+              <h4 className="mb-3">
                 {/* Sign in to enjoy the best home-cooked meals made with care! */}
               </h4>
               {message && <Alert variant="danger">{message}</Alert>}
@@ -98,34 +104,34 @@ const Login = () => {
                   name="password"
                   type="password"
                   placeholder="Password"
-                  
+
                   autoComplete="current-password" // Add autocomplete
                   onChange={handleChange} // Use handleChange here
                 />
-                <Button type="submit" className="btn-primary w-100 mb-3">
+                <Button type="submit" className="w-100 mb-3">
                   Let's Go!
                 </Button>
-                <div className="auth-links d-flex justify-content-between">
-                  <p>
-                    New to HomeBite?{" "}
-                    <a href="/register" className="App-link">
-                      Create an account
-                    </a>
-                  </p>
-                  <p>
-                    <a href="/forgot-password" className="App-link">
+                <div className="auth-links d-md-flex justify-content-between">
+                  <span>
+                  <span className="d-none d-md-inline-block">
+                    New to HomeBite?&nbsp; {" "}
+
+                  </span>
+                  <a href="/register" className="btn-link d-block d-md-inline-block">
+                    Create an account
+                  </a>
+                  </span>
+                  <a href="/forgot-password" className="btn-link">
                     Forgot Password?
                   </a>
-                  </p>
-                  
                 </div>
               </form>
             </div>
           </div>
         </Col>
         <Col
-          md={5}
-          className="d-flex align-items-center justify-content-center p-0 position-relative"
+          lg={5}
+          className="d-none d-lg-flex align-items-center justify-content-center p-0 position-relative"
         >
           <div className="overlay position-absolute w-100 h-100"></div>
           <img
@@ -133,8 +139,16 @@ const Login = () => {
             className="img-fluid login-bg w-100 h-100"
             alt="Background"
           />
-          {/* Carousel omitted for brevity */}
+          <CarouselComponent
+            carouselId="textCarousel"
+            items={[
+              "Bringing the taste of home, made by local chefs, for everyone to enjoy.",
+              "Fresh, homemade meals from your neighbors, straight to your table.",
+              "Crafted with care by local hands, for the heart of our community",
+            ]}
+          />
         </Col>
+
       </Row>
     </Container>
   );

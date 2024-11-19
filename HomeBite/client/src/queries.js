@@ -208,3 +208,34 @@ export const UPDATE_USER_PROFILES = gql`
     }
   }
 `;
+export const GET_CHEFS_AND_PRODUCTS = gql`
+  query GetChefsAndProducts($campus: String) {
+    getAllChefs {
+      id
+      user {
+        first_name
+        last_name
+        profile_image
+        address_line_1
+      }
+      specialty_cuisines
+      type_of_meals
+    }
+    getAllProducts(campus: $campus) {
+      id
+      chef_id
+      name
+      description
+      price
+      quantity
+      image_url
+      created_at
+      is_available
+      user {
+        id
+        address_line_1
+        address_line_2
+      }
+    }
+  }
+`;

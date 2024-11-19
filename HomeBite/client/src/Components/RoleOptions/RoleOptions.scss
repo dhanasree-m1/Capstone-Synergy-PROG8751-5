@@ -1,23 +1,21 @@
 //client/src/Components/RadioButton/roleoptions.scss
+@import '../../App.scss';
 .option {
     flex: 1;
     padding: 14px 20px;
-    border: 1px solid #d8e6dc;
+    border: 1px solid $border-color;
     border-radius: 8px;
     background-color: #fff;
     text-align: left;
     position: relative;
-    margin-right: 15px;
+    width: 100%;
     cursor: pointer;
     transition: all 0.3s ease;
   
-    &:last-child {
-      margin-right: 0;
-    }
   
     p {
-      font-size: 16px;
-      color: #333;
+      font-size: 14px;
+      color: $text-color;
       margin: 0;
       margin-left: 1em;
     }
@@ -28,7 +26,7 @@
   
     input[type="checkbox"] + p:before {
       content: "check_box_outline_blank";
-      color: #ff8a00;
+      color: $btn-primary-bg-color;
       font-family: 'Material Icons';
       position: absolute;
       top: 10px;
@@ -38,18 +36,18 @@
     }
   
     input[type="checkbox"]:checked + p:before {
-      color: #ff8a00;
+      color: $btn-primary-bg-color;
       content: 'check_box';
       font-family: 'Material Icons';
     }
   
     &:hover {
-      border-color: #ff8a00;
+      border-color: $btn-primary-bg-color;
     }
   
     &.checked {
       background-color: #f3faf3;
-      border-color: #B2B2B2;
+      border-color: $border-color;
     }
   }
   

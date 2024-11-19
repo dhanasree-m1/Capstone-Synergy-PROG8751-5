@@ -1,19 +1,15 @@
-// src/components/Button/Button.js
 import React from 'react';
 import { Button as BootstrapButton } from 'react-bootstrap';
 import './Button.scss';
 
-const Button = ({ type, className, onClick, children }) => {
-  const buttonClass = className.includes('btn-secondary') ? 'btn-secondary' : 'btn-primary';
+const Button = ({ type = 'button', className = '', variant = 'primary', onClick, children }) => {
+  // Dynamically construct class names
+  const classes = [`btn-${variant}`, className].join(' ').trim();
 
   return (
-    <BootstrapButton 
-      type={type} 
-      className={`custom-button ${buttonClass} ${className}`} 
-      onClick={onClick}
-    >
+    <button type={type} className={classes} onClick={onClick}>
       {children}
-    </BootstrapButton>
+    </button>
   );
 };
 

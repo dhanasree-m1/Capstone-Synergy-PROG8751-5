@@ -23,14 +23,14 @@ const RoleOptions = ({ roles, onRoleChange }) => {
 
   return (
     <>
-      <h5 className="form-sub-title">What would you like to do?</h5>
-      <div className="fat-options d-flex mb-3">
+      <h5 className="mt-5 mb-3">What would you like to do?</h5>
+      <div className="fat-options d-grid d-lg-flex mb-3 gap-2">
         {roleData.map((role) => (
           <label className={`option ${roles[role.name] ? "checked" : ""}`} key={role.name}>
             <input
               type="checkbox"
               name={role.name}
-              checked={roles[role.name]}
+              checked={roles.includes(role.name)}
               onChange={onRoleChange}
             />
             <p className="mb-0">
@@ -46,11 +46,7 @@ const RoleOptions = ({ roles, onRoleChange }) => {
 };
 
 RoleOptions.propTypes = {
-  roles: PropTypes.shape({
-    customer: PropTypes.bool.isRequired,
-    chef: PropTypes.bool.isRequired,
-    rider: PropTypes.bool.isRequired,
-  }).isRequired,
+  roles: PropTypes.arrayOf(PropTypes.string).isRequired,
   onRoleChange: PropTypes.func.isRequired,
 };
 

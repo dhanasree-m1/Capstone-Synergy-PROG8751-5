@@ -13,6 +13,7 @@ import RoleOptions from "../../Components/RoleOptions/RoleOptions";
 import SpecialtyCuisinesOptions from "../../Components/SpecialtyCuisinesOptions/SpecialtyCuisinesOptions";
 import TypeOfMealsOptions from "../../Components/TypeOfMealsOptions/TypeOfMealsOptions";
 import AvailabilityOptions from "../../Components/AvailabilityOptions/AvailabilityOptions";
+import CarouselComponent from "../../Components/CarouselComponent/CarouselComponent";
 import { Form, Container, Row, Col, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 import { CREATE_USER, CREATE_RIDER, CREATE_CHEF } from "../../queries";
@@ -20,7 +21,7 @@ import { CREATE_PAYMENT_INFO } from "../../queries";
 
 
 const client = new ApolloClient({
-  uri: 'http://localhost:5000/graphql', // Replace with your GraphQL server URI
+  uri: 'http://localhost:5000/graphql',
   cache: new InMemoryCache(),
 });
 
@@ -40,11 +41,7 @@ const Register = () => {
     postalCode: "",
     country: "",
     gender: "Other",
-    roles: {
-      customer: false,
-      chef: false,
-      rider: false,
-    },
+    roles: [],
     nearby_landmark: "",
     // Rider-specific fields
     vehicleType: "",
@@ -72,7 +69,7 @@ const Register = () => {
     transitNumber: "",
   });
 
-  
+
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -100,10 +97,6 @@ const Register = () => {
         [name]: value,
       }));
     }
-    // setRegisterData((prevData) => ({
-    //   ...prevData,
-    //   [name]: value,
-    // }));
     setMessage("");
   };
 
@@ -135,11 +128,16 @@ const Register = () => {
   //   { label: "Sunday", value: "Sunday" },
   // ];
   // Validation helper functions
-  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-  const validatePhoneNumber = (mobile) => /^\d{10}$/.test(mobile);
+  const validateEmail = (email) => /^(?!.*\.\.)(?!.*@.*@)(?!.*\s)(?!.*[,'`])([a-zA-Z0-9._%+-]+)@[a-zA-Z0-9.-]+\.(com|org|net|gov|edu|mil|info|biz|name|us|uk|ca|au|in|de|fr|cn|jp|br|ru|za|mx|nl|es|it|app|blog|shop|online|site|tech|io|ai|co|xyz|photography|travel|museum|jobs|health)$/.test(email);
+  const validatePhoneNumber = (mobile) => /^[0-9]{10}$/.test(mobile.trim());
   const validatePostalCode = (postalCode) =>
     /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postalCode); // Canadian format
   const validateFutureDate = (date) => new Date(date) >= new Date();
+
+  const validatePasswordStrength = (password) =>
+    /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(password); // At least 8 chars, 1 letter, 1 number
+
+  const validateName = (name) => /^[a-zA-Z\s]+$/.test(name);
 
   const validateStep1 = async () => {
     const {
@@ -152,6 +150,7 @@ const Register = () => {
       confirmPassword,
       roles,
     } = registerData;
+
     let isValid = true;
 
     if (
@@ -165,16 +164,27 @@ const Register = () => {
     ) {
       setMessage("Please fill in all fields.");
       isValid = false;
+    } else if (!validateName(firstName)) {
+      setMessage("First name must only contain letters and spaces.");
+      isValid = false;
+    } else if (!validateName(lastName)) {
+      setMessage("Last name must only contain letters and spaces.");
+      isValid = false;
     } else if (!validateEmail(email)) {
       setMessage("Please enter a valid email.");
       isValid = false;
     } else if (!validatePhoneNumber(mobile)) {
-      setMessage("Please enter a valid mobile number.");
+      setMessage("Please enter a valid 10-digit mobile number.");
+      isValid = false;
+    } else if (!validatePasswordStrength(password)) {
+      setMessage(
+        "Password must be at least 8 characters long and include at least one number."
+      );
       isValid = false;
     } else if (password !== confirmPassword) {
       setMessage("Passwords do not match.");
       isValid = false;
-    } else if (!roles.customer && !roles.chef && !roles.rider) {
+    } else if (!registerData.roles || registerData.roles.length === 0) {
       setMessage("Please select at least one role.");
       isValid = false;
     } else {
@@ -258,12 +268,12 @@ const Register = () => {
       insuranceExpiryDate,
       licenseExpiryDate,
     } = registerData;
-  
+
     // Regular expressions for formats
     const regNumberPattern = /^[A-Z0-9-]{5,10}$/; // Example pattern for a vehicle registration number
     const licensePattern = /^[A-Z0-9-]{5,15}$/;   // Example pattern for a driver's license number
     const insurancePattern = /^[a-zA-Z0-9]{8,}$/; // At least 8 alphanumeric characters for insurance number
-  
+
     // Check for required fields
     if (
       !vehicleType ||
@@ -279,28 +289,28 @@ const Register = () => {
       return false;
     }
     setMessage(""); // Reset message if this check passes
-  
+
     // Validate vehicle registration number
     if (!regNumberPattern.test(vehicleRegNumber)) {
       setMessage("Please enter a valid vehicle registration number.");
       return false;
     }
     setMessage(""); // Reset message if this check passes
-  
+
     // Validate driver’s license number
     if (!licensePattern.test(driverLicenseNumber)) {
       setMessage("Please enter a valid driver's license number.");
       return false;
     }
     setMessage(""); // Reset message if this check passes
-  
+
     // Validate vehicle insurance number
     if (!insurancePattern.test(vehicleInsuranceNumber)) {
       setMessage("Vehicle insurance number must be alphanumeric and at least 8 characters long.");
       return false;
     }
     setMessage(""); // Reset message if this check passes
-  
+
     // Validate future dates for insurance and license expiry
     if (insuranceExpiryDate && !validateFutureDate(insuranceExpiryDate)) {
       setMessage("Insurance expiry date cannot be in the past.");
@@ -310,62 +320,98 @@ const Register = () => {
       setMessage("License expiry date cannot be in the past.");
       return false;
     }
-  
+
     // All validations passed
     return true;
   };
 
-const validateChef = () => {
-  const { specialtyCuisines, typeOfMeals, cookingExperience, preferredWorkingDays, maxOrdersPerDay } = registerData;
-  
-  const validExperienceOptions = ["Less than 1 year", "1-3 years", "3-5 years", "5+ years"];
-  
-  if (!specialtyCuisines.length || !typeOfMeals.length || !cookingExperience || !validExperienceOptions.includes(cookingExperience) || !preferredWorkingDays.length || !maxOrdersPerDay) {
-    setMessage("Please ensure all chef details are filled in and valid.");
-    return false;
-  }
+  const validateChef = () => {
+    const { specialtyCuisines, typeOfMeals, cookingExperience, preferredWorkingDays, maxOrdersPerDay } = registerData;
 
-  return true;
-};
+    const validExperienceOptions = ["Less than 1 year", "1-3 years", "3-5 years", "5+ years"];
+
+    if (!specialtyCuisines.length || !typeOfMeals.length || !cookingExperience || !validExperienceOptions.includes(cookingExperience) || !preferredWorkingDays.length || !maxOrdersPerDay) {
+      setMessage("Please ensure all chef details are filled in and valid.");
+      return false;
+    }
+
+    return true;
+  };
 
   const ValidatePayment = () => {
     const { bankAccountNumber, transitNumber } = registerData;
-  
+
     // Define regular expressions for format validations
     const bankAccountPattern = /^\d{8,12}$/;  // Bank account: 8-12 digits
     const transitPattern = /^\d{5}$/;          // Transit number: exactly 5 digits
-  
+
     if (!bankAccountNumber || !transitNumber) {
       setMessage("Please fill in all required fields for Payment.");
       return false;
     }
-  
+
     // Validate bank account number
     if (!bankAccountPattern.test(bankAccountNumber)) {
       setMessage("Please enter a valid bank account number (8-12 digits).");
       return false;
     }
-  
+
     // Validate transit number
     if (!transitPattern.test(transitNumber)) {
       setMessage("Please enter a valid 5-digit transit number.");
       return false;
     }
-  
+
     // Clear the message if all validations pass
     setMessage("");
     return true;
   };
 
+  // const handleRoleChange = (e) => {
+  //   const { name, checked } = e.target;
+  //   setRegisterData((prevData) => ({
+  //     ...prevData,
+  //     roles: {
+  //       ...prevData.roles,
+  //       [name]: checked,
+  //     },
+  //   }));
+  //   setMessage("");
+  // };
+
+  // const handleRoleChange = (e) => {
+  //   console.log("Roles before validation:", registerData.roles);
+  //   const { name, checked } = e.target;
+  //   setRegisterData((prevData) => {
+  //     const roles = prevData.roles || [];
+  //     return {
+  //       ...prevData,
+  //       roles: checked
+  //         ? [...roles, name] // Add role if checked
+  //         : roles.filter((role) => role !== name), // Remove role if unchecked
+  //     };
+  //   });
+  //   setMessage("");
+  // };
+  
   const handleRoleChange = (e) => {
     const { name, checked } = e.target;
-    setRegisterData((prevData) => ({
-      ...prevData,
-      roles: {
-        ...prevData.roles,
-        [name]: checked,
-      },
-    }));
+  
+    setRegisterData((prevData) => {
+      const roles = prevData.roles || [];
+      const updatedRoles = checked
+        ? [...roles, name] // Add role if checked
+        : roles.filter((role) => role !== name); // Remove role if unchecked
+  
+      console.log(`Role change: ${name}, Checked: ${checked}`);
+      console.log("Updated roles:", updatedRoles);
+  
+      return {
+        ...prevData,
+        roles: updatedRoles,
+      };
+    });
+  
     setMessage("");
   };
 
@@ -376,7 +422,7 @@ const validateChef = () => {
       email: registerData.email || "",
       mobile_number: registerData.mobile || "",
       password_hash: registerData.password || "",
-      role: "customer",
+      role: registerData.roles || [],
       gender: registerData.gender || "Other", // Set a default gender value if none selected
       profile_image: registerData.profilePicture || "",
       status: "active",
@@ -386,7 +432,7 @@ const validateChef = () => {
       province: registerData.province || "",
       postal_code: registerData.postalCode || "",
       country: registerData.country || "",
-      nearby_landmark: registerData.nearby_landmark || "",
+      nearby_landmark: registerData.addressLine1 || "",
     };
     console.log("User input for mutation:", userInput);
     const { data } = await createUser({ variables: { input: userInput } });
@@ -491,9 +537,15 @@ const validateChef = () => {
   //   };
 
   const handleSubmit = async (e) => {
+    console.log("Step1:", step);
     e.preventDefault();
-    const { customer, chef, rider } = registerData.roles;
-  
+    //const { customer, chef, rider } = registerData.roles;
+  const  roles = registerData.roles;
+  const customer = roles.includes("customer");
+  const chef = roles.includes("chef");
+  const rider = roles.includes("rider");
+
+
     if (step === 1) {
       console.log("A1");
       // Step 1 validation (common fields)
@@ -510,20 +562,28 @@ const validateChef = () => {
           console.log("A4 - Customer only");
           await handleFormSubmission(); // Save and navigate for Customer only
         } else if (rider && chef) {
+          console.log("Step2:", step);
           console.log("A5 - Customer, Rider, and Chef");
           setStep(3); // Move to Rider form, then Chef form after Rider
         } else if (rider) {
+          console.log("Step3:", step);
           console.log("A6 - Customer and Rider only");
           setStep(3); // Move to Rider form if Customer and Rider are selected
         } else if (chef) {
+          console.log("Step4:", step);
           console.log("A7 - Customer and Chef only");
           setStep(4); // Move to Chef form if Customer and Chef are selected
         }
       }
     } else if (step === 3 && rider) {
+      console.log("Step5:", step);
+      console.log("Roles:", registerData.roles);
+      console.log("Rider selected:", registerData.roles.includes("rider"));
+      console.log("Chef selected:", registerData.roles.includes("chef"));
       console.log("A8 - Rider step");
       // Rider-specific validation at step 3
       if (validateRider()) {
+        console.log("Step6:", step);
         if (chef) {
           console.log("A9 - Proceed to Chef after Rider");
           setStep(4); // Move to Chef form after completing Rider form
@@ -533,6 +593,7 @@ const validateChef = () => {
         }
       }
     } else if (step === 4 && chef) {
+      console.log("Step7:", step);
       console.log("A11 - Chef step");
       // Chef-specific validation at step 4
       if (validateChef()) {
@@ -540,6 +601,7 @@ const validateChef = () => {
         await handleFormSubmission(); // Save and complete for Chef or all roles
       }
     } else if (customer && chef && rider) {
+      console.log("Step8:", step);
       console.log("A13 - All roles selected");
       // All validations at once for Customer, Rider, and Chef
       if (
@@ -552,41 +614,14 @@ const validateChef = () => {
         await handleFormSubmission(); // Save and navigate for all roles
       }
     }
-    // if (step === 1) {
-    //   // Await validateStep1 to complete before proceeding
-    //   const isValidStep1 = await validateStep1();
-    //   if (isValidStep1) {
-    //     setStep(2); // Proceed to the customer form if Step 1 validation passes
-    //   }
-    // } else if (step === 2) {
-    //   // Validate Step 2 and handle customer submission
-    //   if (validateStep2()) {
-    //     // If only customer role is selected, complete the registration and navigate to "/"
-    //     if (customer && !chef && !rider) {
-    //       await handleFormSubmission(); // Save and redirect
-    //     } else {
-    //       // If Rider or Chef role is selected with Customer, move to the next step for additional details
-    //       if (rider) setStep(3); // Move to Rider fields
-    //       else if (chef) setStep(4); // Move to Chef fields
-    //     }
-    //   }
-    // } else if (step === 3 && rider) {
-    //   // Validate and save Rider-specific fields
-    //   if (validateRider()) {
-    //     await createRiderAccount(registerData.user_id); // Save Rider
-    //     navigate("/"); // Redirect to initial path
-    //   }
-    // } else if (step === 4 && chef) {
-    //   // Validate and save Chef-specific fields
-    //   if (validateChef()) {
-    //     await createChefAccount(registerData.user_id); // Save Chef
-    //     navigate("/"); // Redirect to initial path
-    //   }
-    // }
   };
-  
+
 
   const handleFormSubmission = async () => {
+    const  roles = registerData.roles;
+    const customer = roles.includes("customer");
+    const chef = roles.includes("chef");
+    const rider = roles.includes("rider");
     try {
       // Step 1: Create User Account and get `user_id`
       const userId = await createUserAccount();
@@ -596,20 +631,20 @@ const validateChef = () => {
       }
       // Update `user_id` in `registerData` for further use
       setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
-  
+
       // Step 2: Based on selected roles, create additional accounts
-      const { rider, chef } = registerData.roles;
-  
+      //const { rider, chef } = registerData.roles;
+
       if (rider) {
         await createRiderAccount(userId); // Create Rider account if selected
         console.log("Rider account created successfully.");
       }
-  
+
       if (chef) {
         await createChefAccount(userId); // Create Chef account if selected
         console.log("Chef account created successfully.");
       }
-  
+
       // Step 3: Validate Payment Information if filled and create Payment Info
       // if (ValidatePayment()) {
       //   await createPaymentInfo({
@@ -623,14 +658,20 @@ const validateChef = () => {
       //   });
       //   console.log("Payment information saved successfully.");
       // }
-  
+
       // Step 4: Navigate to home or success page
-      navigate("/", { state: { successMessage: "User registered successfully!" } });
+      navigate("/Login", { state: { successMessage: "User registered successfully!" } });
     } catch (error) {
       console.error("Error in form submission:", error);
       setMessage("Failed to register. Please try again.");
     }
   };
+  const getCurrentStep = (role) => {
+    const roleOrder = ["customer", "rider", "chef"];
+    const activeRoles = roleOrder.filter((r) => registerData.roles[r]);
+    return activeRoles.indexOf(role) + 2; // Step 1 is general info, roles start from step 2
+  };
+  
   const selectedRolesCount = Object.values(registerData.roles).filter(
     Boolean
   ).length;
@@ -638,24 +679,25 @@ const validateChef = () => {
   return (
     <Container fluid>
       <Row>
-        <Col md={7} className="p-0">
+        <Col lg={7} className="p-0">
           <div className="login-container">
             <div className="login-box">
-              <img src={Logo} className="logo mb-5" alt="Logo" />
+              <a href="/"><img src={Logo} className="logo mb-5" alt="Logo" /></a>
               {message && <Alert variant="danger">{message}</Alert>}
               {step === 1 && (
                 <>
-                  <h2 className="form-title mb-2">Get Started with HomeBite</h2>
+                  <h4 className="mb-2">Get Started</h4>
                   <p className="mb-4">
                     Enjoy the best home-cooked meals delivered to your doorstep.
                   </p>
+                  <hr />
                 </>
               )}
 
-              <form onSubmit={handleSubmit} className="row p-0 mt-3">
+              <form onSubmit={handleSubmit} className="row p-0 mt-3" noValidate>
                 {step === 1 && (
                   <>
-                    <Col md={6}>
+                    <Col lg={6}>
                       <InputField
                         label="First Name"
                         name="firstName"
@@ -664,7 +706,7 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={6}>
+                    <Col lg={6}>
                       <InputField
                         label="Last Name"
                         name="lastName"
@@ -673,7 +715,7 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={6}>
+                    <Col lg={6}>
                       <InputField
                         label="Create a Password"
                         type="password"
@@ -683,7 +725,7 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={6}>
+                    <Col lg={6}>
                       <InputField
                         label="Confirm Password"
                         type="password"
@@ -693,12 +735,13 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={12}>
-                      <h5 className="form-sub-title">Select your Gender</h5>
-                      <div className="gender-options mb-3">
+                    <Col lg={12}>
+                      <label>Select your Gender</label>
+                      <div className="gender-options mb-3 d-grid d-lg-flex">
                         <RadioButton
                           label="Male"
                           name="gender"
+                          id="gender-male"
                           value="male"
                           checked={registerData.gender === "male"}
                           onChange={handleChange}
@@ -706,6 +749,7 @@ const validateChef = () => {
                         <RadioButton
                           label="Female"
                           name="gender"
+                          id="gender-female"
                           value="female"
                           checked={registerData.gender === "female"}
                           onChange={handleChange}
@@ -713,13 +757,15 @@ const validateChef = () => {
                         <RadioButton
                           label="Other"
                           name="gender"
+                          id="gender-other"
                           value="other"
                           checked={registerData.gender === "other"}
                           onChange={handleChange}
                         />
                       </div>
+
                     </Col>
-                    <Col md={6}>
+                    <Col lg={6}>
                       <InputField
                         label="Your Email Address"
                         name="email"
@@ -729,7 +775,7 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={6}>
+                    <Col lg={6}>
                       <InputField
                         label="Mobile Number"
                         name="mobile"
@@ -738,21 +784,21 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={12}>
+                    <Col lg={12}>
                       <RoleOptions
                         roles={registerData.roles}
                         onRoleChange={handleRoleChange}
                       />
                     </Col>
-                    <Col md={12}>
-                      <Button type="submit" className="btn-primary w-100 mb-3">
+                    <Col lg={12}>
+                      <Button type="submit" className="btn-primary w-100 mb-3 mt-3">
                         Proceed
                       </Button>
                     </Col>
-                    <Col md={12}>
-                      <p className="text-center">
+                    <Col lg={12}>
+                      <p className="text-center d-grid d-lg-flex mb-3 gap-2">
                         Already Have an Account?{" "}
-                        <a href="/login" className="App-link">
+                        <a href="/login" className="btn-link">
                           Sign in here
                         </a>
                       </p>
@@ -763,15 +809,15 @@ const validateChef = () => {
                 {step === 2 && (
                   <>
                     <Col md={12}>
-                      <h2 className="form-title">Additional Information</h2>
+                    <h4 className="mb-2">Home Campus Details</h4>
                       <hr />
-                      <h3>Step 1 of {selectedRolesCount}</h3>
-                      <h4 className="form-sub-title">
-                        For{" "}
-                        {selectedRolesCount > 1 ? "Multiple Roles" : "Customer"}
-                      </h4>
+                      <h5>Step 1 of {selectedRolesCount}</h5>
+                      <h6>
+                        For Customer
+                      </h6>
+                      <hr />
                     </Col>
-                    <hr />
+                    
                     {/* <InputField
                         label="Address"
                         name="address"
@@ -782,14 +828,15 @@ const validateChef = () => {
 
                     {/* Campus Selection */}
 
-                    <Col md={12}>
+                    <Col md={6}>
                       <CampusDropdown
                         registerData={registerData}
                         setRegisterData={setRegisterData}
                       />
                     </Col>
-                    {/* Add more fields for address, rider, and chef specifics here */}
-                    <Col md={12}>
+
+                    
+                    <Col md={6}>
                       <InputField
                         label="Building Name/ Block Name"
                         name="address2"
@@ -799,21 +846,32 @@ const validateChef = () => {
                       />
                     </Col>
                     <Col md={6}>
+                      <InputField 
+                        label="Address Line 1"
+                        name="landmark"
+                        placeholder="Address Line 1"
+                        value={registerData.addressLine1}
+                        onChange={handleChange}
+                        disabled={true}
+                      />
+                    </Col>
+                    <Col md={3}>
                       <InputField
                         label="City"
                         name="city"
                         value={registerData.city}
                         onChange={handleChange}
-                        readOnly
+                        disabled={true}
                       />
                     </Col>
-                    <Col md={6}>
+                    
+                    <Col md={3}>
                       <InputField
                         label="Postal Code"
                         name="postalCode"
                         value={registerData.postalCode}
                         onChange={handleChange}
-                        readOnly
+                        disabled={true}
                       />
                     </Col>
                     <Col md={6}>
@@ -822,7 +880,7 @@ const validateChef = () => {
                         name="province"
                         value={registerData.province}
                         onChange={handleChange}
-                        readOnly
+                        disabled={true}
                       />
                     </Col>
                     <Col md={6}>
@@ -831,18 +889,10 @@ const validateChef = () => {
                         name="country"
                         value={registerData.country}
                         onChange={handleChange}
-                        readOnly
+                        disabled={true}
                       />
                     </Col>
-                    <Col md={12}>
-                      <InputField
-                        label="Nearby Landmark (optional)"
-                        name="landmark"
-                        placeholder="Nearby Landmark (optional)"
-                        value={registerData.nearby_landmark}
-                        onChange={handleChange}
-                      />
-                    </Col>
+
                     <Col md={6}>
                       <div className="d-flex justify-content-between mb-3 mt-3">
                         <Button
@@ -857,27 +907,26 @@ const validateChef = () => {
 
                     <Col md={6}>
                       <Button type="submit" className="btn-primary w-100 mt-3">
-                        Complete Registration
+                        Proceed Registration
                       </Button>
                     </Col>
                   </>
                 )}
-                {step === 3 && registerData.roles.rider && (
+                {step === 3 && registerData.roles.includes("rider") && (
                   <>
                     <Col md={12}>
-                      <h2 className="form-title">Vehicle Information</h2>
+                    <h4 className="mb-2">Additional Information</h4>
                       <hr />
-                      <h3>Step 2 of 2</h3>
-                      <h4 className="form-sub-title">
-                        For{" "}
-                        {selectedRolesCount > 1 ? "Multiple Roles" : "Rider"}
-                      </h4>
-                      
+                      <h5>Step 2 of {selectedRolesCount}</h5>
+                      <h6>
+                        For Rider
+                      </h6>
+                      <hr />
                     </Col>
-                    <hr />
-                    {/* <Col md={12}>
-                      <h5>Vehicle Information</h5>
-                    </Col> */}
+                    
+                    <Col md={12}>
+                      <h5 className="mt-3 mb-3"><b>Vehicle Information</b></h5>
+                    </Col>
                     <Col md={6}>
                       <InputField
                         label="Vehicle Type"
@@ -935,55 +984,17 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    {/* <Col md={12}>
-                      <h5>Upload Driver License/Insurance</h5>
-                      <InputField
-                        label="Upload Driver License"
-                        type="file"
-                        name="document_upload_path"
-                        onChange={(e) =>
-                          setRegisterData({
-                            ...registerData,
-                            document_upload_path: e.target.files[0],
-                          })
-                        }
-                      />
-                    </Col> */}
 
-                    {/* Availability Section */}
-                    {/* <Col md={12}>
-                      <h5>Availability</h5>
-                    </Col>
                     <Col md={12}>
-                      <div className="mb-3">
-                        <label>Preferred Working Days</label>
-                        <div className="d-flex flex-wrap">
-                          {workingDaysOptions.map((option) => (
-                            <Checkbox
-                              key={option.value}
-                              label={option.label}
-                              name="preferredWorkingDays"
-                              value={option.value}
-                              checked={registerData.preferredWorkingDays.includes(
-                                option.value
-                              )}
-                              onChange={handleWorkingDaysChange}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </Col> */}
-                    
-                    <Col md={12}>
-                     
+
                       <AvailabilityOptions
                         selectedDays={registerData.preferredWorkingDays}
                         onDayChange={handleWorkingDaysChange}
                       />
-                      </Col>
-                    
+                    </Col>
 
-                    <Col md={6}>
+
+                    <Col md={3}>
                       <InputField
                         label="Start Time"
                         name="preferredStartTime"
@@ -991,7 +1002,7 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={6}>
+                    <Col md={3}>
                       <InputField
                         label="End Time"
                         name="preferredEndTime"
@@ -1015,71 +1026,43 @@ const validateChef = () => {
                         ]}
                       />
                     </Col>
-                    {/* Payment Information */}
-                    {/* <Col md={12}>
-                      <h5>Payment Information</h5>
-                    </Col>
-                    <Col md={6}>
-                      <InputField
-                        label="Bank Account Number"
-                        name="bankAccountNumber"
-                        placeholder="Bank Account Number"
-                        onChange={handleChange}
-                      />
-                    </Col>
-                    <Col md={6}>
-                      <InputField
-                        label="Transit Number"
-                        name="transitNumber"
-                        placeholder="Transit Number"
-                        onChange={handleChange}
-                      />
-                    </Col> */}
-
-                    {/* Profile Verification */}
-                    {/* <Col md={12}>
-                      <h5>Profile Verification</h5>
-                      <InputField
-                        label="Upload Profile Picture"
-                        type="file"
-                        name="profilePicture"
-                        onChange={(e) =>
-                          setRegisterData({
-                            ...registerData,
-                            profilePicture: e.target.files[0],
-                          })
-                        }
-                      />
-                    </Col> */}
 
                     {/* Submit Button */}
-                    <Col md={12}>
-                      <Button type="submit" className="btn-primary w-100">
+                    <Col md={6}>
+                      <div className="d-flex justify-content-between mb-3 mt-3">
+                        <Button
+                          type="button"
+                          className="btn-secondary w-100"
+                          onClick={() => setStep(2)}
+                        >
+                          Back
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col md={6}>
+                      <Button type="submit" className="btn-primary w-100  mb-3 mt-3">
                         Proceed Registration
                       </Button>
                     </Col>
                   </>
                 )}
                 {/* Step 4 - Chef-Specific Fields */}
-                {step === 4 && registerData.roles.chef && (
+                {step === 4 && registerData.roles.includes("chef") && (
                   <>
                     <Col md={12}>
-                      <h2 className="form-title">Additional Information</h2>
+                    <h4 className="mb-2">Additional Information</h4>
                       <hr />
-                      <h3>Step 2 of 2</h3>
-                      <h4 className="form-sub-title">
-                        For {selectedRolesCount > 1 ? "Multiple Roles" : "Chef"}
-                      </h4>
+                      <h5>Step 3 of {selectedRolesCount}</h5>
+                      <h6>
+                        For Chef
+                      </h6>
                       <hr />
                     </Col>
-                    {/* <h2 className="form-title">Additional Information</h2>
+                    {/* <h2>Additional Information</h2>
                     <p>Step 2 of {selectedRolesCount}</p>
                     <hr /> */}
 
                     {/* Profile Picture */}
-                    <Col md={12}>
-                      <h3>Profile Verification</h3>
-                    </Col>
                     {/* <Col md={12}>
                       <InputField
                         label="Upload Profile Picture"
@@ -1096,17 +1079,17 @@ const validateChef = () => {
 
                     {/* Culinary Information */}
                     <Col md={12}>
-                      <h5>Culinary Information</h5>
+                    <h5 className="mt-3 mb-3"><b>Culinary Information</b></h5>
                     </Col>
-                    <Col md={12}>
-                      <SpecialtyCuisinesOptions
+                    <Col md={12} className="mb-3">
+                      <SpecialtyCuisinesOptions 
                         cuisines={registerData.specialtyCuisines}
                         onCuisineChange={(e) =>
                           handleCheckboxChange(e, "specialtyCuisines")
                         }
                       />
                     </Col>
-                    <Col md={12}>
+                    <Col md={12} className="mb-3">
                       <TypeOfMealsOptions
                         meals={registerData.typeOfMeals}
                         onMealChange={(e) =>
@@ -1114,7 +1097,7 @@ const validateChef = () => {
                         }
                       />
                     </Col>
-                    <Col md={12}>
+                    <Col md={4}>
                       <Form.Group className="input-field mb-3">
                         <Form.Label htmlFor="Experience in Cooking">
                           Experience in Cooking
@@ -1142,104 +1125,14 @@ const validateChef = () => {
                         </Form.Control>
                       </Form.Group>
                     </Col>
-                    {/* <Col md={12}>
-                      <label>Specialty Cuisines</label>
-                      <div className="d-flex flex-wrap">
-                        {[
-                          "Indian",
-                          "Italian",
-                          "Mexican",
-                          "Chinese",
-                          "Other",
-                        ].map((cuisine) => (
-                          <Checkbox
-                            key={cuisine}
-                            label={cuisine}
-                            name="specialtyCuisines"
-                            value={cuisine}
-                            checked={registerData.specialtyCuisines.includes(
-                              cuisine
-                            )}
-                            onChange={(e) =>
-                              handleCheckboxChange(e, "specialtyCuisines")
-                            }
-                          />
-                        ))}
-                      </div>
-                    </Col> */}
-                    {/* <Col md={12}>
-                      <label>Type of Meals</label>
-                      <div className="d-flex flex-wrap">
-                        {["Breakfast", "Lunch", "Dinner", "Snacks"].map(
-                          (meal) => (
-                            <Checkbox
-                              key={meal}
-                              label={meal}
-                              name="typeOfMeals"
-                              value={meal}
-                              checked={registerData.typeOfMeals.includes(meal)}
-                              onChange={(e) =>
-                                handleCheckboxChange(e, "typeOfMeals")
-                              }
-                            />
-                          )
-                        )}
-                      </div>
-                    </Col> */}
-                    {/* <Col md={12}>
-                      <label>Experience in Cooking</label>
-                      <div className="d-flex flex-wrap">
-                        {[
-                          "Less than 1 year",
-                          "1-3 years",
-                          "3-5 years",
-                          "5+ years",
-                        ].map((experience) => (
-                          <Checkbox
-                            key={experience}
-                            label={experience}
-                            name="cookingExperience"
-                            value={experience}
-                            checked={
-                              registerData.cookingExperience === experience
-                            }
-                            onChange={(e) =>
-                              setRegisterData({
-                                ...registerData,
-                                cookingExperience: e.target.value,
-                              })
-                            }
-                          />
-                        ))}
-                      </div>
-                    </Col> */}
+                    <Col md={12}  className="mb-3">
 
-                    {/* <Col md={12}>
-                      <h5>Availability</h5>
-                      <div className="d-flex flex-wrap">
-                        {workingDaysOptions.map((option) => (
-                          <Checkbox
-                            key={option.value}
-                            label={option.label}
-                            name="preferredWorkingDays"
-                            value={option.value}
-                            checked={registerData.preferredWorkingDays.includes(
-                              option.value
-                            )}
-                            onChange={handleWorkingDaysChange}
-                          />
-                        ))}
-                      </div>
-                    </Col> */}
-
-                    <Col md={12}>
-                     
                       <AvailabilityOptions
                         selectedDays={registerData.preferredWorkingDays}
                         onDayChange={handleWorkingDaysChange}
                       />
                     </Col>
-                    <Col md={6}>
+                    <Col md={3}>
                       <InputField
                         label="Start Time"
                         name="preferredStartTimeChef"
@@ -1247,7 +1140,7 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={6}>
+                    <Col md={3}>
                       <InputField
                         label="End Time"
                         name="preferredEndTimeChef"
@@ -1255,7 +1148,7 @@ const validateChef = () => {
                         onChange={handleChange}
                       />
                     </Col>
-                    <Col md={12}>
+                    <Col md={6}>
                       <InputField
                         label="Maximum Orders Per day"
                         name="maxOrdersPerDay"
@@ -1284,7 +1177,7 @@ const validateChef = () => {
                       />
                     </Col> */}
                     <Col md={6}>
-                      <div className="d-flex justify-content-between mb-3">
+                      <div className="d-flex justify-content-between mb-3 mt-3">
                         <Button
                           type="button"
                           className="btn-secondary w-100"
@@ -1295,8 +1188,8 @@ const validateChef = () => {
                       </div>
                     </Col>
                     <Col md={6}>
-                      <Button type="submit" className="btn-primary w-100">
-                        Complete Registration
+                      <Button type="submit" className="btn-primary w-100  mt-3">
+                        Proceed Registration
                       </Button>
                     </Col>
                   </>
@@ -1306,8 +1199,8 @@ const validateChef = () => {
           </div>
         </Col>
         <Col
-          md={5}
-          className="d-flex align-items-center justify-content-center p-0 position-relative"
+          lg={5}
+          className="d-none d-lg-flex align-items-center justify-content-center p-0 position-relative"
         >
           <div className="overlay position-absolute w-100 h-100"></div>
           <img
@@ -1315,50 +1208,16 @@ const validateChef = () => {
             className="img-fluid login-bg w-100 h-100"
             alt="Background"
           />
-          <div
-            id="textCarousel"
-            className="carousel slide position-absolute mb-3"
-            data-bs-ride="carousel"
-          >
-            <div className="carousel-inner w-50">
-              <div className="carousel-item active">
-                <div className="d-block p-3 text-white h3 text-carousel">
-                  “Home-cooked meals, made by the community, for the community.”
-                </div>
-              </div>
-              <div className="carousel-item">
-                <div className="d-block p-3 text-white h3 text-carousel">
-                  Second Text Slide
-                </div>
-              </div>
-              <div className="carousel-item">
-                <div className="d-block p-3 text-white h3 text-carousel">
-                  Third Text Slide
-                </div>
-              </div>
-            </div>
-            <div className="position-relative w-50 mx-3 d-flex">
-              <button
-                className="carousel-control-prev position-relative w-auto"
-                type="button"
-                data-bs-target="#textCarousel"
-                data-bs-slide="prev"
-              >
-                <i className="material-icons">arrow_circle_left</i>
-                <span className="visually-hidden">Previous</span>
-              </button>
-              <button
-                className="carousel-control-next position-relative w-auto mx-3"
-                type="button"
-                data-bs-target="#textCarousel"
-                data-bs-slide="next"
-              >
-                <i className="material-icons">arrow_circle_right</i>
-                <span className="visually-hidden">Next</span>
-              </button>
-            </div>
-          </div>
+          <CarouselComponent
+            carouselId="textCarousel"
+            items={[
+              "Bringing the taste of home, made by local chefs, for everyone to enjoy.",
+              "Fresh, homemade meals from your neighbors, straight to your table.",
+              "Crafted with care by local hands, for the heart of our community",
+            ]}
+          />
         </Col>
+
       </Row>
     </Container>
   );

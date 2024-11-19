@@ -14,15 +14,17 @@ const SpecialtyCuisinesOptions = ({ cuisines, onCuisineChange }) => {
 
   return (
     <>
-      <h5 className="form-sub-title mb-3 mt-3">Specialty Cuisines</h5>
-      <div className="cuisine-options d-flex flex-wrap mb-3 mt-3">
+      <label className="d-block">Specialty Cuisines</label>
+      <div className="d-grid d-lg-flex">
         {cuisineData.map((cuisine) => (
+          <div className="form-check form-check-inline mt-2">
           <label
-            className={`option ${cuisines.includes(cuisine.name) ? "checked" : ""}`}
+            className={`form-check-label ${cuisines.includes(cuisine.name) ? "checked" : ""}`}
             key={cuisine.name}
           >
             <input
               type="checkbox"
+              className="form-check-input"
               name="specialtyCuisines"
               value={cuisine.name}
               checked={cuisines.includes(cuisine.name)}
@@ -34,6 +36,7 @@ const SpecialtyCuisinesOptions = ({ cuisines, onCuisineChange }) => {
               {/* {cuisine.description} */}
             </p>
           </label>
+          </div>
         ))}
       </div>
     </>

@@ -1,77 +1,202 @@
-import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaShoppingCart } from "react-icons/fa";
 import Button from "react-bootstrap/esm/Button";
-import "./Header.scss";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/logo.svg";
 import { useEffect, useState } from "react";
+import {
+  Container,
+  Nav,
+  Navbar,
+  InputGroup,
+  Badge,
+  Col,
+  Row,
+} from "react-bootstrap";
+import "./Header.scss";
 
-export default function Header() {
+export default function Header({
+  cart = {},
+  roles = {},
+  currentRole,
+  onRoleSelect,
+  showCartSummary,
+}) {
+  const totalItems = cart
+    ? Object.values(cart).reduce((sum, qty) => sum + qty, 0)
+    : 0;
+
   const navigate = useNavigate();
-  
-  // const handleLogin = () => {
-  //   navigate("/Login");
-  // };
+  const shouldShowRoleNavbar = roles.chef || roles.rider || roles.customer;
+  const urole = localStorage.getItem("urole");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  console.log("login urole", urole);
   useEffect(() => {
-    // Check if user_id exists in local storage
     const userId = localStorage.getItem("user_id");
     setIsLoggedIn(!!userId);
   }, []);
 
   const handleLoginLogout = () => {
     if (isLoggedIn) {
-      // If logged in, log out the user
       localStorage.removeItem("user_id");
+      localStorage.removeItem("urole"); // Clear the urole value
       setIsLoggedIn(false);
-      navigate("/"); // Redirect to home or another page after logout
+      navigate("/");
     } else {
-      // If not logged in, navigate to login page
       navigate("/Login");
     }
   };
 
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
-      <Container fluid>
-        <Navbar.Brand href="#home">
-          <img src={Logo} className="logo" alt="Logo"/>
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          {/* Apply ms-auto to push items to the right */}
-          <Nav className="ms-auto align-items-center">
-          <Form className="d-flex w-100 me-4">
-              <InputGroup className="mb-0">
-                <InputGroup.Text id="basic-addon1">
-                  <FaSearch />
-                </InputGroup.Text>
-                <Form.Control
-                  placeholder="Search For Food Items"
-                  aria-label="Search"
-                  aria-describedby="basic-addon1"
-                />
-              </InputGroup>
-            </Form>
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#cart">Cart</Nav.Link>
-            
-            <Button
-              variant="dark"
-              onClick={handleLoginLogout}
-              className="me-3"
-            >
-              {isLoggedIn ? "Logout" : "Login"}
-            </Button>
-            
+    <>
+      {/* Primary Navbar */}
+      <Navbar expand="lg" className="bg-body-tertiary site-header">
+        <Container fluid>
+          <Row className="w-100">
+            <Col className="d-flex justify-content-between align-items-center mobile-header">
+              <Navbar.Brand href="/">
+                <img src={Logo} className="logo" alt="Logo" />
+              </Navbar.Brand>
+              <div className="d-flex align-items-center justify-content-between    mobile-header m-w-100">
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+               
+              </div>
+              <Navbar.Collapse id="basic-navbar-nav" className="m-w-100 flex-none">
+                  <Nav className="d-flex gap-2 justify-content-between">
+                    <Nav.Link
+                      href="/"
+                      className={`m-0 btn-link ${currentRole === "home" ||
+                          ["customer", "chef", "rider"].includes(currentRole)
+                          ? "active"
+                          : ""
+                        }`}
+                    >
+                      
+                      Home
+                    </Nav.Link>
+                    {urole && (
+                      <div className="cart-icon d-flex gap-2 m-w-100">
+                        <Nav className=" b-0 ">
+                          {urole === "customer" && (
+                            <Nav.Link
+                              href="/customer/dashboard"
+                              active={currentRole === "customer"}
+                              onClick={() => onRoleSelect("customer")}
+                            >
+                              Customer
+                            </Nav.Link>
+                          )}
+                          {/* {urole === "chef" && (
+                            <Nav.Link
+                            className={`cart-icon d-flex p-0 align-items-baseline ${
+                              currentRole === "chef"
+                                ? "active"
+                                : ""
+                            }`}
+                              
+                              href="/chef/orders"
+                              active={currentRole === "chef"}
+                              onClick={() => onRoleSelect("chef")}
+                            >
+                              <div className="position-relative ">
+                                <span className="material-icons align-middle">
+                                  coffee
+                                </span>
+                              </div>
+                              <h6 className="mb-0 mx-2 btn-link">
+                                Chef Dashboard
+                              </h6>
+                            </Nav.Link>
+                          )} */}
+                          {urole.includes("chef") && (
+                            <Nav.Link
+                              className={`m-w-100 cart-icon d-flex p-0 align-items-baseline ${urole.includes("chef") ? "active" : " "
+                                }`}
+                              href="/chef/orders"
+                              onClick={() => onRoleSelect("chef")}
+                            >
+                              <div className="position-relative header-icon">
+                                <span className="material-icons align-middle">
+                                  room_service
+                                </span>
+                              </div>
+                              <h6 className="mb-0 mx-2 btn-link">
+                                Chef Dashboard
+                              </h6>
+                            </Nav.Link>
+                          )}
+
+                          {urole === "rider" && (
+                            <Nav.Link
+                              href="/rider/dashboard"
+                              active={currentRole === "rider"}
+                              onClick={() => onRoleSelect("rider")}
+                            >
+                              Rider
+                            </Nav.Link>
+                          )}
+                        </Nav>
+                      </div>
+                    )}
+                    <div
+                      className="cart-icon d-flex m-w-100"
+                      onClick={showCartSummary}
+                    >
+                      <div className="position-relative  header-icon ">
+                        <span className="material-icons align-middle">
+                          shopping_cart
+                        </span>
+                        {totalItems > 0 && (
+                          <Badge bg="danger" pill className="position-absolute">
+                            {totalItems}
+                          </Badge>
+                        )}
+                      </div>
+                      <h6 className="mb-0 mx-2 btn-link">Cart</h6>
+                    </div>
+                    <Nav.Link onClick={handleLoginLogout} className="btn-link m-0">
+                      {isLoggedIn ? "Logout" : "Login"}
+                    </Nav.Link>
+                  </Nav>
+                </Navbar.Collapse>
+            </Col>
+          </Row>
+        </Container>
+      </Navbar>
+
+      {/* Conditional Role Navbar */}
+      {/* {urole && (
+        <div className="role-navbar">
+          <Nav className="nav nav-tabs">
+            {urole === "customer" && (
+              <Nav.Link
+                href="/customer/dashboard"
+                active={currentRole === "customer"}
+                onClick={() => onRoleSelect("customer")}
+              >
+                Customer
+              </Nav.Link>
+            )}
+            {urole === "chef" && (
+              <Nav.Link
+                href="/chef/orders"
+                active={currentRole === "chef"}
+                onClick={() => onRoleSelect("chef")}
+              >
+                <span class="material-icons">coffee</span> Chef Dashboard
+              </Nav.Link>
+            )}
+            {urole === "rider" && (
+              <Nav.Link
+                href="/rider/dashboard"
+                active={currentRole === "rider"}
+                onClick={() => onRoleSelect("rider")}
+              >
+                Rider
+              </Nav.Link>
+            )}
           </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+        </div>
+      )} */}
+    </>
   );
 }

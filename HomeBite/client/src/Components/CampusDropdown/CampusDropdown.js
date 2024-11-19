@@ -13,6 +13,7 @@ const CampusDropdown = ({ registerData, setRegisterData }) => {
       setRegisterData((prevData) => ({
         ...prevData,
         address: selectedCampus.address,
+        addressLine1:selectedCampus.addressLine1,
         city: selectedCampus.city,
         postalCode: selectedCampus.postalCode,
         province: selectedCampus.province,

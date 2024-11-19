@@ -73,10 +73,6 @@ async function startApolloServer() {
     },
   });
   
-  
-  
-  
-
   await server.start();
   server.applyMiddleware({ app }); 
 

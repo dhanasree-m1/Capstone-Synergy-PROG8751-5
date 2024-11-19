@@ -3,18 +3,39 @@
 $font-family: "Comfortaa", sans-serif;
 $background-color: #282c34;
 $primary-color: #FF8A00;
-$secondary-color: #4A4A4A;
-$text-color: white;
-$font-size-base: calc(10px + 2vmin);
+$secondary-color: #FF4B2B;
+$text-color: #4A4A4A;
+$font-size-base: 14px;
 $logo-size: 40vmin;
 $overlay-color: rgba(0, 0, 0, 0.5);
 $slider-icon-size: 3em;
-$btn-primary-bg-color: #ff8a00;
+$btn-primary-bg-color: #FF8A00;
+$btn-primary-bg-color-hover:#FFAA33;
+$btn-primary-color:#000;
 $btn-primary-font-size: 16px;
-$btn-link-color: #ff8a00;
+$btn-link-color: #D32F2F;
 $btn-link-font-size: 14px;
-$link-color: #ff8a00;
+$link-color: #D32F2F;
 $text-size: 14px;
+$border-color:#DDE1E6;
+$homepage-search-block-bg:#EEF0EF;
+$card-bg:#F0FFF4;
+$chef-card: #F8F8F8;
+$header-bg:#F5F5F5;
+$null:0;
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family;
+  line-height: 1.2;
+
+  h1 { font-size: 36px; font-weight: 700; }
+  h2 { font-size: 30px; font-weight: 600; line-height: 1.3; }
+  h3 { font-size: 26px; font-weight: 500; line-height: 1.3; }
+  h4 { font-size: 22px; font-weight: 500; line-height: 1.4; }
+  h5 { font-size: 18px; font-weight: 400; line-height: 1.5; }
+  h6 { font-size: 16px; font-weight: 400; line-height: 1.6; }
+}
+
 
 
 // Styles
@@ -22,8 +43,9 @@ $text-size: 14px;
   text-align: center;
 }
 
-html {
+html,body {
   font-family: $font-family;
+  font-size: $font-size-base;
 }
 
 .App-logo {
@@ -70,57 +92,6 @@ p {
   object-fit: cover;
 }
 
-.overlay {
-  background-color: $overlay-color;
-  z-index: 1;
-}
-
-.carousel {
-  z-index: 2;
-  bottom: 10%;
-  left: 10%;
-}
-
-.carousel-control-prev,
-.carousel-control-next {
-  opacity: 1 !important;
-
-  .material-icons {
-    font-size: $slider-icon-size;
-  }
-}
-
-// btn-primary style
-.btn-primary {
-  background-color: $btn-primary-bg-color;
-  font-size: $btn-primary-font-size;
-  color: $text-color;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: darken($btn-primary-bg-color, 10%);
-  }
-}
-
-// btn-link style
-.btn-link {
-  background: none;
-  border: none;
-  color: $btn-link-color;
-  font-size: $btn-link-font-size;
-  text-decoration: none;
-  cursor: pointer;
-  padding: 0;
-
-  &:hover {
-    text-decoration: none;
-    color: darken($btn-link-color, 10%);
-  }
-}
-
 footer {
   max-width: 100%;
   display: flex;
@@ -137,12 +108,18 @@ footer {
 }
 
 // General styling for the container
+.ht{
+  height: 200px;
+}
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #fff;
+  background-color: $card-bg;
+}
+.login-container .logo{
+  height: auto;
 }
 
 // Styling for the login/register box
@@ -150,8 +127,10 @@ footer {
   background-color: white;
   padding: 30px;
   border-radius: 10px;
-  width: 100%;
-  max-width: 80%;
+  width: 70%;
+  max-width: 90%;
+  border: 1px solid $border-color;
+  margin: 30px 0;
 }
 
 // Title for the form
@@ -218,109 +197,88 @@ input:-internal-autofill-selected {
   }
 }
 
-// Container for the role options
-.fat-options {
+
+
+.dashboard-container {
+  padding: 20px;
+}
+
+.top-picks-section, .chefs-around-section {
+  padding: 20px 0;
+}
+
+.product-list, .chef-list {
+  gap: 20px;
+}
+
+.cart-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.cart-controls span {
+  font-size: 16px;
+  font-weight: bold;
+}
+.cart-item {
   display: flex;
   justify-content: space-between;
-}
-
-// Style for each option (role card)
-.option {
-  flex: 1;
-  padding: 14px 20px;
-  border: 1px solid #d8e6dc;
-  border-radius: 8px;
-  background-color: #fff;
-  text-align: left;
-  position: relative;
-  margin-right: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:last-child {
-    margin-right: 0;
-  }
-
-  p {
-    font-size: 16px;
-    color: #333;
-    margin: 0;
-    margin-left: 1em;
-  }
-
-  // Hide native checkbox
-  input[type="checkbox"] {
-    display: none;
-  }
-
-  // Custom checkmark styling
-  input[type="checkbox"]+p:before {
-    content: "check_box_outline_blank";
-    color: $primary-color;
-    font-family: 'Material Icons';
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 20px;
-    transition: opacity 0.2s ease-in-out;
-  }
-
-  // Highlight the card when checkbox is checked
-  input[type="checkbox"]:checked+p:before {
-    color: $primary-color;
-    content: 'check_box';
-    font-family: 'Material Icons';
-  }
-
-  &:hover {
-    border-color: $primary-color;
-  }
-
-  &.checked {
-    background-color: #f3faf3;
-    border-color: #B2B2B2;
-  }
-}
-
-
-
-.form-check {
   align-items: center;
-  margin-bottom: 15px;
+}
 
-  .form-check-input {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    cursor: pointer;
-    appearance: none;
-    border: 1px solid #B2B2B2; // default unchecked border color
-    border-radius: 50%;
-    position: relative;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+.quantity-controls button {
+  width: 30px;
+  height: 30px;
+  line-height: 1;
+}
 
-    &:checked {
-      background-color: #fff; // background for checked state
-      border: 1px solid #FF8A00; // orange border for checked state
+.subtotal {
+  text-align: right;
+  margin-top: 20px;
+}
 
-      &::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 10px;
-        height: 10px;
-        background-color: #FF8A00; // orange dot in the center for checked state
-        border-radius: 50%;
-      }
-    }
+.b-0{
+  border: $null;
+}
+.link-color{
+  color:$link-color;}
+//Dropdown
+select.form-control{
+  background: url("assets/images/chevron-down.svg") no-repeat right 1rem center/20px 20px;
+  font-size: 14px;
+}
+.form-control{
+  font-size: 14px !important;
+  min-height: 44px;
+}
+.form-check-input:checked,.form-check-input:active,.form-check-input:focus{
+  background-color:#F9F5FF;
+  border-color:$primary-color;
+}
+.form-check-input:checked[type=checkbox]{
+  background-image: url("assets/images/check.svg");
+}
+// Responsive Typography
+@media (max-width: 1200px) {
+  .login-box{
+    width: 100%;
   }
-
-  .form-check-label {
-    font-size: 16px;
-    color: #3A445D; // text color
-    cursor: pointer;
-    vertical-align: text-top;
+}
+@media (max-width: 768px) {
+  h1 { font-size: 28px; }
+  h2 { font-size: 24px; }
+  h3 { font-size: 22px; }
+  h4 { font-size: 20px; }
+  h5 { font-size: 16px; }
+  h6 { font-size: 14px; }
+  .login-container{
+    align-items: flex-start;
+    background-color: $card-bg;
+  }
+  .login-box{
+    width: 100%;
+    margin-top: 2em;
   }
 }

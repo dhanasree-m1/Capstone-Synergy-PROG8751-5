@@ -1,18 +1,23 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "./AvailabilityOptions"; // Reusing RoleOptions styles
+import "./AvailabilityOptions.scss";
 
 const AvailabilityOptions = ({ selectedDays, onDayChange }) => {
   const workingDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   return (
     <>
-   <h3>Availability</h3>
-    <h5 className="form-sub-title mb-3 mt-3">Preferred Working Days</h5>
-    <div className="fat-options d-flex flex-wrap mb-3 mt-3">
+    
+   <h5  className="mt-3 mb-3">Availability</h5>
+    <label className="d-block">Preferred Working Days</label>
+    <div className="row mb-3">
       {workingDays.map((day) => (
-        <label className={`option mb-3 ${selectedDays.includes(day) ? "checked" : ""}`} key={day}>
+        <div className="col-md-3 col">
+          <div className="form-check form-check-inline mt-2">
+        <label className={`form-check-label ${selectedDays.includes(day) ? "checked" : ""}`} key={day}>
           <input
+           className="form-check-input"
             type="checkbox"
             name="preferredWorkingDays"
             value={day}
@@ -20,10 +25,11 @@ const AvailabilityOptions = ({ selectedDays, onDayChange }) => {
             onChange={(e) => onDayChange(e, "preferredWorkingDays")}
             
           />
-          <p className="mb-0"><b>{day}</b><br /></p>
+          <p className="mb-0">{day}<br /></p>
         </label>
+        </div></div>
       ))}
-    </div>
+      </div>
     </>
   );
 };

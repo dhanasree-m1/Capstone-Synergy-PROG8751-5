@@ -9,6 +9,7 @@ import TypeOfMealsOptions from "../../Components/TypeOfMealsOptions/TypeOfMealsO
 import AvailabilityOptions from "../../Components/AvailabilityOptions/AvailabilityOptions";
 import { UPDATE_USER_PROFILES } from "../../queries";
 import { useMutation } from "@apollo/client";
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const [userInfo, setUserInfo] = useState({
@@ -187,6 +188,14 @@ const Profile = () => {
 
   return (
     <Container>
+      <Row>
+        <Col>
+          <Link className="btn-link  mb-3" to="/chef/products">Menu</Link><span className="material-icons">
+            arrow_forward
+          </span><span>Add Menu</span>
+        </Col>
+        <Col md={12} className='mt-5'><h5>Profile Details</h5><hr /></Col>
+      </Row>
       <h2>Profile</h2>
       {message && (
         // <Alert variant={message.includes("Error") ? "danger" : "success"}>
@@ -208,7 +217,7 @@ const Profile = () => {
               <RadioButton label="Other" name="gender" value="Other" checked={userInfo.gender === "Other"} onChange={(e) => handleInputChange(e, setUserInfo)} />
             </div>
           </Col>
-          <Col md={6}>
+          {/* <Col md={6}>
             <InputField label="Address Line 1" name="address_line_1" value={userInfo.address_line_1 || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
             <InputField label="Address Line 2" name="address_line_2" value={userInfo.address_line_2 || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
             <InputField label="City" name="city" value={userInfo.city || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
@@ -216,7 +225,7 @@ const Profile = () => {
             <InputField label="Postal Code" name="postal_code" value={userInfo.postal_code || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
             <InputField label="Country" name="country" value={userInfo.country || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
             <InputField label="Nearby Landmark" name="nearby_landmark" value={userInfo.nearby_landmark || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-          </Col>
+          </Col> */}
         </Row>
         <ImageUpload label="Profile Image" currentImageUrl={profileImageUrl} onImageUpload={handleProfileImageUpload} />
         <div>

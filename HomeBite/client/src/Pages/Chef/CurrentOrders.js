@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Container,  Table, Button } from "react-bootstrap";
+import { Container, Table, Button } from "react-bootstrap";
+import { Form, Row, Col, Alert } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 // import Header from '../../Components/Header/Header';
 import "./chef.scss"; // Import the SCSS file
@@ -94,15 +95,55 @@ const CurrentOrders = () => {
   };
 
   return (
-    <Container fluid className="orders-page">
-        {/* <Header /> */}
-       <h2>Orders</h2>
-        <div className="tab-selector">
-          <Link className="tab active">Current Orders</Link>
-          <Link to="completed" className="tab ">Order Completed</Link>
+    <Container fluid>
+    <Row className="orders-page">
+      <div className='row'>
+              <div className='col-12 mb-5'>
+                <h2>Welcome back, {localStorage.getItem('uname')}</h2>
+                <h6>Track, manage and forecast your customers and orders.</h6>
+              </div>
+            </div>
+      <div className='col-3'>
+        <div className='card alert alert-primary'>
+          <div className='card-body'>
+            <h5>Today's orders</h5>
+            <h3>24</h3>
+          </div>
         </div>
+      </div>
+      <div className='col-3'>
+        <div className='card alert alert-success'>
+          <div className='card-body'>
+            <h5>Today's Earnings</h5>
+            <h3>$ 1,210</h3>
+          </div>
+        </div>
+      </div>
+      <div className='col-3'>
+        <div className='card alert alert-warning'>
+          <div className='card-body'>
+            <h5>Total orders</h5>
+            <h3>24</h3>
+          </div>
+        </div>
+      </div>
+      <div className='col-3'>
+        <div className='card alert alert-danger'>
+          <div className='card-body'>
+            <h5>Total Earnings</h5>
+            <h3>$ 1,210</h3>
+          </div>
+        </div>
+      </div>
+      {/* <Header /> */}
+      <h2>Orders</h2>
+      <div className="tab-selector">
+        <Link to="/chef/orders" className="tab active">Current Orders</Link>
+        <Link to="/chef/orders/Completed" className="tab">Order Completed</Link>
+        
+      </div>
 
-      
+
 
       <Table >
         <thead>
@@ -111,7 +152,7 @@ const CurrentOrders = () => {
             <th>Customer Details</th>
             <th>Item Details</th>
             <th>Payment Details</th>
-            
+
             <th>Action</th>
           </tr>
         </thead>
@@ -130,16 +171,16 @@ const CurrentOrders = () => {
                   </p>
                 </td>
                 <td>
-  {order.items && order.items.length > 0 ? (
-    order.items.map((item, index) => (
-      <p key={index}>
-        {item.product_id ? item.product_id.name : "Product not available"} (QNT: {item.quantity})
-      </p>
-    ))
-  ) : (
-    <p>No items available</p>
-  )}
-</td>
+                  {order.items && order.items.length > 0 ? (
+                    order.items.map((item, index) => (
+                      <p key={index}>
+                        {item.product_id ? item.product_id.name : "Product not available"} (QNT: {item.quantity})
+                      </p>
+                    ))
+                  ) : (
+                    <p>No items available</p>
+                  )}
+                </td>
                 <td>
                   {order.payment ? (
                     <>
@@ -150,24 +191,24 @@ const CurrentOrders = () => {
                     <p>Payment information not available</p>
                   )}
                 </td>
-               
+
                 <td className="action-buttons">
-                {order.status === "Pending" ? (
-                  <>
-                  <Button
-                    className="accept-button"
-                    onClick={() => handleAction(order._id, "Waiting Pickup")}
-                  >
-                    Accept
-                  </Button>
-                  <Button
-                    className="reject-button"
-                    onClick={() => handleAction(order._id, "Cancelled")}
-                  >
-                    Reject
-                  </Button>
-                  </>
-                   ) : (
+                  {order.status === "Pending" ? (
+                    <>
+                      <Button
+                        className="accept-button"
+                        onClick={() => handleAction(order._id, "Waiting Pickup")}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        className="reject-button"
+                        onClick={() => handleAction(order._id, "Cancelled")}
+                      >
+                        Reject
+                      </Button>
+                    </>
+                  ) : (
                     <p> {order.status}</p>
                   )}
                 </td>
@@ -183,7 +224,8 @@ const CurrentOrders = () => {
         </tbody>
       </Table>
 
-      
+
+    </Row>
     </Container>
   );
 };

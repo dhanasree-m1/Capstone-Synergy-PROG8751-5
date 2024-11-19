@@ -22,7 +22,7 @@ const generateToken = (user) => {
     },
     process.env.JWT_SECRET, // Use a secret from your environment variables
     {
-      expiresIn: '1h', // Token expiration
+      expiresIn: '2h', // Token expiration
     }
   );
 };
@@ -42,6 +42,71 @@ const resolvers = {
         const existingUser = await User.findOne({ email });
         return !existingUser; // true if no user found, false if exists
       },
+
+  getAllProducts: async (_, { campus }) => {
+        try {
+          // Step 1: Fetch all products marked as available
+          const products = await Product.find({ is_available: true });
+      
+          // Step 2: Extract chef IDs from products
+          const chefIds = products.map((product) => product.chef_id);
+      
+          // Step 3: Fetch users associated with those chef IDs
+          const users = await User.find({ _id: { $in: chefIds } });
+      
+          // Step 4: Filter users by campus if campus is provided
+          const filteredUsers = campus
+            ? users.filter((user) => user.address_line_1 === campus)
+            : users;
+      
+          // Step 5: Create a map of chef_id to user data
+          const userMap = {};
+          filteredUsers.forEach((user) => {
+            userMap[user._id.toString()] = user;
+          });
+      
+          // Step 6: Populate products with user data and filter by available chefs
+          const populatedProducts = products
+            .map((product) => {
+              const user = userMap[product.chef_id.toString()] || null;
+              if (!user) return null; // Exclude products with no matching user
+              return {
+                id: product._id.toString(),
+                chef_id: product.chef_id,
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                quantity: product.quantity,
+                image_url: product.image_url,
+                created_at: product.created_at,
+                is_available: product.is_available,
+                user,
+              };
+            })
+            .filter((product) => product !== null); // Remove null entries
+      
+          return populatedProducts;
+        } catch (error) {
+          console.error("Error fetching filtered products:", error);
+          throw new Error("Failed to fetch products.");
+        }
+      },
+      //  getAllProducts: async () => {
+      //   try {
+      //     const products = await Product.find({ is_available: true }).populate();
+      //     console.log("Fetched Products:", products);
+      //     return products; // Skip filtering for now
+      //   } catch (error) {
+      //     console.error("Error fetching products with chef details:", error);
+      //     throw new Error("Failed to fetch products.");
+      //   }
+      // },
+
+    getAllChefs: async () => {
+      const chefs = await Chef.find().populate("user_id"); // Populate using user_id, not user
+      //console.log("Chefs data:", chefs); // Debug line
+      return chefs;
+    },
       getProductsByChef: async (_, { chef_id }) => {
         return await Product.find({ chef_id });
       },
@@ -213,7 +278,13 @@ const resolvers = {
       }
     },
     createUser: async (_, { input }) => {
-      const newUser = new User(input);
+      const existingUser = await User.findOne({ email: input.email });
+      console.log(input);
+      if (existingUser) {
+        throw new Error("User with this email already exists.");
+      }
+      const hashedPassword = await bcrypt.hash(input.password_hash, 10);
+      const newUser = new User({ ...input, password_hash: hashedPassword });
       return await newUser.save();
     },
     
@@ -248,6 +319,7 @@ const resolvers = {
           first_name: user.first_name,
           last_name: user.last_name,
           email: user.email,
+          role: user.role,
         },
       };
     },

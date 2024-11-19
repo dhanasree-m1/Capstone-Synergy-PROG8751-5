@@ -7,25 +7,28 @@ const TypeOfMealsOptions = ({ meals, onMealChange }) => {
 
   return (
     <>
-    <h5 className="form-sub-title mb-3 mt-3">Type of Meals</h5>
-    <div className="fat-options d-flex mb-3">
+      <label className="d-block">Type of Meals</label>
+      <div className="d-grid d-lg-flex">
       {mealData.map((meal) => (
-        <label className={`option ${meals.includes(meal) ? "checked" : ""}`} key={meal}>
-          <input
-            type="checkbox"
-            name="typeOfMeals"
-            value={meal}
-            checked={meals.includes(meal)}
-            onChange={(e) => onMealChange(e, "typeOfMeals")}
-          />
-          <p className="mb-0">
-            <b>{meal}</b>
-          </p>
-        </label>
+        <div className="form-check form-check-inline mt-2">
+          <label className={`form-check-label ${meals.includes(meal) ? "checked" : ""}`} key={meal}>
+            <input
+              type="checkbox"
+              className="form-check-input"
+              name="typeOfMeals"
+              value={meal}
+              checked={meals.includes(meal)}
+              onChange={(e) => onMealChange(e, "typeOfMeals")}
+            />
+            <p className="mb-0">
+              <b>{meal}</b>
+            </p>
+          </label>
+        </div>
       ))}
-    </div>
+</div>
     </>
-    
+
   );
 };
 
