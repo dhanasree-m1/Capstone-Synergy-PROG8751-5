@@ -11,9 +11,10 @@ const AvailabilityOptions = ({ selectedDays, onDayChange }) => {
     
    <h5  className="mt-3 mb-3">Availability</h5>
     <label className="d-block">Preferred Working Days</label>
-    <div className="d-grid d-lg-flex">
+    <div className="row mb-3">
       {workingDays.map((day) => (
-        <div className="form-check form-check-inline mt-2">
+        <div className="col-md-3 col">
+          <div className="form-check form-check-inline mt-2">
         <label className={`form-check-label ${selectedDays.includes(day) ? "checked" : ""}`} key={day}>
           <input
            className="form-check-input"
@@ -26,7 +27,7 @@ const AvailabilityOptions = ({ selectedDays, onDayChange }) => {
           />
           <p className="mb-0">{day}<br /></p>
         </label>
-        </div>
+        </div></div>
       ))}
       </div>
     </>
