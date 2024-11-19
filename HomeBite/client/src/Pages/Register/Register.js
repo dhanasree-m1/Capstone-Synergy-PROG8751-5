@@ -618,6 +618,10 @@ const Register = () => {
 
 
   const handleFormSubmission = async () => {
+    const  roles = registerData.roles;
+    const customer = roles.includes("customer");
+    const chef = roles.includes("chef");
+    const rider = roles.includes("rider");
     try {
       // Step 1: Create User Account and get `user_id`
       const userId = await createUserAccount();
@@ -629,7 +633,7 @@ const Register = () => {
       setRegisterData((prevData) => ({ ...prevData, user_id: userId }));
 
       // Step 2: Based on selected roles, create additional accounts
-      const { rider, chef } = registerData.roles;
+      //const { rider, chef } = registerData.roles;
 
       if (rider) {
         await createRiderAccount(userId); // Create Rider account if selected
