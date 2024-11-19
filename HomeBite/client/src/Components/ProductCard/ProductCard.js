@@ -20,7 +20,7 @@ export default function ProductCard({ product, cart, addToCart, incrementQuantit
         <Card.Title className="justify-content-between d-flex">{product.name}<img className="align-bottom" src={veg} /></Card.Title>
         <Card.Text className="text-truncate">{product.description}</Card.Text>
         
-        <Card.Text className="campus-name"><span class="material-icons">
+        <Card.Text className="campus-name"><span className="material-icons">
           location_on
         </span> {campusName}</Card.Text>
         <hr />

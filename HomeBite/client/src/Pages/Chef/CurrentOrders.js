@@ -95,7 +95,8 @@ const CurrentOrders = () => {
   };
 
   return (
-    <Row fluid className="orders-page">
+    <Container fluid>
+    <Row className="orders-page">
       <div className='row'>
               <div className='col-12 mb-5'>
                 <h2>Welcome back, {localStorage.getItem('uname')}</h2>
@@ -225,6 +226,7 @@ const CurrentOrders = () => {
 
 
     </Row>
+    </Container>
   );
 };
 

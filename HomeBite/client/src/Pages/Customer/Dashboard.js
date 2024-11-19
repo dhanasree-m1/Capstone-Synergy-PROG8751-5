@@ -119,7 +119,7 @@ export default function Dashboard() {
                     <div className="homepage-search-form">
                       <Form className="form-noborder">
                         <div className="form-row row justify-content-center">
-                          <Form.Group className='col-12 col-md-3 col-lg-2 mb-3'>
+                          {/* <Form.Group className='col-12 col-md-3 col-lg-2 mb-3'>
                             <Dropdown onSelect={handleCampusSelect}>
                               <Dropdown.Toggle variant="secondary" id="dropdown-campus" className="w-100">
                                 {selectedCampus || "Select Campus"}
@@ -136,7 +136,7 @@ export default function Dashboard() {
                             <span class="material-icons">close</span>
                             </Button>
                             </Dropdown>
-                          </Form.Group>
+                          </Form.Group> */}
                           <div className="col-md-4 col-12 position-relative">
   <Form.Control
     type="text"
@@ -220,7 +220,7 @@ export default function Dashboard() {
                   ))
                 ) : (
                   <div className="col-12">
-                    <div class="alert alert-warning" role="alert">
+                    <div className="alert alert-warning" role="alert">
                       No products found.
                     </div>
                   </div>
@@ -259,7 +259,7 @@ export default function Dashboard() {
                     ))
                   ) : (
                     <div className="col-12">
-                      <div class="alert alert-warning" role="alert">
+                      <div className="alert alert-warning" role="alert">
                         No products available for the selected campus.
                       </div>
                     </div>
@@ -288,7 +288,7 @@ export default function Dashboard() {
                       .map((chef) => <div className="col-md-3"><ChefCard key={chef.id} chef={chef} /></div>)
                   ) : (
                     <div className="col-12">
-                      <div class="alert alert-warning" role="alert">
+                      <div className="alert alert-warning" role="alert">
                         No chefs available for the selected campus.
                       </div>
                     </div>

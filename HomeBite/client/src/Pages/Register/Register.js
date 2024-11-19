@@ -656,7 +656,7 @@ const Register = () => {
       // }
 
       // Step 4: Navigate to home or success page
-      navigate("/", { state: { successMessage: "User registered successfully!" } });
+      navigate("/Login", { state: { successMessage: "User registered successfully!" } });
     } catch (error) {
       console.error("Error in form submission:", error);
       setMessage("Failed to register. Please try again.");

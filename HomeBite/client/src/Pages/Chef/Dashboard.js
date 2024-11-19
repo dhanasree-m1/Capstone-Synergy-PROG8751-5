@@ -18,9 +18,9 @@ const Dashboard = () => {
             {/* <div className="logo">HomeBite</div> */}
             <nav>
               <ul>
-                <li><Link to="orders" className='btn-link'><span class="material-icons">home</span>Dashboard</Link></li>
-                <li><Link to="products" className='btn-link'><span class="material-icons">coffee</span>Menu</Link></li>
-                <li><Link to="profile" className='btn-link'><span class="material-icons">person</span>Profile Details</Link></li>
+                <li><Link to="orders" className='btn-link'><span className="material-icons">home</span>Dashboard</Link></li>
+                <li><Link to="products" className='btn-link'><span className="material-icons">coffee</span>Menu</Link></li>
+                <li><Link to="profile" className='btn-link'><span className="material-icons">person</span>Profile Details</Link></li>
               </ul>
             </nav>
           </div>

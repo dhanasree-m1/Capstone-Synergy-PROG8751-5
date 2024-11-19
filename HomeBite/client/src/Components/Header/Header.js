@@ -107,9 +107,9 @@ export default function Header({
                               </h6>
                             </Nav.Link>
                           )} */}
-                          {urole === "chef" && (
+                          {urole.includes("chef") && (
                             <Nav.Link
-                              className={`m-w-100 cart-icon d-flex p-0 align-items-baseline ${currentRole === "chef" ? "active" : " "
+                              className={`m-w-100 cart-icon d-flex p-0 align-items-baseline ${urole.includes("chef") ? "active" : " "
                                 }`}
                               href="/chef/orders"
                               onClick={() => onRoleSelect("chef")}

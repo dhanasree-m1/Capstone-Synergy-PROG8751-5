@@ -51,7 +51,7 @@ const ProfileView = () => {
     <Container>
       <Row>
         <Col>
-          <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span class="material-icons">
+          <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
             arrow_forward
           </span><span>Profile Details</span>
         </Col>
