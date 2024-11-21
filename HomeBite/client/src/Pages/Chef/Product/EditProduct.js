@@ -205,7 +205,7 @@ const EditProduct = () => {
             </Col>
             <Col md={4}>
               <InputField
-                label="Price"
+                label="Price $"
                 name="price"
                 type="number"
                 placeholder="Price"
