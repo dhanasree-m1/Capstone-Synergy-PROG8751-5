@@ -9,7 +9,8 @@ import TypeOfMealsOptions from "../../Components/TypeOfMealsOptions/TypeOfMealsO
 import AvailabilityOptions from "../../Components/AvailabilityOptions/AvailabilityOptions";
 import { UPDATE_USER_PROFILES } from "../../queries";
 import { useMutation } from "@apollo/client";
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
+
 
 const Profile = () => {
   const [userInfo, setUserInfo] = useState({
@@ -39,6 +40,7 @@ const Profile = () => {
 
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [message, setMessage] = useState(""); // State to store feedback messages
+  const navigate = useNavigate();
   const [updateUserProfile] = useMutation(UPDATE_USER_PROFILES);
 
   const fetchData = async () => {
@@ -179,6 +181,7 @@ const Profile = () => {
           chefInput: chefData,
         },
       });
+      navigate("/chef/profile", { state: { successMessage: "Profile updated successfully!" } });
       setMessage("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
