@@ -10,10 +10,15 @@ import { OrderItem } from '../../src/models/order_items.js';
 import { sendResetEmail } from '../../utils/emailService.js';
 import { Payment } from '../../src/models/payments.js'; 
 import { Product } from '../../src/models/products.js'; 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 // import { sendResetEmail } from "../utils/emailService.js";
 // Define the generateToken function
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -372,9 +377,34 @@ const resolvers = {
       return await Product.findByIdAndUpdate(id, input, { new: true });
     },
     deleteProduct: async (_, { id }) => {
-      await Product.findByIdAndDelete(id);
-      return true;
-    },
+      try {
+          // Fetch the product to get its image URL
+          const product = await Product.findById(id);
+          if (!product) {
+              throw new Error("Product not found");
+          }
+
+          // Get the file path from the image URL
+          const imagePath = path.join(__dirname, '..', '..', 'uploads', product.image_url.split('/').pop());
+          
+          // Delete the product from the database
+          await Product.findByIdAndDelete(id);
+
+          // Delete the image file
+          fs.unlink(imagePath, (err) => {
+              if (err) {
+                  console.error("Failed to delete image file:", err);
+              } else {
+                  console.log("Image file deleted successfully");
+              }
+          });
+
+          return true;
+      } catch (error) {
+          console.error("Error deleting product:", error);
+          throw new Error("Failed to delete product");
+      }
+  },
     updateUserProfile: async (_, {id, userInput, chefInput }) => {
       if (!id) {
         throw new Error("User not authenticated");

@@ -44,19 +44,34 @@ const Products = () => {
   };
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      await fetch('http://localhost:5000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `
-          mutation {
-            deleteProduct(id: "${productId}")
-          }
-        `,
-        }),
-      });
-      fetchProducts();
-    } // Refresh product list
+      try {
+        const response = await fetch('http://localhost:5000/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `
+              mutation {
+                deleteProduct(id: "${productId}")
+              }
+            `,
+          }),
+        });
+        const { data, errors } = await response.json();
+  
+        if (errors) {
+          alert("Failed to delete product. Please try again.");
+          console.error(errors);
+          return;
+        }
+  
+        // Refresh product list
+        fetchProducts();
+        alert("Product deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        alert("An error occurred. Please try again.");
+      }
+    }
   };
   const handleEdit = (productId) => {
     // Confirm before editing
@@ -73,7 +88,7 @@ const Products = () => {
             <p>Manage your menu listing</p>
           </div>
           <div>
-            <Button variant='secondary small' className="mb-3" onClick={() => navigate('/chef/product/add')}>Add Food</Button>
+            <Button variant='secondary small' className="mb-3" onClick={() => navigate('/chef/product/add')}>Add Menu</Button>
           </div>
         </div>
         <div className='col-12'>
