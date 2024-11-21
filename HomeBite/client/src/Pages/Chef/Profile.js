@@ -195,7 +195,7 @@ const Profile = () => {
         <Col>
           <Link className="btn-link  mb-3" to="/chef/products">Menu</Link><span className="material-icons">
             arrow_forward
-          </span><span>Add Menu</span>
+          </span><span>Edit Profile Menu</span>
         </Col>
         <Col md={12} className='mt-5'><h5>Profile Details</h5><hr /></Col>
       </Row>
