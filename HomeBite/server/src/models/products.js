@@ -9,7 +9,7 @@ const ProductSchema = new mongoose.Schema({
   image_url: { type: String },
   dietary:{ type: String, enum: ['Veg', 'Non Veg', 'Gluten Free'], default: 'Veg' },
   created_at: { type: Date, default: Date.now },
-  is_available: { type: Boolean, default: true }
+  is_available: { type: String,  enum: ['Yes', 'No'], default: '' }
 });
 
 export const Product = mongoose.model('Product', ProductSchema);

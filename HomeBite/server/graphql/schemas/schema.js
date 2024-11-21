@@ -222,7 +222,7 @@ const typeDefs = gql`
     image_url: String
     dietary: String
     created_at: String
-    is_available: Boolean
+    is_available: String
     user: User
   }
 
@@ -233,7 +233,7 @@ const typeDefs = gql`
     quantity: Int
     image_url: String
     dietary: String
-    is_available: Boolean
+    is_available: String
   }
 
   type Query {

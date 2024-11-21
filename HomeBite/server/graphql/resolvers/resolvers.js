@@ -46,7 +46,7 @@ const resolvers = {
   getAllProducts: async (_, { campus }) => {
         try {
           // Step 1: Fetch all products marked as available
-          const products = await Product.find({ is_available: true });
+          const products = await Product.find({ is_available: "Yes" });
       
           // Step 2: Extract chef IDs from products
           const chefIds = products.map((product) => product.chef_id);
