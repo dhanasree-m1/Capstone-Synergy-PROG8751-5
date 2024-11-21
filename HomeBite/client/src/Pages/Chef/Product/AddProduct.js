@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col,Alert } from "react-bootstrap";
 import InputField from '../../../Components/InputField/InputField';
 import Button from "../../../Components/Button/Button";
 import ImageUpload from '../../../Components/ImageUpload/ImageUpload';
@@ -14,19 +14,19 @@ const AddProduct = () => {
     description: '',
     price: '',
     quantity: '',
-    dietary: "Veg", // Default value for dietary field
+    dietary: '', // Default value for dietary field
     image_url: '',
-    is_available: true,
+    is_available: '', // Default value for is_available field
   });
 
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(''); // To display validation messages
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setProduct({
       ...product,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: value,
     });
   };
 
@@ -62,26 +62,33 @@ const AddProduct = () => {
       return false;
     }
 
-    // Validate Description
-    if (!product.description.trim()) {
-      setMessage('Description cannot be empty.');
+  
+
+    // Validate Dietary
+    if (!product.dietary) {
+      setMessage('Please select a dietary option.');
       return false;
     }
 
-    // Validate Dietary
-    if (!["Veg", "Non Veg", "Gluten Free"].includes(product.dietary)) {
-      setMessage('Please select a valid dietary option.');
+    // Validate Availability
+    if (!product.is_available) {
+      setMessage('Please select if the product is available.');
       return false;
     }
+    // Validate Description
+    if (!product.description.trim()) {
+        setMessage('Description cannot be empty.');
+        return false;
+      }
 
     // Validate Image
     if (!product.image_url) {
       setMessage('Product image is required.');
       return false;
     }
+      
 
-    // Clear any previous messages if validation passes
-    setMessage('');
+    setMessage(''); // Clear any previous messages if validation passes
     return true;
   };
 
@@ -107,7 +114,7 @@ const AddProduct = () => {
                 quantity: ${product.quantity},
                 dietary: "${product.dietary}",
                 image_url: "${product.image_url}",
-                is_available: ${product.is_available}
+                is_available: "${product.is_available }"
               }) {
                 id
               }
@@ -141,6 +148,7 @@ const AddProduct = () => {
           </Card>
         </Col>
         <Col md={6} className="p-0">
+          {message && <Alert variant="danger">{message}</Alert>}
           <form onSubmit={handleSubmit} className='row'>
             <Col md={12}>
               <InputField
@@ -173,21 +181,17 @@ const AddProduct = () => {
               />
             </Col>
             <Col md={4}>
-              <label className="d-block">Availability</label>
-              <div className="d-grid d-lg-flex">
-                <div className="form-check form-check-inline mt-2">
-                  <label>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      name="is_available"
-                      checked={product.is_available}
-                      onChange={handleChange}
-                    />
-                    <p className="mb-0">Available</p>
-                  </label>
-                </div>
-              </div>
+              <label>Availability</label>
+              <select
+                name="is_available"
+                className="form-control"
+                value={product.is_available}
+                onChange={handleChange}
+              >
+                <option value="">-select-</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
             </Col>
             <Col md={4}>
               <label>Dietary</label>
@@ -197,6 +201,7 @@ const AddProduct = () => {
                 value={product.dietary}
                 onChange={handleChange}
               >
+                <option value="">-select-</option>
                 <option value="Veg">Veg</option>
                 <option value="Non Veg">Non Veg</option>
                 <option value="Gluten Free">Gluten Free</option>
@@ -212,8 +217,6 @@ const AddProduct = () => {
                 onChange={handleChange}
               />
             </Col>
-
-            {message && <p style={{ color: 'red', marginTop: '10px' }}>{message}</p>}
 
             <Button type="submit" className="btn btn-primary">Save</Button>
           </form>
