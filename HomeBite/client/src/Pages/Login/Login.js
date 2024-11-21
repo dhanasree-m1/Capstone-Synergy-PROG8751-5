@@ -5,11 +5,14 @@ import loginbg from "../../assets/images/login-bg.jpg";
 import Logo from "../../assets/images/logo.svg";
 import InputField from "../../Components/InputField/InputField";
 import Button from "../../Components/Button/Button";
+import { useLocation } from "react-router-dom";
 import CarouselComponent from "../../Components/CarouselComponent/CarouselComponent";
 import { Container, Row, Col, Alert,Nav } from "react-bootstrap";
 
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const location = useLocation();
+  const successMessage = location.state?.successMessage;
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -81,6 +84,13 @@ const Login = () => {
         <Col className="home-bg col-12 d-lg-none ht">
         <div className="overlay"></div>
         </Col>
+        {successMessage && (
+            <Col md={12}>
+              <Alert variant="success" className="my-3">
+                {successMessage}
+              </Alert>
+            </Col>
+          )}
         <Col lg={7} className="p-0">
           <div className="login-container">
             <div className="login-box">
