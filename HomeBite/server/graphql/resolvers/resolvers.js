@@ -83,6 +83,7 @@ const resolvers = {
                 price: product.price,
                 quantity: product.quantity,
                 image_url: product.image_url,
+                dietary: product.dietary,
                 created_at: product.created_at,
                 is_available: product.is_available,
                 user,

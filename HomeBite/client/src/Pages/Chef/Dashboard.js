@@ -1,12 +1,32 @@
 import React from 'react';
+import { useState, useEffect } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { Container } from "react-bootstrap";
 import Header from '../../Components/Header/Header';
+import CartSummary from "../Customer/CartSummary";
 import "./chef.scss";
 
 
 
 const Dashboard = () => {
+
+  const [showCart, setShowCart] = useState(false);
+  const [cart, setCart] = useState(() => { 
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : {};
+  });
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem("cart") || "{}");
+    setCart(savedCart);
+  }, []);
+  
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  const handleShowCart = () => setShowCart(true);
+  const handleCloseCart = () => setShowCart(false);
+
   return (
     <>
       <Container fluid className='p-0' >
