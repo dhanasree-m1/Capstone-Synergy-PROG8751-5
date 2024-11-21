@@ -6,7 +6,7 @@ import Logo from "../../assets/images/logo.svg";
 import InputField from "../../Components/InputField/InputField";
 import Button from "../../Components/Button/Button";
 import CarouselComponent from "../../Components/CarouselComponent/CarouselComponent";
-import { Container, Row, Col, Alert } from "react-bootstrap";
+import { Container, Row, Col, Alert,Nav } from "react-bootstrap";
 
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -84,7 +84,8 @@ const Login = () => {
         <Col lg={7} className="p-0">
           <div className="login-container">
             <div className="login-box">
-              <img src={Logo} className="logo" alt="Logo" />
+              
+              <Nav.Link href="/"><img src={Logo} className="logo" alt="Logo" /></Nav.Link>
               <h4 className="mt-5 mb-2">Sign In </h4>
               <h4 className="mb-3">
                 {/* Sign in to enjoy the best home-cooked meals made with care! */}

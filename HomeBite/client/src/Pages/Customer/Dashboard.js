@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_CHEFS_AND_PRODUCTS } from "../../queries";
 import { Container, Alert, Col, Row, Dropdown, Form } from "react-bootstrap";
@@ -25,9 +25,25 @@ export default function Dashboard() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const successMessage = location.state?.successMessage;
-  const [cart, setCart] = useState({});
+  const [cart, setCart] = useState(() => { 
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : {};
+  });
   const [showCart, setShowCart] = useState(false); // State for cart modal visibility
 
+  // useEffect(() => {
+  //   localStorage.setItem("cart", JSON.stringify(cart));
+  // }, [cart]);
+
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem("cart") || "{}");
+    setCart(savedCart);
+  }, []);
+  
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+  
   const handleShowCart = () => setShowCart(true);
   const handleCloseCart = () => setShowCart(false);
 

@@ -1097,7 +1097,7 @@ const Register = () => {
                         }
                       />
                     </Col>
-                    <Col md={4}>
+                    <Col md={5}>
                       <Form.Group className="input-field mb-3">
                         <Form.Label htmlFor="Experience in Cooking">
                           Experience in Cooking

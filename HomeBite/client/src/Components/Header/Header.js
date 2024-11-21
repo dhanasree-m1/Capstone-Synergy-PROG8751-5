@@ -29,8 +29,9 @@ export default function Header({
     if (isLoggedIn) {
       localStorage.removeItem("user_id");
       localStorage.removeItem("urole"); // Clear the urole value
+      localStorage.removeItem("cart");
       setIsLoggedIn(false);
-      navigate("/");
+      navigate("/Login");
     } else {
       navigate("/Login");
     }
@@ -93,14 +94,14 @@ export default function Header({
                           : ""
                       }`} // Chef Dashboard active only when not on Home
                       onClick={() => onRoleSelect("chef")}
-                    ><div className="position-relative header-icon d-none d-lg-inline-block">
+                    >Chef Dashboard<div className="position-relative header-icon d-none d-lg-inline-block">
                     <span className="material-icons align-middle ">room_service</span>
                    
                   </div>
-                      Chef Dashboard
+                      
                     </Nav.Link>
                   )}
-                  {urole === "rider" && (
+                  {/* {urole.includes("rider") && (
                     <Nav.Link
                       href="/rider/dashboard"
                       className={` ${
@@ -110,14 +111,12 @@ export default function Header({
                     >
                       Rider
                     </Nav.Link>
-                  )}
+                  )} */}
                 </>
               )}
 
               {/* Cart */}
-              <Nav.Link
-                
-                onClick={showCartSummary}
+              <Nav.Link onClick={showCartSummary} 
               >
                 <div className="position-relative header-icon d-none d-lg-inline-block">
                 Cart<span className="material-icons align-middle ">shopping_cart</span>

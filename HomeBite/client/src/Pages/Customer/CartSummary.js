@@ -41,7 +41,7 @@ export default function CartSummary({
     <Offcanvas show={show} onHide={handleClose} placement="end">
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>Cart</Offcanvas.Title>
-        <span>{cartItems.length} Items</span>
+        <span> ({cartItems.length})</span>
       </Offcanvas.Header>
       <Offcanvas.Body>
         {cartItems.length > 0 ? (
