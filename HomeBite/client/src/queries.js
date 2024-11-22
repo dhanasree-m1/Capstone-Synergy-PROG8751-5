@@ -231,6 +231,7 @@ export const GET_CHEFS_AND_PRODUCTS = gql`
       price
       quantity
       image_url
+      dietary
       created_at
       is_available
       user {

@@ -271,12 +271,12 @@ export default function Dashboard() {
                       {selectedCampus || "all campuses"}
                     </p>
                   </div>
-                  <a
+                  <Button
                     className="btn-link"
                     onClick={() => setViewAllProducts(!viewAllProducts)}
                   >
                     {viewAllProducts ? "Show Less" : "View All"}
-                  </a>
+                  </Button>
                 </div>
                 <hr className="mt-0" />
                 <div className="row">
