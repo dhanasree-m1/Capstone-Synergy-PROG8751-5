@@ -281,7 +281,7 @@ export default function Dashboard() {
                 <hr className="mt-0" />
                 <div className="row">
                   {data?.getAllProducts?.length > 0 ? (
-                    data.getAllProducts.map((product) => (
+                    data.getAllProducts.slice(0, viewAllProducts ? data.getAllProducts.length : 4).map((product) => (
                       <div className="col-md-3">
                         <ProductCard
                           key={product.id}
