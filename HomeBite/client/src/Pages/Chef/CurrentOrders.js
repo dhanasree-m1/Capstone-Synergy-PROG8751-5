@@ -14,6 +14,7 @@ const CurrentOrders = () => {
   }, []);
 
   const fetchOrders = async () => {
+    const chef_id=localStorage.getItem("user_id")
     try {
       const response = await fetch("http://localhost:5000/graphql", {
         method: "POST",
@@ -23,7 +24,7 @@ const CurrentOrders = () => {
         body: JSON.stringify({
           query: `
             query {
-              getCurrentOrders {
+              getCurrentOrderss(chef_id: "${chef_id}") {
                 _id
                 order_no
                 status

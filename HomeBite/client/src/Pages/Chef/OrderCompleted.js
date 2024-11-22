@@ -12,6 +12,7 @@ const OrderCompleted = () => {
   }, []);
 
   const fetchOrders = async () => {
+    const chef_id=localStorage.getItem("user_id")
     try {
       const response = await fetch("http://localhost:5000/graphql", {
         method: "POST",
@@ -21,7 +22,7 @@ const OrderCompleted = () => {
         body: JSON.stringify({
           query: `
             query {
-              getCompletedOrders {
+              getCompletedOrders(chef_id: "${chef_id}") {
                 _id
                 order_no
                 status

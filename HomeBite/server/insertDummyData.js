@@ -6,7 +6,7 @@ import { Order } from './src/models/orders.js';
 import { OrderItem } from './src/models/order_items.js';
 
 async function main() {
-  const uri = "mongodb+srv://jayalekshmivj08:Harmony2024@cluster0.rifewjx.mongodb.net/HomeBite?retryWrites=true&w=majority"; // Replace with your Atlas connection string
+  const uri = "mongodb+srv://HomeBite:Homebite123@homebite.1dasn.mongodb.net/HomeBite?retryWrites=true&w=majority"; // Replace with your Atlas connection string
   const client = new MongoClient(uri);
 
   try {
@@ -102,67 +102,69 @@ async function main() {
     const collection3 = database.collection("orders");
     const dummyOrder=[
         {
-          "customer_id": new ObjectId('6729653bfb23f4a3579c5cd2'),
-          "chef_id": new ObjectId('67356b6c5fb8631563503160'),
-          "rider_id": new ObjectId('671f060b32c0ef3a13225dc2'),
+          "order_no": 11100,
+          "customer_id": new ObjectId('673f79ab955fe1e78eccb275'),
+          "chef_id": new ObjectId('673bed290ba269e4fedf6f58'),
+          "rider_id": new ObjectId('673f8f562fb62ef217a402fd'),
           "total_amount": 25.98,
           "status": "Pending",
-          "created_at": "2024-11-06T00:00:00Z"
+          "created_at": "2024-11-21T00:00:00Z"
         },
         {
-          "customer_id": new ObjectId('6729653bfb23f4a3579c5cd2'),
-          "chef_id": new ObjectId('67356b6c5fb8631563503160'),
-          "rider_id": new ObjectId('671f060b32c0ef3a13225dc2'),
+          "order_no": 11101,
+          "customer_id": new ObjectId('673f79ab955fe1e78eccb275'),
+          "chef_id": new ObjectId('673bed290ba269e4fedf6f58'),
+          "rider_id": new ObjectId('673f8f562fb62ef217a402fd'),
           "total_amount": 8.99,
           "status": "In Progress",
-          "created_at": "2024-11-06T00:00:00Z"
+          "created_at": "2024-11-21T00:00:00Z"
         }
       ]
-      //const result2 = await collection3.insertMany(dummyOrder);
+    //   const result2 = await collection3.insertMany(dummyOrder);
 
-    //console.log(`${result2.insertedCount} order documents were inserted.`);
+    // console.log(`${result2.insertedCount} order documents were inserted.`);
     const collection4 = database.collection("orderitems");
     const dummyOrdItems=[
         {
-          "order_id": new ObjectId("673b90fa120284643fbc98f2"),
-          "product_id": new ObjectId("672baf8b2a879a46a3b430ab"),
+          "order_id": new ObjectId("673fde8697770b70ecc09e0d"),
+          "product_id": new ObjectId("673c2b289d4dae5d49ecae73"),
           "quantity": 3,
-          "special_request": "Extra spicy",
-          "unit_price": 12.99
+          "special_request": "Extra spicy curry",
+          "unit_price": 33.00
         },
         {
-          "order_id": new ObjectId("673b90fa120284643fbc98f3"),
-          "product_id":new ObjectId("672bb086347a0380f536e108"),
+          "order_id": new ObjectId("673fde8697770b70ecc09e0e"),
+          "product_id":new ObjectId("673ed5fe469daac5a9041c55"),
           "quantity": 2,
-          "special_request": "No nuts",
-          "unit_price": 8.99
+          "special_request": "Add Cutlery",
+          "unit_price": 30.00
         }
       ]
-      //const result33 = await collection4.insertMany(dummyOrdItems);
+      const result33 = await collection4.insertMany(dummyOrdItems);
 
-      // console.log(`${result33.insertedCount} order item documents were inserted.`);
+      console.log(`${result33.insertedCount} order item documents were inserted.`);
       const collection5 = database.collection("payments");
       const dummyPayment=[ {
-        "order_id": new ObjectId("673b90fa120284643fbc98f2"),
+        "order_id": new ObjectId("673fde8697770b70ecc09e0d"),
         "payment_method":"COD",
         "transaction_id": "12345",
-        "amount": 25.98,
+        "amount": 33.99,
         "payment_status": "successful",
-        "payment_date":"05-11-2024"
+        "payment_date":"21-11-2024"
       },
       {
-        "order_id": new ObjectId("673b90fa120284643fbc98f3"),
+        "order_id": new ObjectId("673fde8697770b70ecc09e0e"),
         "payment_method":"COD",
         "transaction_id": "12346",
-        "amount": 8.99,
+        "amount": 30.99,
         "payment_status": "successful",
-        "payment_date":"05-11-2024"
+        "payment_date":"21-11-2024"
       }
     ]
 
   const result3 = await collection5.insertMany(dummyPayment);
 
-//       console.log(`${result3.insertedCount} payment documents were inserted.`);
+      console.log(`${result3.insertedCount} payment documents were inserted.`);
    
   } finally {
     await client.close();
