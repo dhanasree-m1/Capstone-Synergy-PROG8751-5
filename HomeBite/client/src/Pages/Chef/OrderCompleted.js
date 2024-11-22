@@ -73,7 +73,7 @@ const OrderCompleted = () => {
         <h2>Welcome back, {localStorage.getItem('uname')}</h2>
         <h6>Track, manage and forecast your customers and orders.</h6>
       </div>
-      <div className='col-12 col-lg-3'>
+      <div className='col-12 col-lg-6 col-xl-3'>
         <div className='card alert alert-primary'>
           <div className='card-body'>
             <h5>Today's orders</h5>
@@ -81,7 +81,7 @@ const OrderCompleted = () => {
           </div>
         </div>
       </div>
-      <div className='col-12 col-lg-3'>
+      <div className='col-12 col-lg-6 col-xl-3'>
         <div className='card alert alert-success'>
           <div className='card-body'>
             <h5>Today's Earnings</h5>
@@ -89,7 +89,7 @@ const OrderCompleted = () => {
           </div>
         </div>
       </div>
-      <div className='col-12 col-lg-3'>
+      <div className='col-12 col-lg-6 col-xl-3'>
         <div className='card alert alert-warning'>
           <div className='card-body'>
             <h5>Total orders</h5>
@@ -97,7 +97,7 @@ const OrderCompleted = () => {
           </div>
         </div>
       </div>
-      <div className='col-12 col-lg-3'>
+      <div className='col-12 col-lg-6 col-xl-3'>
         <div className='card alert alert-danger'>
           <div className='card-body'>
             <h5>Total Earnings</h5>
