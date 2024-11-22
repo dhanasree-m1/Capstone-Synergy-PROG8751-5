@@ -168,47 +168,6 @@
     width: 100%;
     margin: 0 auto;
   }
-
-  @media screen and (max-width: 601px) {
-    table.mobile-optimised {
-      word-wrap: break-word;
-
-      thead {
-        position: absolute;
-        left: -999em;
-        top: -999em;
-      }
-
-      td {
-        display: block;
-        float: left;
-        width: 100%;
-        clear: both;
-        background: #f5f5f5;
-        padding: 10px 5px;
-        box-sizing: border-box;
-      }
-
-      tbody,
-      tr {
-        display: block;
-      }
-
-      td:before {
-        content: attr(data-th);
-        display: block;
-        font-weight: bold;
-        margin: 0 0 2px;
-        color: #000;
-      }
-
-      tbody tr {
-        float: left;
-        width: 100%;
-        margin-bottom: 10px;
-      }
-    }
-  }
 }
 
 /* Orders Section */
@@ -221,31 +180,6 @@
   border-bottom: 1px solid #C1C7CD;
 }
 
-.orders-table {
-  width: 100%;
-  max-width: 1280px;
-  margin: 20px 80px;
-  border-collapse: collapse;
-
-  th,
-  td {
-    padding: 10px;
-    font-weight: 500;
-    font-size: 14px;
-    text-align: left;
-    color: #4A4A4A;
-  }
-
-  th {
-    text-transform: uppercase;
-    border-bottom: 2px solid #DDE1E6;
-  }
-
-  td {
-    border-bottom: 1px solid #DDE1E6;
-    line-height: 1.5;
-  }
-}
 
 /* Buttons Section */
 .action-buttons {
@@ -294,6 +228,9 @@
     max-width: 100%;
     border: none;
     min-height: auto;
+  }
+  .chef-page .tab-selector .tab{
+    padding: 10px;
   }
 }
 

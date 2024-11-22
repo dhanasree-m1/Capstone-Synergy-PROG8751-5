@@ -212,7 +212,7 @@ const AddProduct = () => {
                 <option value="Gluten Free">Gluten Free</option>
               </select>
             </Col>
-            <Col md={12}>
+            <Col md={12} className='mt-3'>
               <InputField
                 label="Description"
                 name="description"
