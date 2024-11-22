@@ -24,7 +24,7 @@ const CurrentOrders = () => {
         body: JSON.stringify({
           query: `
             query {
-              getCurrentOrderss(chef_id: "${chef_id}") {
+              getCurrentOrders(chef_id: "${chef_id}") {
                 _id
                 order_no
                 status

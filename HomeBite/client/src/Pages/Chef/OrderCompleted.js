@@ -13,6 +13,7 @@ const OrderCompleted = () => {
 
   const fetchOrders = async () => {
     const chef_id=localStorage.getItem("user_id")
+    console.log("chefid",chef_id)
     try {
       const response = await fetch("http://localhost:5000/graphql", {
         method: "POST",

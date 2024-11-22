@@ -27,7 +27,7 @@ const generateToken = (user) => {
     },
     process.env.JWT_SECRET, // Use a secret from your environment variables
     {
-      expiresIn: '2h', // Token expiration
+      expiresIn: '12h', // Token expiration
     }
   );
 };
@@ -117,6 +117,7 @@ const resolvers = {
         return await Product.find({ chef_id });
       },
       getCurrentOrders: async (_, { chef_id }) => {
+        
         try {
           // Fetch all orders with status not equal to "Completed"
           const orders = await Order.find({ status: { $ne: 'Completed' },chef_id: chef_id })
