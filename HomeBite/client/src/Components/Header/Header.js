@@ -22,7 +22,7 @@ export default function Header({
 
   useEffect(() => {
     const userId = localStorage.getItem("user_id");
-    setIsLoggedIn(!!userId);
+    setIsLoggedIn(!userId);
   }, []);
 
   const handleLoginLogout = () => {
