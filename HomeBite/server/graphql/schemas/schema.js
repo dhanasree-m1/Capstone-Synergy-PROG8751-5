@@ -191,8 +191,8 @@ const typeDefs = gql`
     getUser(id: ID!): User
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
-    getCurrentOrders: [Order]
-    getCompletedOrders: [Order]
+    getCurrentOrders(chef_id: ID!): [Order]
+    getCompletedOrders(chef_id: ID!): [Order]
     isEmailUnique(email: String!): Boolean!
   }
 

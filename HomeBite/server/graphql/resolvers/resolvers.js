@@ -115,10 +115,10 @@ const resolvers = {
       getProductsByChef: async (_, { chef_id }) => {
         return await Product.find({ chef_id });
       },
-      getCurrentOrders: async () => {
+      getCurrentOrders: async (_, { chef_id }) => {
         try {
           // Fetch all orders with status not equal to "Completed"
-          const orders = await Order.find({ status: { $ne: 'Completed' } })
+          const orders = await Order.find({ status: { $ne: 'Completed' },chef_id: chef_id })
             .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
             .populate('chef_id', 'specialty_cuisines type_of_meals')
             .populate('rider_id', 'vehicle_type vehicle_registration_number')
@@ -154,10 +154,10 @@ const resolvers = {
           throw new Error("Failed to fetch current orders.");
         }
       },
-      getCompletedOrders: async () => {
+      getCompletedOrders: async (_, { chef_id }) => {
         try {
           // Fetch all orders with status not equal to "Completed"
-          const orders = await Order.find({ status: "Completed" })
+          const orders = await Order.find({ status: "Completed",chef_id: chef_id })
             .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
             .populate('chef_id', 'specialty_cuisines type_of_meals')
             .populate('rider_id', 'vehicle_type vehicle_registration_number')
