@@ -186,6 +186,7 @@ export const UPDATE_USER_PROFILES = gql`
         last_name
         email
         mobile_number
+        password_hash
         role
         gender
         profile_image
@@ -197,6 +198,7 @@ export const UPDATE_USER_PROFILES = gql`
         postal_code
         country
         nearby_landmark
+
       }
       chef {
         specialty_cuisines
