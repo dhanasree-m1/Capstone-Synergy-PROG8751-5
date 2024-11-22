@@ -6,6 +6,7 @@ const typeDefs = gql`
     first_name: String!
     last_name: String!
     email: String!
+    password_hash: String
     mobile_number: String!
     role: [String!]
     gender: String
@@ -258,6 +259,7 @@ const typeDefs = gql`
     first_name: String!
     last_name: String!
     email: String!
+    password_hash: String
     mobile_number: String
     gender: String
     address_line_1: String
@@ -269,7 +271,7 @@ const typeDefs = gql`
     nearby_landmark: String
     role: [String!]
     profile_image: String
-    password_hash: String
+ 
   }
 
   input ChefInput {
