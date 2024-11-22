@@ -176,6 +176,7 @@ const Profile = () => {
           userInput: {
             ...userInfo,
             profile_image: profileImageUrl,
+            password_hash: userInfo.password_hash|| "",
             //role: userInfo.role ? userInfo.role[0] : undefined,
           },
           chefInput: chefData,
@@ -249,7 +250,15 @@ const Profile = () => {
               </div>
             </Col>
             <Col md={6}>
-              <InputField label="New Password" name="password" type="password" placeholder="Enter new password" value={userInfo.password || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
+             
+              <InputField
+  label="New Password"
+  name="password_hash"
+  type="password"
+  placeholder="Enter new password"
+  value={userInfo.password_hash || ''}
+  onChange={(e) => handleInputChange(e, setUserInfo)}
+/>
             </Col>
             <Col md={12}><hr /></Col>
           </Row>
