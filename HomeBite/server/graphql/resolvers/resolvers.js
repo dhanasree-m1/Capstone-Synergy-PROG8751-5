@@ -1,6 +1,7 @@
 // resolvers.js
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { User } from '../../src/models/users.js';
 import  {Rider} from '../../src/models/riders.js';
 import { Chef } from '../../src/models/chefs.js';
@@ -117,9 +118,10 @@ const resolvers = {
         return await Product.find({ chef_id });
       },
       getCurrentOrders: async (_, { chef_id }) => {
+
         try {
           // Fetch all orders with status not equal to "Completed"
-          const orders = await Order.find({ status: { $ne: 'Completed' },chef_id: chef_id })
+          const orders = await Order.find({ status: { $ne: 'Completed' } ,chef_id:chef_id})
             .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
             .populate('chef_id', 'specialty_cuisines type_of_meals')
             .populate('rider_id', 'vehicle_type vehicle_registration_number')
@@ -158,7 +160,7 @@ const resolvers = {
       getCompletedOrders: async (_, { chef_id }) => {
         try {
           // Fetch all orders with status not equal to "Completed"
-          const orders = await Order.find({ status: "Completed",chef_id: chef_id })
+          const orders = await Order.find({ status: "Completed",chef_id:chef_id })
             .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
             .populate('chef_id', 'specialty_cuisines type_of_meals')
             .populate('rider_id', 'vehicle_type vehicle_registration_number')
