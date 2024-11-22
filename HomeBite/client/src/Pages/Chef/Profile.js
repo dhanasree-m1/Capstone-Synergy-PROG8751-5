@@ -9,7 +9,8 @@ import TypeOfMealsOptions from "../../Components/TypeOfMealsOptions/TypeOfMealsO
 import AvailabilityOptions from "../../Components/AvailabilityOptions/AvailabilityOptions";
 import { UPDATE_USER_PROFILES } from "../../queries";
 import { useMutation } from "@apollo/client";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
+
 
 const Profile = () => {
   const [userInfo, setUserInfo] = useState({
@@ -39,8 +40,9 @@ const Profile = () => {
 
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [message, setMessage] = useState(""); // State to store feedback messages
-  const [updateUserProfile] = useMutation(UPDATE_USER_PROFILES);
   const navigate = useNavigate();
+  const [updateUserProfile] = useMutation(UPDATE_USER_PROFILES);
+
   const fetchData = async () => {
     const token = localStorage.getItem("token");
     const response = await fetch(`http://localhost:5000/graphql`, {
@@ -179,6 +181,7 @@ const Profile = () => {
           chefInput: chefData,
         },
       });
+      navigate("/chef/profile", { state: { successMessage: "Profile updated successfully!" } });
       setMessage("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col,Alert } from "react-bootstrap";
 import Button from "../../Components/Button/Button";
-import { Link } from 'react-router-dom';
+import { Link,useLocation } from 'react-router-dom';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -9,6 +9,8 @@ const ProfileView = () => {
   const [userInfo, setUserInfo] = useState({});
   const [chefInfo, setChefInfo] = useState({});
   const [profileImageUrl, setProfileImageUrl] = useState(null);
+  const location = useLocation();
+  const successMessage = location.state?.successMessage;  
   const navigate = useNavigate();
 
   const fetchData = async () => {
@@ -53,6 +55,15 @@ const ProfileView = () => {
   return (
     <>
       <Container fluid className="orders-page mt-3 bt-1">
+      <Row>
+          {successMessage && (
+            <Col md={12}>
+              <Alert variant="success" className="my-3">
+                {successMessage}
+              </Alert>
+            </Col>
+          )}
+        </Row>
         <Row>
           <Col>
             <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
