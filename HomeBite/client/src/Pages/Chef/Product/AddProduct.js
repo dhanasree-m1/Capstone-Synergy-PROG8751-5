@@ -186,7 +186,7 @@ const AddProduct = () => {
               />
             </Col>
             <Col md={4}>
-              <label>Availability</label>
+              <label className='mb-2'>Availability</label>
               <select
                 name="is_available"
                 className="form-control"
@@ -199,7 +199,7 @@ const AddProduct = () => {
               </select>
             </Col>
             <Col md={4}>
-              <label>Dietary</label>
+              <label className='mb-2'>Dietary</label>
               <select
                 name="dietary"
                 className="form-control"
