@@ -10,10 +10,15 @@ import { OrderItem } from '../../src/models/order_items.js';
 import { sendResetEmail } from '../../utils/emailService.js';
 import { Payment } from '../../src/models/payments.js'; 
 import { Product } from '../../src/models/products.js'; 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 // import { sendResetEmail } from "../utils/emailService.js";
 // Define the generateToken function
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -22,7 +27,7 @@ const generateToken = (user) => {
     },
     process.env.JWT_SECRET, // Use a secret from your environment variables
     {
-      expiresIn: '2h', // Token expiration
+      expiresIn: '12h', // Token expiration
     }
   );
 };
@@ -46,7 +51,7 @@ const resolvers = {
   getAllProducts: async (_, { campus }) => {
         try {
           // Step 1: Fetch all products marked as available
-          const products = await Product.find({ is_available: true });
+          const products = await Product.find({ is_available: "Yes" });
       
           // Step 2: Extract chef IDs from products
           const chefIds = products.map((product) => product.chef_id);
@@ -78,6 +83,7 @@ const resolvers = {
                 price: product.price,
                 quantity: product.quantity,
                 image_url: product.image_url,
+                dietary: product.dietary,
                 created_at: product.created_at,
                 is_available: product.is_available,
                 user,
@@ -110,10 +116,11 @@ const resolvers = {
       getProductsByChef: async (_, { chef_id }) => {
         return await Product.find({ chef_id });
       },
-      getCurrentOrders: async () => {
+      getCurrentOrders: async (_, { chef_id }) => {
+        
         try {
           // Fetch all orders with status not equal to "Completed"
-          const orders = await Order.find({ status: { $ne: 'Completed' } })
+          const orders = await Order.find({ status: { $ne: 'Completed' },chef_id: chef_id })
             .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
             .populate('chef_id', 'specialty_cuisines type_of_meals')
             .populate('rider_id', 'vehicle_type vehicle_registration_number')
@@ -149,10 +156,10 @@ const resolvers = {
           throw new Error("Failed to fetch current orders.");
         }
       },
-      getCompletedOrders: async () => {
+      getCompletedOrders: async (_, { chef_id }) => {
         try {
           // Fetch all orders with status not equal to "Completed"
-          const orders = await Order.find({ status: "Completed" })
+          const orders = await Order.find({ status: "Completed",chef_id: chef_id })
             .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
             .populate('chef_id', 'specialty_cuisines type_of_meals')
             .populate('rider_id', 'vehicle_type vehicle_registration_number')
@@ -374,9 +381,34 @@ const resolvers = {
       return await Product.findByIdAndUpdate(id, input, { new: true });
     },
     deleteProduct: async (_, { id }) => {
-      await Product.findByIdAndDelete(id);
-      return true;
-    },
+      try {
+          // Fetch the product to get its image URL
+          const product = await Product.findById(id);
+          if (!product) {
+              throw new Error("Product not found");
+          }
+
+          // Get the file path from the image URL
+          const imagePath = path.join(__dirname, '..', '..', 'uploads', product.image_url.split('/').pop());
+          
+          // Delete the product from the database
+          await Product.findByIdAndDelete(id);
+
+          // Delete the image file
+          fs.unlink(imagePath, (err) => {
+              if (err) {
+                  console.error("Failed to delete image file:", err);
+              } else {
+                  console.log("Image file deleted successfully");
+              }
+          });
+
+          return true;
+      } catch (error) {
+          console.error("Error deleting product:", error);
+          throw new Error("Failed to delete product");
+      }
+  },
     updateUserProfile: async (_, {id, userInput, chefInput }) => {
       if (!id) {
         throw new Error("User not authenticated");

@@ -6,6 +6,7 @@ const typeDefs = gql`
     first_name: String!
     last_name: String!
     email: String!
+    password_hash: String
     mobile_number: String!
     role: [String!]
     gender: String
@@ -193,8 +194,8 @@ const typeDefs = gql`
     getUser(id: ID!): User
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
-    getCurrentOrders: [Order]
-    getCompletedOrders: [Order]
+    getCurrentOrders(chef_id: ID!): [Order]
+    getCompletedOrders(chef_id: ID!): [Order]
     isEmailUnique(email: String!): Boolean!
     completedOrders: [Order]
     orderItems: [OrderItem]
@@ -226,7 +227,7 @@ const typeDefs = gql`
     image_url: String
     dietary: String
     created_at: String
-    is_available: Boolean
+    is_available: String
     user: User
   }
 
@@ -237,7 +238,7 @@ const typeDefs = gql`
     quantity: Int
     image_url: String
     dietary: String
-    is_available: Boolean
+    is_available: String
   }
 
   type Query {
@@ -262,6 +263,7 @@ const typeDefs = gql`
     first_name: String!
     last_name: String!
     email: String!
+    password_hash: String
     mobile_number: String
     gender: String
     address_line_1: String
@@ -273,7 +275,7 @@ const typeDefs = gql`
     nearby_landmark: String
     role: [String!]
     profile_image: String
-    password_hash: String
+ 
   }
 
   input ChefInput {

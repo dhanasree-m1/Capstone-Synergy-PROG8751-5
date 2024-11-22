@@ -12,7 +12,7 @@ export default function MainLayout({ cart, handleShowCart }) {
 
   const handleRoleSelect = (role) => {
     console.log(`Navigating to ${role} dashboard`);
-    // Implement navigation logic if required
+
   };
 
   return (

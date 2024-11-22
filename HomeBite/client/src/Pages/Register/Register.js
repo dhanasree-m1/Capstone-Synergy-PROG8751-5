@@ -334,7 +334,10 @@ const Register = () => {
       setMessage("Please ensure all chef details are filled in and valid.");
       return false;
     }
-
+    // if (isNaN(maxOrdersPerDay) || parseInt(maxOrdersPerDay, 10) <= 0) {
+    //   setMessage("Max Orders Per Day must be a valid positive number.");
+    //   return false;
+    // }
     return true;
   };
 
@@ -1097,7 +1100,7 @@ const Register = () => {
                         }
                       />
                     </Col>
-                    <Col md={4}>
+                    <Col md={5}>
                       <Form.Group className="input-field mb-3">
                         <Form.Label htmlFor="Experience in Cooking">
                           Experience in Cooking

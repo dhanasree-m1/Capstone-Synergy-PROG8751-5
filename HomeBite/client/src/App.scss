@@ -23,6 +23,8 @@ $card-bg:#F0FFF4;
 $chef-card: #F8F8F8;
 $header-bg:#F5F5F5;
 $null:0;
+$success-color:#007F00;
+
 // Typography
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-family;
@@ -107,6 +109,17 @@ footer {
   color: $link-color;
 }
 
+.btn-success {
+  background-color: $success-color; // Green for accept
+}
+
+.btn-error,.btn-error:hover {
+  background-color: $link-color; // Red for reject
+  color: #fff;
+}
+.text-wrap{
+  text-wrap-mode: wrap;
+}
 // General styling for the container
 .ht{
   height: 200px;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_CHEFS_AND_PRODUCTS } from "../../queries";
 import { Container, Alert, Col, Row, Dropdown, Form } from "react-bootstrap";
@@ -12,7 +12,7 @@ import { campuses } from "../../Components/data/Campuses";
 import CartSummary from "../Customer/CartSummary";
 import Homebg from "../../assets/images/home-bg.jpeg";
 import "./Dashboard.scss";
-import Loader from "../../Components/Loader/Loader"
+import Loader from "../../Components/Loader/Loader";
 
 export default function Dashboard() {
   const [selectedCampus, setSelectedCampus] = useState(null);
@@ -25,9 +25,25 @@ export default function Dashboard() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const successMessage = location.state?.successMessage;
-  const [cart, setCart] = useState({});
+  const [cart, setCart] = useState(() => { 
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : {};
+  });
   const [showCart, setShowCart] = useState(false); // State for cart modal visibility
 
+  // useEffect(() => {
+  //   localStorage.setItem("cart", JSON.stringify(cart));
+  // }, [cart]);
+
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem("cart") || "{}");
+    setCart(savedCart);
+  }, []);
+  
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+  
   const handleShowCart = () => setShowCart(true);
   const handleCloseCart = () => setShowCart(false);
 
@@ -45,30 +61,30 @@ export default function Dashboard() {
   // Filter chefs and products based on the selected campus
   const filteredChefs = selectedCampus
     ? data.getAllChefs.filter((chef) => {
-      console.log(
-        `Filtering chef campus: ${chef.user.address_line_1} against selected campus: ${selectedCampus}`
-      );
-      return chef.user.address_line_1 === selectedCampus;
-    })
+        console.log(
+          `Filtering chef campus: ${chef.user.address_line_1} against selected campus: ${selectedCampus}`
+        );
+        return chef.user.address_line_1 === selectedCampus;
+      })
     : data.getAllChefs; // If no campus is selected, show all chefs
 
   const filteredProducts = selectedCampus
     ? data.getAllProducts.filter((product) => {
-      const address = product.chef?.user?.address_line_1 || "Unknown";
-      console.log(
-        `Filtering product: ${address} against campus: ${selectedCampus}`
-      );
-      return address === selectedCampus;
-    })
+        const address = product.chef?.user?.address_line_1 || "Unknown";
+        console.log(
+          `Filtering product: ${address} against campus: ${selectedCampus}`
+        );
+        return address === selectedCampus;
+      })
     : data.getAllProducts;
 
   const searchedProducts = filteredProducts
     ? filteredProducts.filter(
-      (product) =>
-        product &&
-        product.name &&
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+        (product) =>
+          product &&
+          product.name &&
+          product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     : [];
 
   console.log("Selected Campus:", selectedCampus);
@@ -108,52 +124,66 @@ export default function Dashboard() {
         <Row>
           <Col md={12} className="p-0">
             <section className="pt-5 pb-5 position-relative home-search text-center">
-
               <Container>
                 <Row className="align-items-center">
                   <Col lg={12} className="col-12">
                     <div className="homepage-search-title">
-                      <h1 className="mb-2"><b>Enjoy Fresh, Homemade Meals on Campus</b></h1>
-                      <h5 className="mb-5 text-secondary font-weight-normal">Order delicious, home-cooked food made by students, delivered straight to you!</h5>
+                      <h1 className="mb-2">
+                        <b>Enjoy Fresh, Homemade Meals on Campus</b>
+                      </h1>
+                      <h5 className="mb-5 text-secondary font-weight-normal">
+                        Order delicious, home-cooked food made by students,
+                        delivered straight to you!
+                      </h5>
                     </div>
                     <div className="homepage-search-form">
                       <Form className="form-noborder">
                         <div className="form-row row justify-content-center">
-                          <Form.Group className='col-12 col-md-3 col-lg-2 mb-3'>
+                          <Form.Group className="col-12 col-md-3 mb-3">
                             <Dropdown onSelect={handleCampusSelect}>
-                              <Dropdown.Toggle variant="secondary" id="dropdown-campus" className="w-100">
+                              <Dropdown.Toggle
+                                variant="secondary"
+                                id="dropdown-campus"
+                                className="w-100"
+                              >
                                 {selectedCampus || "Select Campus"}
                               </Dropdown.Toggle>
                               <Dropdown.Menu>
-                                
                                 {campuses.map((campus) => (
-                                  <Dropdown.Item key={campus.address} eventKey={campus.address}>
+                                  <Dropdown.Item
+                                    key={campus.address}
+                                    eventKey={campus.address}
+                                  >
                                     {campus.address}
                                   </Dropdown.Item>
                                 ))}
                               </Dropdown.Menu>
-                              <Button className={`small icon-btn ${!selectedCampus ? "d-none" : "d-inline-block"}`} onClick={handleResetCampus}>
-                            <span class="material-icons">close</span>
-                            </Button>
+                              <Button
+                                className={`small icon-btn ${
+                                  !selectedCampus ? "d-none" : "d-inline-block"
+                                }`}
+                                onClick={handleResetCampus}
+                              >
+                                <span class="material-icons">close</span>
+                              </Button>
                             </Dropdown>
                           </Form.Group>
                           <div className="col-md-4 col-12 position-relative">
-  <Form.Control
-    type="text"
-    placeholder="Search for products"
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-  />
-  {searchQuery && ( // Show the close button only if there is a search query
-    <Button
-      className="small icon-btn pl-2 right-10"
-      onClick={() => setSearchQuery("")}
-    >
-      <span className="material-icons">close</span>
-    </Button>
-  )}
-</div>
-
+                            <Form.Control
+                              type="text"
+                              placeholder="Search for products"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            {searchQuery && ( // Show the close button only if there is a search query
+                              <Button
+                                className="small icon-btn pl-2 right-10"
+                                onClick={() => setSearchQuery("")}
+                              >
+                                <span className="material-icons">close</span>
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </Form>
                     </div>
@@ -161,11 +191,10 @@ export default function Dashboard() {
                 </Row>
               </Container>
             </section>
-
           </Col>
         </Row>
       </Container>
-      <Container fluid >
+      <Container fluid>
         <Row>
           {successMessage && (
             <Col md={12}>
@@ -205,7 +234,9 @@ export default function Dashboard() {
 
           {searchQuery ? (
             <Col md={12}>
-              <h6><b>Search results for "{searchQuery}"</b></h6>
+              <h6>
+                <b>Search results for "{searchQuery}"</b>
+              </h6>
               <div className="product-list row">
                 {searchedProducts.length > 0 ? (
                   searchedProducts.map((product) => (
@@ -216,7 +247,9 @@ export default function Dashboard() {
                         cart={cart}
                         addToCart={addToCart}
                         incrementQuantity={incrementQuantity}
-                        decrementQuantity={decrementQuantity} /></div>
+                        decrementQuantity={decrementQuantity}
+                      />
+                    </div>
                   ))
                 ) : (
                   <div className="col-12">
@@ -238,14 +271,17 @@ export default function Dashboard() {
                       {selectedCampus || "all campuses"}
                     </p>
                   </div>
-                  <a className="btn-link" onClick={() => setViewAllProducts(!viewAllProducts)}>
+                  <Button
+                    className="btn-link"
+                    onClick={() => setViewAllProducts(!viewAllProducts)}
+                  >
                     {viewAllProducts ? "Show Less" : "View All"}
-                  </a>
+                  </Button>
                 </div>
                 <hr className="mt-0" />
                 <div className="row">
                   {data?.getAllProducts?.length > 0 ? (
-                    data.getAllProducts.map((product) => (
+                    data.getAllProducts.slice(0, viewAllProducts ? data.getAllProducts.length : 4).map((product) => (
                       <div className="col-md-3">
                         <ProductCard
                           key={product.id}
@@ -265,7 +301,6 @@ export default function Dashboard() {
                     </div>
                   )}
                 </div>
-
               </Col>
               <Col md={12} className="mb-5">
                 <div className="d-flex justify-content-between align-items-baseline">
@@ -275,7 +310,10 @@ export default function Dashboard() {
                       Connect with chefs at {selectedCampus || "all campuses"}
                     </p>
                   </div>
-                  <a className="btn-link" onClick={() => setViewAllChefs(!viewAllChefs)}>
+                  <a
+                    className="btn-link"
+                    onClick={() => setViewAllChefs(!viewAllChefs)}
+                  >
                     {viewAllChefs ? "Show Less" : "View All"}
                   </a>
                 </div>
@@ -285,7 +323,11 @@ export default function Dashboard() {
                   {filteredChefs.length > 0 ? (
                     filteredChefs
                       .slice(0, viewAllChefs ? filteredChefs.length : 4)
-                      .map((chef) => <div className="col-md-3"><ChefCard key={chef.id} chef={chef} /></div>)
+                      .map((chef) => (
+                        <div className="col-md-3">
+                          <ChefCard key={chef.id} chef={chef} />
+                        </div>
+                      ))
                   ) : (
                     <div className="col-12">
                       <div className="alert alert-warning" role="alert">
@@ -294,7 +336,6 @@ export default function Dashboard() {
                     </div>
                   )}
                 </div>
-
               </Col>
             </>
           )}

@@ -27,10 +27,19 @@ export default function ChefCard({ chef }) {
 
   return (
     <Card className="chef-card mb-3">
-      <Card.Img
+      {/* <Card.Img
         variant="top"
         src={chef.user.profile_image || defaultChefImage} // Fallback image
         alt={`${chef.user.first_name || "New"} ${chef.user.last_name || "Chef"}`}
+      /> */}
+      <Card.Img
+        variant="top"
+        src={chef.user.profile_image || defaultChefImage} // Use profile image or fallback
+        alt={`${chef?.user?.first_name || "New"} ${chef?.user?.last_name || "Chef"}`}
+        onError={(e) => {
+          e.target.onerror = null; // Prevent infinite loop
+          e.target.src = defaultChefImage; // Set fallback image
+        }}
       />
       <Card.Body className="pb-0">
         <Card.Title>

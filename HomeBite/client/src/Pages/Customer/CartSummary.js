@@ -41,7 +41,7 @@ export default function CartSummary({
     <Offcanvas show={show} onHide={handleClose} placement="end">
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>Cart</Offcanvas.Title>
-        <span>{cartItems.length} Items</span>
+        <span> ({cartItems.length})</span>
       </Offcanvas.Header>
       <Offcanvas.Body>
         {cartItems.length > 0 ? (
@@ -66,11 +66,11 @@ export default function CartSummary({
           <p>Your cart is empty.</p>
         )}
         <hr />
-        <Form>
+        {/* <Form>
           <Form.Group controlId="tips" className="mb-3">
             <Form.Control type="number" placeholder="Add tips" />
           </Form.Group>
-        </Form>
+        </Form> */}
         <div className="subtotal">
           <strong>Subtotal: ${subtotal.toFixed(2)}</strong>
           <p>Extra charges may apply</p>

@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col } from "react-bootstrap";
-import { Link } from 'react-router-dom';
+import { Container, Row, Col,Alert } from "react-bootstrap";
+import Button from "../../Components/Button/Button";
+import { Link,useLocation } from 'react-router-dom';
+
+import { useNavigate } from 'react-router-dom';
 
 const ProfileView = () => {
   const [userInfo, setUserInfo] = useState({});
   const [chefInfo, setChefInfo] = useState({});
   const [profileImageUrl, setProfileImageUrl] = useState(null);
+  const location = useLocation();
+  const successMessage = location.state?.successMessage;  
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     const token = localStorage.getItem("token");
@@ -33,7 +39,7 @@ const ProfileView = () => {
         `,
       }),
     });
-    
+
     const data = await response.json();
     const { user, chef } = data.data.getUserProfile;
 
@@ -48,65 +54,106 @@ const ProfileView = () => {
 
   return (
     <>
-    <Container>
+      <Container fluid className="orders-page mt-3 bt-1">
       <Row>
-        <Col>
-          <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
-            arrow_forward
-          </span><span>Profile Details</span>
-        </Col>
-        <Col md={12} className='mt-5'><h5>Profile Details</h5><hr /></Col>
-      </Row>
-      </Container>
-     
-      <Container>
- 
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Profile</h2>
-        <Link to="edit" className="btn-primary mb-3">Edit</Link>
-      </div>
-
-      {/* User Information */}
-      <Row>
-        <Col md={6}>
-          <p><strong>First Name:</strong> {userInfo.first_name}</p>
-          <p><strong>Last Name:</strong> {userInfo.last_name}</p>
-          <p><strong>Email:</strong> {userInfo.email}</p>
-          <p><strong>Mobile Number:</strong> {userInfo.mobile_number}</p>
-          <p><strong>Gender:</strong> {userInfo.gender}</p>
-        </Col>
-        <Col md={6}>
-          <p><strong>Address Line 1:</strong> {userInfo.address_line_1}</p>
-          <p><strong>Address Line 2:</strong> {userInfo.address_line_2}</p>
-          <p><strong>City:</strong> {userInfo.city}</p>
-          <p><strong>Province:</strong> {userInfo.province}</p>
-          <p><strong>Postal Code:</strong> {userInfo.postal_code}</p>
-          <p><strong>Country:</strong> {userInfo.country}</p>
-          <p><strong>Nearby Landmark:</strong> {userInfo.nearby_landmark}</p>
-        </Col>
-      </Row>
-      
-      {profileImageUrl && (
-        <Row className="mb-3">
+          {successMessage && (
+            <Col md={12}>
+              <Alert variant="success" className="my-3">
+                {successMessage}
+              </Alert>
+            </Col>
+          )}
+        </Row>
+        <Row>
           <Col>
-            <img src={profileImageUrl} alt="Profile" className="img-fluid rounded" style={{ maxWidth: "150px" }} />
+            <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
+              arrow_forward
+            </span><span>Profile Details</span>
           </Col>
         </Row>
-      )}
-
-      {/* Chef Information */}
-      {chefInfo && (
-        <div>
-          <h4>Chef Information</h4>
-          <p><strong>Specialty Cuisines:</strong> {chefInfo.specialty_cuisines?.join(', ')}</p>
-          <p><strong>Type of Meals:</strong> {chefInfo.type_of_meals?.join(', ')}</p>
-          <p><strong>Cooking Experience:</strong> {chefInfo.cooking_experience}</p>
-          <p><strong>Max Orders Per Day:</strong> {chefInfo.max_orders_per_day}</p>
-          <p><strong>Preferred Working Days:</strong> {chefInfo.preferred_working_days?.join(', ')}</p>
+        <div className='row mt-5'>
+          <div className='col-12 col-md-6 align-content-center'>
+            <h5>Profile Details</h5>
+          </div>
+          <div className='col-12 col-md-6 text-start text-md-end '>
+            <Button variant='secondary' className='small' onClick={() => navigate('/chef/profile/edit')} >Edit</Button>
+          </div>
+          <div className='col-12 pt-3'>
+            <hr className="mt-0" />
+          </div>
         </div>
-      )}
-    
-    </Container>
+      </Container>
+      <div className='container-fluid'>
+        <div className='row'>
+          <div className='col-12'>
+            <div className='card'>
+              <div className='card-body pt-0 pb-0'>
+                <div className='row'>
+                  <div className='col-md-4 text-center bg-light p-5'>
+                    {profileImageUrl && (
+                      <img src={profileImageUrl} alt="Profile" className="img-fluid profile-img" style={{ maxWidth: "150px" }} />
+                    )}
+                    <h5 class="mb-1 mt-3">{userInfo.first_name} {userInfo.last_name}</h5>
+                  </div>
+                  <div class="col-md-8 mt-md-4 pb-3">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="clearfix"></div>
+                        <p class="mb-0 text-muted"><span class="material-icons me-2">email</span>{userInfo.email}</p>
+                        <div class="clearfix"></div>
+                        <p class="mb-0 text-muted mt-3"><span class="material-icons me-2">call</span>{userInfo.mobile_number}</p>
+                        <div class="clearfix"></div>
+                        <p class="mb-0 text-muted mt-3"><span class="material-icons me-2">wc</span>{userInfo.gender}</p>
+                        <div class="clearfix"></div>
+                        <div class="d-flex text-muted  mt-3">
+                          <span class="material-icons me-2">map</span>
+                          <div class="flex-grow-1">
+                            <p class="mb-0 text-muted">{userInfo.address_line_1}</p>
+                            <p class="mb-0 text-muted">{userInfo.address_line_2}</p>
+                            <p class="mb-0 text-muted">{userInfo.city}</p>
+                            <p class="mb-0 text-muted">{userInfo.province}, {userInfo.country} - {userInfo.postal_code}</p>
+                            <p class="mb-0 text-muted mt-2">Nearby landmark - {userInfo.nearby_landmark}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className='col-12 mt-5'>
+            <div className='card'>
+              <div className='card-body'>
+                <h5 class="card-title">Chef Information</h5>
+                <hr />
+                <div className='row'>
+
+
+                  {chefInfo && (
+                    <>
+                      <div className='col-md-4'>
+                        <p><small>Specialty Cuisines</small><br /> {chefInfo.specialty_cuisines?.join(', ')}</p>
+                      </div><div className='col-md-4'>
+                        <p><small>Type of Meals</small><br /> {chefInfo.type_of_meals?.join(', ')}</p>
+                      </div><div className='col-md-4'>
+                        <p><small>Cooking Experience</small><br /> {chefInfo.cooking_experience}</p>
+                      </div><div className='col-md-4'>
+                        <p><small>Max Orders Per Day</small><br /> {chefInfo.max_orders_per_day}</p>
+                      </div><div className='col-md-4'>
+                        <p><small>Preferred Working Days</small><br /> {chefInfo.preferred_working_days?.join(', ')}</p>
+                      </div>
+                    </>
+                  )}
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div >
     </>
   );
 };
