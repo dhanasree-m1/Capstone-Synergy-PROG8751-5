@@ -330,11 +330,14 @@ const Register = () => {
 
     const validExperienceOptions = ["Less than 1 year", "1-3 years", "3-5 years", "5+ years"];
 
-    if (!specialtyCuisines.length || !typeOfMeals.length || !cookingExperience || !validExperienceOptions.includes(cookingExperience) || !preferredWorkingDays.length || !maxOrdersPerDay) {
+    if (!specialtyCuisines.length || !typeOfMeals.length || !cookingExperience || !validExperienceOptions.includes(cookingExperience) || !preferredWorkingDays.length || maxOrdersPerDay === undefined ||  maxOrdersPerDay === null || maxOrdersPerDay === "") {
       setMessage("Please ensure all chef details are filled in and valid.");
       return false;
     }
-
+    if (isNaN(maxOrdersPerDay) || parseInt(maxOrdersPerDay, 10) <= 0) {
+      setMessage("Max Orders Per Day must be a valid positive number.");
+      return false;
+    }
     return true;
   };
 
