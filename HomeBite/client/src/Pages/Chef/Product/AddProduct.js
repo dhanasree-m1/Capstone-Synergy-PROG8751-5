@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col,Alert } from "react-bootstrap";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import InputField from '../../../Components/InputField/InputField';
 import Button from "../../../Components/Button/Button";
 import ImageUpload from '../../../Components/ImageUpload/ImageUpload';
@@ -62,7 +62,7 @@ const AddProduct = () => {
       return false;
     }
 
-  
+
 
     // Validate Dietary
     if (!product.dietary) {
@@ -77,16 +77,16 @@ const AddProduct = () => {
     }
     // Validate Description
     if (!product.description.trim()) {
-        setMessage('Description cannot be empty.');
-        return false;
-      }
+      setMessage('Description cannot be empty.');
+      return false;
+    }
 
     // Validate Image
     if (!product.image_url) {
       setMessage('Product image is required.');
       return false;
     }
-      
+
 
     setMessage(''); // Clear any previous messages if validation passes
     return true;
@@ -114,7 +114,7 @@ const AddProduct = () => {
                 quantity: ${product.quantity},
                 dietary: "${product.dietary}",
                 image_url: "${product.image_url}",
-                is_available: "${product.is_available }"
+                is_available: "${product.is_available}"
               }) {
                 id
               }
@@ -126,18 +126,23 @@ const AddProduct = () => {
     navigate('/chef/products');
   };
 
+  const handleCancel = () => {
+    navigate("/chef/products"); // Redirect to products.js
+  };
   return (
-    <Container fluid>
+    <Container fluid className="orders-page mt-3 bt-1">
       <Row>
         <Col>
-          <Link className="btn-link mb-3" to="/chef/products">Menu</Link>
-          <span className="material-icons">arrow_forward</span>
-          <span>Add Menu</span>
+          <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
+            arrow_forward
+          </span>
+          <Link className="btn-link mb-3" to="/chef/products">Menu</Link><span className="material-icons">
+            arrow_forward
+          </span><span>Add Menu</span>
         </Col>
-        <Col md={12} className='mt-5'><h5>Menu</h5><hr /></Col>
       </Row>
-      <Row>
-        <Col md={3}>
+      <Row className=' mt-5'>
+        <Col md={3} className='mb-3'>
           <Card>
             <Card className="product-card" key={product.id}>
               <Card.Title><h6>Upload Image</h6></Card.Title>
@@ -217,8 +222,10 @@ const AddProduct = () => {
                 onChange={handleChange}
               />
             </Col>
-
-            <Button type="submit" className="btn btn-primary">Save</Button>
+            <Col md={12}>
+              <hr />
+              <Button variant='secondary' type="button" onClick={handleCancel}>Cancel</Button>
+              <Button variant='primary' type="submit" className="mx-3" >Save</Button></Col>
           </form>
         </Col>
       </Row>

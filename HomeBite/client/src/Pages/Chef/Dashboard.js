@@ -1,25 +1,21 @@
-import React from 'react';
-import { useState, useEffect } from "react";
-import { Link, Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, Outlet } from "react-router-dom";
 import { Container } from "react-bootstrap";
 import Header from '../../Components/Header/Header';
-import CartSummary from "../Customer/CartSummary";
 import "./chef.scss";
 
-
-
 const Dashboard = () => {
-
   const [showCart, setShowCart] = useState(false);
   const [cart, setCart] = useState(() => { 
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : {};
   });
+
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart") || "{}");
     setCart(savedCart);
   }, []);
-  
+
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
@@ -29,24 +25,48 @@ const Dashboard = () => {
 
   return (
     <>
-      <Container fluid className='p-0' >
+      <Container fluid className="p-0">
         <Header />
       </Container>
-      <Container fluid >
-        <div className='row'>
-          <div className="col-2 sidebar">
-            {/* <div className="logo">HomeBite</div> */}
-            <nav>
+      <Container fluid>
+        <div className="row">
+          <div className="col-12 col-lg-2 sidebar">
+            <nav className="mt-3">
               <ul>
-                <li><Link to="orders" className='btn-link'><span className="material-icons">home</span>Dashboard</Link></li>
-                <li><Link to="products" className='btn-link'><span className="material-icons">coffee</span>Menu</Link></li>
-                <li><Link to="profile" className='btn-link'><span className="material-icons">person</span>Profile Details</Link></li>
+                <li>
+                  <NavLink
+                    to="orders"
+                    className={({ isActive }) =>
+                      isActive ? "btn-link active" : "btn-link"
+                    }
+                  >
+                    <span className="material-icons">home</span>Dashboard
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="products"
+                    className={({ isActive }) =>
+                      isActive ? "btn-link active" : "btn-link"
+                    }
+                  >
+                    <span className="material-icons">coffee</span>Menu
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="profile"
+                    className={({ isActive }) =>
+                      isActive ? "btn-link active" : "btn-link"
+                    }
+                  >
+                    <span className="material-icons">person</span>Profile Details
+                  </NavLink>
+                </li>
               </ul>
             </nav>
           </div>
-          <div className="col-10 content">
-            
-
+          <div className="col-12 col-lg-10 chef-page">
             <Outlet /> {/* This will render the selected page */}
           </div>
         </div>
@@ -56,4 +76,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

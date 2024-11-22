@@ -9,7 +9,7 @@ import TypeOfMealsOptions from "../../Components/TypeOfMealsOptions/TypeOfMealsO
 import AvailabilityOptions from "../../Components/AvailabilityOptions/AvailabilityOptions";
 import { UPDATE_USER_PROFILES } from "../../queries";
 import { useMutation } from "@apollo/client";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const [userInfo, setUserInfo] = useState({
@@ -40,7 +40,7 @@ const Profile = () => {
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [message, setMessage] = useState(""); // State to store feedback messages
   const [updateUserProfile] = useMutation(UPDATE_USER_PROFILES);
-
+  const navigate = useNavigate();
   const fetchData = async () => {
     const token = localStorage.getItem("token");
     const response = await fetch(`http://localhost:5000/graphql`, {
@@ -67,7 +67,7 @@ const Profile = () => {
         `,
       }),
     });
-    
+
     const data = await response.json();
     const { user, chef } = data.data.getUserProfile;
 
@@ -185,61 +185,102 @@ const Profile = () => {
       setMessage("Error updating profile. Please try again.");
     }
   };
+  const handleCancel = () => {
+    navigate("/chef/profile"); // Redirect to ProfileView.js
+  };
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          <Link className="btn-link  mb-3" to="/chef/products">Menu</Link><span className="material-icons">
-            arrow_forward
-          </span><span>Add Menu</span>
-        </Col>
-        <Col md={12} className='mt-5'><h5>Profile Details</h5><hr /></Col>
-      </Row>
-      <h2>Profile</h2>
-      {message && (
-        // <Alert variant={message.includes("Error") ? "danger" : "success"}>
-        <Alert variant= "danger" >
-          {message}
-        </Alert>
-      )}
-      <form onSubmit={handleSubmit}>
+    <>
+      <Container fluid className="orders-page mt-3 bt-1">
         <Row>
-          <Col md={6}>
-            <InputField label="First Name" name="first_name" value={userInfo.first_name || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <InputField label="Last Name" name="last_name" value={userInfo.last_name || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <InputField label="Email" name="email" value={userInfo.email || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <InputField label="Mobile Number" name="mobile_number" value={userInfo.mobile_number || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <h5 className="form-sub-title">Select your Gender</h5>
-            <div className="gender-options mb-3">
-              <RadioButton label="Male" name="gender" value="Male" checked={userInfo.gender === "Male"} onChange={(e) => handleInputChange(e, setUserInfo)} />
-              <RadioButton label="Female" name="gender" value="Female" checked={userInfo.gender === "Female"} onChange={(e) => handleInputChange(e, setUserInfo)} />
-              <RadioButton label="Other" name="gender" value="Other" checked={userInfo.gender === "Other"} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            </div>
+          <Col>
+            <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
+              arrow_forward
+            </span>
+            <Link className="btn-link  mb-3" to="/chef/profile">Profile Details</Link><span className="material-icons">
+              arrow_forward
+            </span><span>Edit Details</span>
           </Col>
-          {/* <Col md={6}>
-            <InputField label="Address Line 1" name="address_line_1" value={userInfo.address_line_1 || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <InputField label="Address Line 2" name="address_line_2" value={userInfo.address_line_2 || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <InputField label="City" name="city" value={userInfo.city || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <InputField label="Province" name="province" value={userInfo.province || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <InputField label="Postal Code" name="postal_code" value={userInfo.postal_code || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <InputField label="Country" name="country" value={userInfo.country || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-            <InputField label="Nearby Landmark" name="nearby_landmark" value={userInfo.nearby_landmark || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-          </Col> */}
         </Row>
-        <ImageUpload label="Profile Image" currentImageUrl={profileImageUrl} onImageUpload={handleProfileImageUpload} />
-        <div>
-          <h4>Chef Information</h4>
-          <SpecialtyCuisinesOptions cuisines={chefInfo.specialty_cuisines} onCuisineChange={handleCuisineChange} />
-          <TypeOfMealsOptions meals={chefInfo.type_of_meals} onMealChange={handleMealChange} />
-          <InputField label="Cooking Experience" name="cooking_experience" value={chefInfo.cooking_experience || ''} onChange={(e) => handleInputChange(e, setChefInfo)} />
-          <InputField label="Max Orders Per Day" name="max_orders_per_day" value={chefInfo.max_orders_per_day || ''} onChange={(e) => handleInputChange(e, setChefInfo)} />
-          <AvailabilityOptions selectedDays={chefInfo.preferred_working_days} onDayChange={handleWorkingDaysChange} />
+        <div className='row mt-5'>
+          <div className='col-12 align-content-center'>
+            <h5>Edit Details</h5>
+          </div>
+          <div className='col-12 pt-3'>
+            <hr className="mt-0" />
+          </div>
         </div>
-        <InputField label="New Password" name="password" type="password" placeholder="Enter new password" value={userInfo.password || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
-        <Button className="btn-primary mb-3" type="submit">Save Changes</Button>
-      </form>
-    </Container>
+        <div className='row'>
+          <div className='col-12'>
+            {message && (
+              // <Alert variant={message.includes("Error") ? "danger" : "success"}>
+              <Alert variant="danger" >
+                {message}
+              </Alert>
+            )}
+          </div>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <Row>
+            <Col md={12} className='mb-3'>
+              <ImageUpload label="Profile Image" currentImageUrl={profileImageUrl} onImageUpload={handleProfileImageUpload} />
+            </Col>
+            <Col md={6}>
+              <InputField label="First Name" name="first_name" value={userInfo.first_name || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
+            </Col>
+            <Col md={6}>
+              <InputField label="Last Name" name="last_name" value={userInfo.last_name || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
+            </Col>
+            <Col md={6}>
+              <InputField label="Email" name="email" value={userInfo.email || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
+            </Col>
+            <Col md={6}>
+              <InputField label="Mobile Number" name="mobile_number" value={userInfo.mobile_number || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
+            </Col>
+            <Col md={6}>
+              <h5 className="form-sub-title">Select your Gender</h5>
+              <div className="gender-options mb-3">
+                <RadioButton label="Male" name="gender" value="Male" checked={userInfo.gender === "Male"} onChange={(e) => handleInputChange(e, setUserInfo)} />
+                <RadioButton label="Female" name="gender" value="Female" checked={userInfo.gender === "Female"} onChange={(e) => handleInputChange(e, setUserInfo)} />
+                <RadioButton label="Other" name="gender" value="Other" checked={userInfo.gender === "Other"} onChange={(e) => handleInputChange(e, setUserInfo)} />
+              </div>
+            </Col>
+            <Col md={6}>
+              <InputField label="New Password" name="password" type="password" placeholder="Enter new password" value={userInfo.password || ''} onChange={(e) => handleInputChange(e, setUserInfo)} />
+            </Col>
+            <Col md={12}><hr /></Col>
+          </Row>
+
+          <div className='row mt-3'>
+            <div className='col-12'>
+              <h4>Chef Information</h4>
+            </div>
+
+            <Col md={12} className='mb-3'>
+              <SpecialtyCuisinesOptions cuisines={chefInfo.specialty_cuisines} onCuisineChange={handleCuisineChange} />
+            </Col>
+            <Col md={12} className='mb-3'>
+              <TypeOfMealsOptions meals={chefInfo.type_of_meals} onMealChange={handleMealChange} />
+            </Col>
+            <Col md={6}>
+              <InputField label="Cooking Experience" name="cooking_experience" value={chefInfo.cooking_experience || ''} onChange={(e) => handleInputChange(e, setChefInfo)} />
+            </Col>
+            <Col md={6}>
+              <InputField label="Max Orders Per Day" name="max_orders_per_day" value={chefInfo.max_orders_per_day || ''} onChange={(e) => handleInputChange(e, setChefInfo)} />
+            </Col>
+            <Col md={12}>
+              <AvailabilityOptions selectedDays={chefInfo.preferred_working_days} onDayChange={handleWorkingDaysChange} />
+            </Col>
+
+            <Col md={12} className="mb-3">
+            <hr />
+            <Button variant='secondary' type="button" onClick={handleCancel}>Cancel</Button>
+            <Button variant='primary' className="mx-3" type="submit">Save Changes</Button>
+          </Col>
+          </div>
+        </form>
+      </Container>
+    </>
   );
 };
 

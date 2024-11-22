@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Table } from "react-bootstrap";
+import { Container, Row, Col, Table } from "react-bootstrap";
 import Button from "../../../Components/Button/Button";
 import ProductCard from "../../../Components/ProductCard/ProductCard";
 import { Card } from "react-bootstrap";
@@ -57,13 +57,13 @@ const Products = () => {
           }),
         });
         const { data, errors } = await response.json();
-  
+
         if (errors) {
           alert("Failed to delete product. Please try again.");
           console.error(errors);
           return;
         }
-  
+
         // Refresh product list
         fetchProducts();
         alert("Product deleted successfully!");
@@ -80,16 +80,21 @@ const Products = () => {
     }
   };
   return (
-    <Container fluid className="orders-page mt-5" >
-      <div className='row'>
-        <div className='col-12 d-flex justify-content-between'>
-          <div>
-            <h5>Menu</h5>
-            <p>Manage your menu listing</p>
-          </div>
-          <div>
-            <Button variant='secondary small' className="mb-3" onClick={() => navigate('/chef/product/add')}>Add Menu</Button>
-          </div>
+    <Container fluid className="orders-page mt-3 bt-1" >
+      <Row>
+        <Col>
+          <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
+            arrow_forward
+          </span><span>Menu Details</span>
+        </Col>
+      </Row>
+      <div className='row mt-5'>
+        <div className='col-12 col-md-6 align-content-center'>
+          <h5>Menu</h5>
+          <p>Manage your menu listing</p>
+        </div>
+        <div className='col-12 col-md-6 text-start text-md-end '>
+          <Button variant='secondary small' className="mb-3" onClick={() => navigate('/chef/product/add')}>Add Menu</Button>
         </div>
         <div className='col-12'>
           <hr className="mt-0" />
@@ -107,15 +112,15 @@ const Products = () => {
                 {/* <Card.Text>{product.description}</Card.Text> */}
 
                 {/* <Card.Text className="campus-name"><span class="material-icons">location_on</span> {campusName}</Card.Text> */}
-               
+
                 <div className="d-flex justify-content-between align-center">
                   <p className="price mb-0">${product.price}</p>
                   <p className="price mb-0">Qty: {product.quantity}</p>
                 </div>
                 <hr />
                 <div className='d-flex gap-2 justify-content-between'>
-                <Link className="btn-link  mb-3" to={`/chef/product/edit/${product.id}`}><span className='material-icons'>edit</span> Edit</Link>
-                <Link className="btn-link  mb-3" onClick={() => handleDelete(product.id)}><span className='material-icons'>delete_outline</span>Delete</Link>
+                  <Link className="btn-link  mb-3" to={`/chef/product/edit/${product.id}`}><span className='material-icons'>edit</span> Edit</Link>
+                  <Link className="btn-link  mb-3" onClick={() => handleDelete(product.id)}><span className='material-icons'>delete_outline</span>Delete</Link>
                 </div>
               </Card.Body>
             </Card>

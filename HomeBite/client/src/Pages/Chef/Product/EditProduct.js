@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col,Alert } from "react-bootstrap";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from "../../../Components/Button/Button";
 import InputField from '../../../Components/InputField/InputField';
@@ -93,7 +93,7 @@ const EditProduct = () => {
       return false;
     }
 
-   
+
 
     // Validate Dietary
     if (!product.dietary) {
@@ -106,11 +106,11 @@ const EditProduct = () => {
       setMessage('Please select if the product is available.');
       return false;
     }
-     // Validate Description
-     if (!product.description.trim()) {
-        setMessage('Description cannot be empty.');
-        return false;
-      }
+    // Validate Description
+    if (!product.description.trim()) {
+      setMessage('Description cannot be empty.');
+      return false;
+    }
 
     // Validate Image
     if (!product.image_url && !newImageUrl) {
@@ -161,22 +161,27 @@ const EditProduct = () => {
     }
   };
 
+  const handleCancel = () => {
+    navigate("/chef/products"); // Redirect to products.js
+  };
   return (
-    <Container fluid>
+    <Container fluid className="orders-page mt-3 bt-1">
       <Row>
         <Col>
-          <Link className="btn-link mb-3" to="/chef/products">Menu</Link>
-          <span className="material-icons">arrow_forward</span>
-          <span>Edit Menu</span>
+          <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
+            arrow_forward
+          </span>
+          <Link className="btn-link mb-3" to="/chef/products">Menu</Link><span className="material-icons">
+            arrow_forward
+          </span><span>Edit Menu</span>
         </Col>
-        <Col md={12} className='mt-5'><h5>Menu</h5><hr /></Col>
       </Row>
-    
-      <Row>
-        <Col md={3}>
+
+      <Row className='mt-5'>
+        <Col md={3} className='mb-3'>
           <Card>
             <Card className="product-card" key={product.id}>
-              {product.image_url &&  (
+              {product.image_url && (
                 <div className='mb-3'>
                   <label>Current Image</label><br />
                   <img src={product.image_url} alt="Product" style={{ width: '100px', height: '100px' }} />
@@ -201,7 +206,7 @@ const EditProduct = () => {
           </Card>
         </Col>
         <Col md={6} className="p-0">
-        {message && <Alert variant="danger">{message}</Alert>}
+          {message && <Alert variant="danger">{message}</Alert>}
           <form onSubmit={handleSubmit} className='row'>
             <Col md={12}>
               <InputField
@@ -268,8 +273,9 @@ const EditProduct = () => {
                 onChange={handleChange}
               />
             </Col>
-            <Col>
-              <Button className="btn btn-primary" type="submit">Update Product</Button>
+            <Col><hr />
+              <Button variant='secondary' type="button" onClick={handleCancel}>Cancel</Button>
+              <Button variant='primary' className="mx-3"  type="submit">Update Product</Button>
             </Col>
           </form>
         </Col>
