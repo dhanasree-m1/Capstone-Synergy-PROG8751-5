@@ -14,6 +14,9 @@ import CurrentOrders from "./Pages/Chef/CurrentOrders";
 import CompletedOrders from "./Pages/Chef/OrderCompleted";
 import Profile from "./Pages/Chef/ProfileView";
 import EditProfile from "./Pages/Chef/Profile";
+
+import RiderOrderCompleted from './Pages/Rider/RiderOrderCompleted';
+
 import "./App.scss";
 
 function App() {
@@ -37,6 +40,10 @@ function App() {
         <Route path="profile" element={<Profile />} />
         <Route path="profile/edit" element={<EditProfile />} />
       </Route>
+      {/* Rider routes */}
+<     Route path="/rider/orders/completed" element={<RiderOrderCompleted />} />
+      
+
       
     </Routes>
   );
