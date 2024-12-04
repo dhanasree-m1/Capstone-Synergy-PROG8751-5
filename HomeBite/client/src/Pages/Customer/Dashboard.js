@@ -7,16 +7,17 @@ import MainLayout from "../../Components/Layouts/MainLayout";
 import Carousel from "../../Components/Carousel/Carousel";
 import ChefCard from "../../Components/ChefCard/ChefCard";
 import ProductCard from "../../Components/ProductCard/ProductCard";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { campuses } from "../../Components/data/Campuses";
 import CartSummary from "../Customer/CartSummary";
 import Homebg from "../../assets/images/home-bg.jpeg";
 import "./Dashboard.scss";
+import { useNavigate } from 'react-router-dom';
 import Loader from "../../Components/Loader/Loader";
 
 export default function Dashboard() {
   const [selectedCampus, setSelectedCampus] = useState(null);
-
+  const navigate = useNavigate();
   const { loading, error, data } = useQuery(GET_CHEFS_AND_PRODUCTS, {
     variables: { campus: selectedCampus },
   });
@@ -271,18 +272,18 @@ export default function Dashboard() {
                       {selectedCampus || "all campuses"}
                     </p>
                   </div>
-                  <Button
+                  <a
                     className="btn-link"
                     onClick={() => setViewAllProducts(!viewAllProducts)}
                   >
                     {viewAllProducts ? "Show Less" : "View All"}
-                  </Button>
+                  </a>
                 </div>
                 <hr className="mt-0" />
                 <div className="row">
                   {data?.getAllProducts?.length > 0 ? (
                     data.getAllProducts.slice(0, viewAllProducts ? data.getAllProducts.length : 4).map((product) => (
-                      <div className="col-md-3">
+                      <div className="col-md-3" onClick={() => navigate(`/Customer/ProductDetails/${product.id}`)}>
                         <ProductCard
                           key={product.id}
                           product={product}
@@ -290,6 +291,7 @@ export default function Dashboard() {
                           addToCart={addToCart}
                           incrementQuantity={incrementQuantity}
                           decrementQuantity={decrementQuantity}
+                          
                         />
                       </div>
                     ))
@@ -324,8 +326,8 @@ export default function Dashboard() {
                     filteredChefs
                       .slice(0, viewAllChefs ? filteredChefs.length : 4)
                       .map((chef) => (
-                        <div className="col-md-3">
-                          <ChefCard key={chef.id} chef={chef} />
+                        <div className="col-md-3"  onClick={() => navigate(`/Customer/chefDetails/${chef.id}`)}>
+                          <ChefCard key={chef.id} chef={chef}/>
                         </div>
                       ))
                   ) : (

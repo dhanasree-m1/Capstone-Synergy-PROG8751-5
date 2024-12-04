@@ -237,12 +237,25 @@ const typeDefs = gql`
     is_available: String
   }
 
+  type ProductDetails {
+  id: ID!
+  chef_id:ID
+  name: String!
+  description: String
+  price: Float!
+  image_url: String
+  dietary: String
+  is_available: String
+  chef: Chef
+}
+
   type Query {
     getProductsByChef(chef_id: ID!): [Product]
   }
   type Query {
     getAllProducts(campus: String): [Product]
     getAllChefs: [Chef]
+    getProductById(id: ID!): ProductDetails
     getProduct(id: ID!): Product
   }
   type Mutation {
@@ -303,6 +316,19 @@ const typeDefs = gql`
   type Query {
     getUserProfile: UserProfile
   }
+    
+  type Mutation {
+  createCheckoutSession(orderInput: OrderInput!): CheckoutSessionResponse!
+}
+  input OrderInput {
+  products: [ProductInput!]!
+  successUrl: String!
+  cancelUrl: String!
+}
+  type CheckoutSessionResponse {
+  sessionId: String!
+  url: String!
+}
 `;
 
 export default typeDefs;

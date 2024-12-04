@@ -22,20 +22,48 @@ export default function CartSummary({
     0
   );
 
-  // Handle Checkout Logic
-  const handleCheckout = () => {
-    const userId = localStorage.getItem("user_id"); // Check if user is logged in
-    
-    if (!userId) {
-       
-      navigate("/Login"); // Redirect to login page if not logged in
-    } else {
-      // Proceed with the checkout process
-      console.log("Proceeding to checkout with cart:", cart);
-      // Add your checkout logic here
-    }
-  };
+// Handle Checkout Logic
+const handleCheckout = async () => {
+  const userId = localStorage.getItem("user_id"); // Check if user is logged in
 
+  if (!userId) {
+    navigate("/Login"); // Redirect to login page if not logged in
+    return;
+  }
+
+  try {
+    // Prepare cart items for the checkout session
+    const lineItems = cart.map((item) => ({
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+    }));
+
+    // Make a POST request to your backend to create a Stripe checkout session
+    const response = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        products: lineItems,
+        successUrl: "http://localhost:3000/success", // Replace with your success page URL
+        cancelUrl: "http://localhost:3000/cancel", // Replace with your cancel page URL
+      }),
+    });
+
+    const { url } = await response.json();
+
+    if (url) {
+      // Redirect to Stripe Checkout
+      window.location.href = url;
+    } else {
+      console.error("Error: Unable to create checkout session.");
+    }
+  } catch (error) {
+    console.error("Error during checkout:", error.message);
+  }
+};
 
   return (
     <Offcanvas show={show} onHide={handleClose} placement="end">

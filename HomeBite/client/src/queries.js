@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 // Mutation for creating a user
 export const CREATE_USER = gql`
@@ -127,7 +127,6 @@ export const CREATE_PAYMENT_INFO = gql`
   }
 `;
 
-
 export const GET_USER_PROFILE = gql`
   query GetUserProfile($userId: ID!) {
     getUserProfile(userId: $userId) {
@@ -136,7 +135,6 @@ export const GET_USER_PROFILE = gql`
       last_name
       email
       mobile_number
-      
     }
   }
 `;
@@ -167,9 +165,6 @@ export const GET_RIDER_PROFILE = gql`
   }
 `;
 
-
-
-
 export const UPDATE_CHEF = gql`
   mutation UpdateChef($input: ChefInput!) {
     updateChef(input: $input) {
@@ -178,8 +173,12 @@ export const UPDATE_CHEF = gql`
   }
 `;
 export const UPDATE_USER_PROFILES = gql`
-  mutation UpdateUserProfile($id: ID!,$userInput: UserInput!, $chefInput: ChefInput!) {
-    updateUserProfile(id: $id,userInput: $userInput, chefInput: $chefInput) {
+  mutation UpdateUserProfile(
+    $id: ID!
+    $userInput: UserInput!
+    $chefInput: ChefInput!
+  ) {
+    updateUserProfile(id: $id, userInput: $userInput, chefInput: $chefInput) {
       user {
         id
         first_name
@@ -198,7 +197,6 @@ export const UPDATE_USER_PROFILES = gql`
         postal_code
         country
         nearby_landmark
-
       }
       chef {
         specialty_cuisines
@@ -238,6 +236,63 @@ export const GET_CHEFS_AND_PRODUCTS = gql`
         id
         address_line_1
         address_line_2
+      }
+    }
+  }
+`;
+
+export const GET_PRODUCT_DETAILS = gql`
+  query GetProductDetails($id: ID!) {
+    getProductById(id: $id) {
+    id
+    chef_id
+      name
+      description
+      price
+      image_url
+      dietary
+      is_available
+      chef {
+        id
+        specialty_cuisines
+        type_of_meals
+        user {
+          first_name
+          last_name
+          address_line_1
+          address_line_2
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CHEF_DETAILS = gql`
+  query GetChefDetails($id: ID!) {
+    getChefById(id: $id) {
+      id
+        specialty_cuisines
+        type_of_meals
+        cooking_experience
+        max_orders_per_day
+        preferred_working_days
+      user {
+        first_name
+        last_name
+        profile_image
+        address_line_1
+      }
+      products {
+        id
+      chef_id
+      name
+      description
+      price
+      quantity
+      image_url
+      dietary
+      created_at
+      is_available
       }
     }
   }

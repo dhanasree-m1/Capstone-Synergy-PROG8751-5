@@ -1,11 +1,10 @@
-
 import { Route, Routes } from "react-router-dom";
 //import Home from "./Pages/Home/Home";
 import Login from "./Pages/Login/Login";
 import ForgotPassword from "./Pages/Login/ForgotPassword";
 import ResetPassword from "./Pages/Login/ResetPassword";
 import Dashboard from "./Pages/Customer/Dashboard";
-import Register from './Pages/Register/Register';
+import Register from "./Pages/Register/Register";
 import ChefDash from "./Pages/Chef/Dashboard";
 import Products from "./Pages/Chef/Product/Products";
 import AddProduct from "./Pages/Chef/Product/AddProduct";
@@ -14,19 +13,23 @@ import CurrentOrders from "./Pages/Chef/CurrentOrders";
 import CompletedOrders from "./Pages/Chef/OrderCompleted";
 import Profile from "./Pages/Chef/ProfileView";
 import EditProfile from "./Pages/Chef/Profile";
+import ProductDetails from "./Pages/Customer/ProductDetails";
+import ChefDetails from "./Pages/Customer/ChefDetails";
 import "./App.scss";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Dashboard />} />
+      <Route path="/Customer/ProductDetails/:productId" element={<ProductDetails />} />
+      <Route path="/Customer/ChefDetails//:chefId" element={<ChefDetails />} />
       {/* <Route path="/Home" element={<Home />} /> */}
       <Route path="/Login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-       {/* Chef routes */}
-       {/* Chef Dashboard Layout with Nested Routes */}
+      {/* Chef routes */}
+      {/* Chef Dashboard Layout with Nested Routes */}
       <Route path="/chef" element={<ChefDash />}>
         {/* <Route index element={<Dashboard />} /> This could be the main dashboard view */}
         <Route path="orders" element={<CurrentOrders />} />
@@ -37,7 +40,6 @@ function App() {
         <Route path="profile" element={<Profile />} />
         <Route path="profile/edit" element={<EditProfile />} />
       </Route>
-      
     </Routes>
   );
 }
