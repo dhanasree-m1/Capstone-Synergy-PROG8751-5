@@ -222,6 +222,18 @@ const resolvers = {
           
         };
       },
+      getCompletedOrdersRider: async (_, { rider_id }) => {
+        try {
+          const orders = await Order.find({ rider_id, status: "Completed" })
+            .populate("customer_id", "first_name last_name address_line_1 city province")
+            .populate("items.product_id", "name")
+            .populate("payment");
+          return orders;
+        } catch (error) {
+          console.error("Error fetching completed orders for rider:", error);
+          throw new Error("Failed to fetch completed orders.");
+        }
+      },
       
   },
 
