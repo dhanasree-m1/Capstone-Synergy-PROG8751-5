@@ -4,6 +4,7 @@ import "./ProductCard.scss";
 import defaultProductImage from "../../assets/images/product.jpg";
 import veg from "../../assets/images/veg.svg";
 import nonveg from "../../assets/images/non-veg.svg";
+import { useNavigate } from 'react-router-dom';
 
 export default function ProductCard({
   product,
@@ -22,6 +23,7 @@ export default function ProductCard({
   const campusName =
     product.user?.address_line_1 || "Campus information unavailable";
   const quantity = cart[product.id] || 0;
+  const navigate = useNavigate();
   return (
     <Card className="product-card mb-3">
       <Card.Img
@@ -45,6 +47,9 @@ export default function ProductCard({
 
         <Card.Text className="campus-name">
           <span className="material-icons">location_on</span> {campusName}
+        </Card.Text>
+        <Card.Text >
+        <a onClick={() => navigate(`/Customer/ProductDetails/${product.id}`)} >Product Details</a>
         </Card.Text>
         <hr />
         <div className="d-flex justify-content-between align-center">

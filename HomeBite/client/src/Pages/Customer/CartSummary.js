@@ -24,39 +24,65 @@ export default function CartSummary({
 
 // Handle Checkout Logic
 const handleCheckout = async () => {
-  const userId = localStorage.getItem("user_id"); // Check if user is logged in
+  const userId = localStorage.getItem("user_id"); // Get customer ID
 
   if (!userId) {
     navigate("/Login"); // Redirect to login page if not logged in
     return;
   }
 
+  if (!cart || cartItems.length === 0) {
+    console.error("Error: Cart is empty.");
+    return;
+  }
+
   try {
     // Prepare cart items for the checkout session
-    const lineItems = cart.map((item) => ({
+    const products = cartItems.map((item) => ({
+      id: item.id, // Pass product ID
       name: item.name,
-      price: item.price,
+      price: Math.round(item.price * 100), // Convert to cents for Stripe
       quantity: item.quantity,
     }));
 
-    // Make a POST request to your backend to create a Stripe checkout session
-    const response = await fetch("/api/create-checkout-session", {
+    // Get the chef_id dynamically from the first product in the cart
+    const chefId = cartItems[0]?.chef_id;
+
+    // Define GraphQL mutation
+    const mutation = `
+      mutation CreateCheckoutSession($orderInput: OrderInput!) {
+        createCheckoutSession(orderInput: $orderInput) {
+          sessionId
+          url
+        }
+      }
+    `;
+
+    // Make a POST request to the GraphQL endpoint
+    const response = await fetch("http://localhost:5000/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        products: lineItems,
-        successUrl: "http://localhost:3000/success", // Replace with your success page URL
-        cancelUrl: "http://localhost:3000/cancel", // Replace with your cancel page URL
+        query: mutation,
+        variables: {
+          orderInput: {
+            products,
+            successUrl: "http://localhost:3000/OrderDetails",
+            cancelUrl: "http://localhost:3000/",
+            customerId: userId,
+            chefId, // Pass the derived chef ID
+          },
+        },
       }),
     });
 
-    const { url } = await response.json();
+    const data = await response.json();
 
-    if (url) {
+    if (data?.data?.createCheckoutSession?.url) {
       // Redirect to Stripe Checkout
-      window.location.href = url;
+      window.location.href = data.data.createCheckoutSession.url;
     } else {
       console.error("Error: Unable to create checkout session.");
     }

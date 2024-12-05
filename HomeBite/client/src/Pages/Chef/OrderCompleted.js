@@ -154,7 +154,7 @@ const OrderCompleted = () => {
                         <div className="mb-2"><span class="badge rounded-pill text-bg-success"><span className="material-icons">check_circle</span> {order.payment.payment_method}</span></div>
                       </>
                     ) : (
-                      <span class="badge rounded-pill text-bg-warning">Payment information not available</span>
+                      <span className="badge rounded-pill text-bg-warning">Payment information not available</span>
                     )}
                   </div>
                 </div>

@@ -93,26 +93,26 @@ const ProfileView = () => {
                     {profileImageUrl && (
                       <img src={profileImageUrl} alt="Profile" className="img-fluid profile-img" style={{ maxWidth: "150px" }} />
                     )}
-                    <h5 class="mb-1 mt-3">{userInfo.first_name} {userInfo.last_name}</h5>
+                    <h5 className="mb-1 mt-3">{userInfo.first_name} {userInfo.last_name}</h5>
                   </div>
-                  <div class="col-md-8 mt-md-4 pb-3">
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="clearfix"></div>
-                        <p class="mb-0 text-muted"><span class="material-icons me-2">email</span>{userInfo.email}</p>
-                        <div class="clearfix"></div>
-                        <p class="mb-0 text-muted mt-3"><span class="material-icons me-2">call</span>{userInfo.mobile_number}</p>
-                        <div class="clearfix"></div>
-                        <p class="mb-0 text-muted mt-3"><span class="material-icons me-2">wc</span>{userInfo.gender}</p>
-                        <div class="clearfix"></div>
-                        <div class="d-flex text-muted  mt-3">
-                          <span class="material-icons me-2">map</span>
-                          <div class="flex-grow-1">
-                            <p class="mb-0 text-muted">{userInfo.address_line_1}</p>
-                            <p class="mb-0 text-muted">{userInfo.address_line_2}</p>
-                            <p class="mb-0 text-muted">{userInfo.city}</p>
-                            <p class="mb-0 text-muted">{userInfo.province}, {userInfo.country} - {userInfo.postal_code}</p>
-                            <p class="mb-0 text-muted mt-2">Nearby landmark - {userInfo.nearby_landmark}</p>
+                  <div className="col-md-8 mt-md-4 pb-3">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="clearfix"></div>
+                        <p className="mb-0 text-muted"><span className="material-icons me-2">email</span>{userInfo.email}</p>
+                        <div className="clearfix"></div>
+                        <p className="mb-0 text-muted mt-3"><span className="material-icons me-2">call</span>{userInfo.mobile_number}</p>
+                        <div className="clearfix"></div>
+                        <p className="mb-0 text-muted mt-3"><span className="material-icons me-2">wc</span>{userInfo.gender}</p>
+                        <div className="clearfix"></div>
+                        <div className="d-flex text-muted  mt-3">
+                          <span className="material-icons me-2">map</span>
+                          <div className="flex-grow-1">
+                            <p className="mb-0 text-muted">{userInfo.address_line_1}</p>
+                            <p className="mb-0 text-muted">{userInfo.address_line_2}</p>
+                            <p className="mb-0 text-muted">{userInfo.city}</p>
+                            <p className="mb-0 text-muted">{userInfo.province}, {userInfo.country} - {userInfo.postal_code}</p>
+                            <p className="mb-0 text-muted mt-2">Nearby landmark - {userInfo.nearby_landmark}</p>
                           </div>
                         </div>
                       </div>

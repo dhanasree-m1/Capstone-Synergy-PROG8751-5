@@ -149,16 +149,16 @@ const CurrentOrders = () => {
               <div className="card-body">
                 <div className="row">
                   <div className="col-md-6">
-                    <h5 class="card-title">{order.customer_id.first_name} {order.customer_id.last_name}</h5>
+                    <h5 className="card-title">{order.customer_id.first_name} {order.customer_id.last_name}</h5>
                   </div>
                   <div className="col-md-6 text-end mb-3">
-                    <span class="badge rounded-pill text-bg-light text-wrap"><span className="material-icons link-color me-2">location_on</span>Delivery Address: {order.customer_id.address_line_1}, {order.customer_id.city}, {order.customer_id.province}</span>
+                    <span className="badge rounded-pill text-bg-light text-wrap"><span className="material-icons link-color me-2">location_on</span>Delivery Address: {order.customer_id.address_line_1}, {order.customer_id.city}, {order.customer_id.province}</span>
                   </div>
                   <div className="col-md-12 text-muted small">Order No :# {order.order_no}</div>
                   <div className="col-md-12 mb-3">
                     {order.items && order.items.length > 0 ? (
                       order.items.map((item, index) => (
-                        <span class="badge rounded-pill text-bg-light me-3" key={index}>
+                        <span className="badge rounded-pill text-bg-light me-3" key={index}>
                           {item.product_id ? item.product_id.name : "Product not available"} x {item.quantity}
                         </span>
                       ))
@@ -174,7 +174,7 @@ const CurrentOrders = () => {
                         <div className="mb-2"><span class="badge rounded-pill text-bg-success"><span className="material-icons">check_circle</span> {order.payment.payment_method}</span></div>
                       </>
                     ) : (
-                      <span class="badge rounded-pill text-bg-warning">Payment information not available</span>
+                      <span className="badge rounded-pill text-bg-warning">Payment information not available</span>
                     )}
                   </div>
                   <div className="col-lg-6 text-lg-end">
@@ -194,7 +194,7 @@ const CurrentOrders = () => {
                         </Button>
                       </>
                     ) : (
-                      <span class="badge rounded-pill text-bg-light"> {order.status}</span>
+                      <span className="badge rounded-pill text-bg-light"> {order.status}</span>
                     )}
 
                   </div>

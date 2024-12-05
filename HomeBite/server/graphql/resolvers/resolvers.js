@@ -14,13 +14,12 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import Stripe from "stripe";
+import Stripe from 'stripe';
 import mongoose from "mongoose";
+import dotenv from 'dotenv';
+dotenv.config();
 
-
-const stripe = new Stripe(
-  "sk_test_51QR0TwP2Bo6WMaMr1l49G4NkNnCt71qxuZm4QBrarAvxF9X53PfTIr2lJtjtZja6bFMW9axt4UHz4yv8n4jHBvI3008mm7HOmu"
-);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 console.log("Stripe Secret Key:", stripe);
 // import { sendResetEmail } from "../utils/emailService.js";
 // Define the generateToken function
@@ -489,19 +488,19 @@ const resolvers = {
     },
     async createCheckoutSession(_, { orderInput }) {
       try {
-        const { products, successUrl, cancelUrl } = orderInput;
-
-        // Dynamically build line items from product list
+        const { products, successUrl, cancelUrl, customerId, chefId } = orderInput;
+    
+        // Build line items for Stripe
         const lineItems = products.map((product) => ({
           price_data: {
             currency: 'usd',
             product_data: { name: product.name },
-            unit_amount: product.price * 100, // Stripe expects amounts in cents
+            unit_amount: product.price, // Stripe expects amount in cents
           },
           quantity: product.quantity,
         }));
-
-        // Create a Stripe Checkout Session
+    
+        // Create Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
           mode: 'payment',
@@ -509,17 +508,36 @@ const resolvers = {
           success_url: successUrl,
           cancel_url: cancelUrl,
         });
-
+    
+        // Save a pending order in the database
+        const order = new Order({
+          order_no: Math.floor(1000 + Math.random() * 9000), // Generate random order number
+          customer_id: customerId,
+          chef_id: chefId,
+          total_amount: products.reduce((total, p) => total + p.price * p.quantity, 0) / 100,
+          status: 'Pending', // Initial status
+        });
+        const savedOrder = await order.save();
+    
+        // Save order items
+        const orderItems = products.map((product) => ({
+          order_id: savedOrder._id,
+          product_id: product.id,
+          quantity: product.quantity,
+          unit_price: product.price / 100, // Convert back to dollars
+        }));
+        await OrderItem.insertMany(orderItems);
+    
         return {
-          sessionId: session.id, // Return session ID to the client
-          url: session.url, // Optional: Redirect user to this URL for payment
+          sessionId: session.id,
+          url: session.url,
         };
       } catch (error) {
         console.error('Stripe Checkout Error:', error.message);
         throw new Error('Failed to create checkout session');
       }
     },
-
+    
     updateUserProfile: async (_, { id, userInput, chefInput }) => {
       if (!id) {
         throw new Error("User not authenticated");

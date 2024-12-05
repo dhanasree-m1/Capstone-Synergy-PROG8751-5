@@ -228,6 +228,7 @@ const typeDefs = gql`
   }
 
   input ProductInput {
+    id: ID!
     name: String!
     description: String
     price: Float!
@@ -320,11 +321,15 @@ const typeDefs = gql`
   type Mutation {
   createCheckoutSession(orderInput: OrderInput!): CheckoutSessionResponse!
 }
-  input OrderInput {
+
+input OrderInput {
   products: [ProductInput!]!
   successUrl: String!
   cancelUrl: String!
+  customerId: ID!
+  chefId: ID
 }
+
   type CheckoutSessionResponse {
   sessionId: String!
   url: String!

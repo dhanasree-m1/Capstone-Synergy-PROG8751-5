@@ -165,7 +165,7 @@ export default function Dashboard() {
                                 }`}
                                 onClick={handleResetCampus}
                               >
-                                <span class="material-icons">close</span>
+                                <span className="material-icons">close</span>
                               </Button>
                             </Dropdown>
                           </Form.Group>
@@ -283,7 +283,7 @@ export default function Dashboard() {
                 <div className="row">
                   {data?.getAllProducts?.length > 0 ? (
                     data.getAllProducts.slice(0, viewAllProducts ? data.getAllProducts.length : 4).map((product) => (
-                      <div className="col-md-3" onClick={() => navigate(`/Customer/ProductDetails/${product.id}`)}>
+                      <div className="col-md-3">
                         <ProductCard
                           key={product.id}
                           product={product}
@@ -326,7 +326,7 @@ export default function Dashboard() {
                     filteredChefs
                       .slice(0, viewAllChefs ? filteredChefs.length : 4)
                       .map((chef) => (
-                        <div className="col-md-3"  onClick={() => navigate(`/Customer/chefDetails/${chef.id}`)}>
+                        <div className="col-md-3">
                           <ChefCard key={chef.id} chef={chef}/>
                         </div>
                       ))

@@ -29,7 +29,7 @@ mongoose.connect('mongodb+srv://HomeBite:Homebite123@homebite.1dasn.mongodb.net/
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverSelectionTimeoutMS: 10000, // Adjust the timeout duration
-  socketTimeoutMS: 45000
+  socketTimeoutMS: 45000,
 })
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
@@ -84,3 +84,35 @@ app.listen(PORT, () => {
 });
 }
 startApolloServer();
+
+app.post(
+  '/webhook',
+  bodyParser.raw({ type: 'application/json' }),
+  async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+
+    try {
+      const event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_SECRET_KEY
+      );
+
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+
+        // Update order status to "In Progress" or "Completed"
+        const order = await Order.findOne({ order_no: session.client_reference_id });
+        if (order) {
+          order.status = 'In Progress'; // Update as needed
+          await order.save();
+        }
+      }
+
+      res.json({ received: true });
+    } catch (err) {
+      console.error('Webhook Error:', err.message);
+      res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+  }
+);
