@@ -112,7 +112,7 @@ const OrderCompleted = () => {
         <h2>Orders</h2>
         <div className="tab-selector">
           <Link to="/chef/orders" className="tab ">Current Orders</Link>
-          <Link to="/chef/orders/Completed" className="tab active">Order Completed</Link>
+          <Link to="/chef/orders/completed" className="tab active">Order Completed</Link>
         </div>
       </div>
       <div className="col-12">

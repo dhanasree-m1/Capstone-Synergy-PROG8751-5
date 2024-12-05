@@ -194,6 +194,8 @@ const typeDefs = gql`
     getChef(id: ID!): Chef
     getCurrentOrders(chef_id: ID!): [Order]
     getCompletedOrders(chef_id: ID!): [Order]
+    getCurrentOrdersRider(rider_id: ID!): [Order]
+    getInprogressOrdersRider(rider_id: ID!): [Order]
     getCompletedOrdersRider(rider_id: ID!): [Order]
     isEmailUnique(email: String!): Boolean!
   }

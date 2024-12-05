@@ -68,10 +68,19 @@ const Login = () => {
         localStorage.setItem("user_id", result.data.login.user.id);
         localStorage.setItem("uname", result.data.login.user.first_name);
         localStorage.setItem("urole", result.data.login.user.role);
+        const urole = localStorage.getItem("urole");
         //console.log(result.data.login.token)
         //console.log(result.data.login.user.id)
         //console.log(localStorage.getItem("user_id"))
-        navigate("/chef/orders");
+        console.log("urole:",urole);
+        if(urole.includes("chef")){
+          navigate("/chef/orders");
+
+        }else{
+          navigate("/rider/orders");
+
+        }
+        
       }
     } catch (error) {
       setMessage("Error logging in");

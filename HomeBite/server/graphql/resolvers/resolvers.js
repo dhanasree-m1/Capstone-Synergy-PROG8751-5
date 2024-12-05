@@ -222,16 +222,123 @@ const resolvers = {
           
         };
       },
+      getCurrentOrdersRider: async (_, { rider_id }) => {
+        
+        try {
+          // Fetch all orders with status not equal to "Completed"
+          const orders = await Order.find({ status: { $ne: 'Completed' },rider_id: rider_id })
+            .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
+            .populate('chef_id', 'specialty_cuisines type_of_meals')
+            .populate('rider_id', 'vehicle_type vehicle_registration_number')
+            .lean();
+          // For each order, find the associated OrderItems
+          const ordersWithDetails = await Promise.all(
+            orders.map(async (order) => {
+              // Fetch OrderItems for the current order
+              const items = await OrderItem.find({ order_id: order._id })
+              .populate({
+                path: 'product_id',
+                select: 'name'
+              }).lean();
+      
+              // Fetch Payment for the current order
+              const payment = await Payment.findOne({ order_id: order._id }).lean();
+      
+              // Return the order with populated items and payment details
+              return {
+                ...order,
+                items,   // Attach items array to the order
+                payment, // Attach payment details to the order
+              };
+            })
+          );
+          console.log("Current Order with items Rider:")
+          console.log(ordersWithDetails);
+          return ordersWithDetails;
+         
+         
+        } catch (error) {
+          console.error("Error fetching current orders:", error);
+          throw new Error("Failed to fetch current orders.");
+        }
+      },
+      getInprogressOrdersRider: async (_, { rider_id }) => {
+        
+        try {
+          // Fetch all orders with status not equal to "Completed"
+          const orders = await Order.find({ status:  'In-Progress' ,rider_id: rider_id })
+            .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
+            .populate('chef_id', 'specialty_cuisines type_of_meals')
+            .populate('rider_id', 'vehicle_type vehicle_registration_number')
+            .lean();
+          // For each order, find the associated OrderItems
+          const ordersWithDetails = await Promise.all(
+            orders.map(async (order) => {
+              // Fetch OrderItems for the current order
+              const items = await OrderItem.find({ order_id: order._id })
+              .populate({
+                path: 'product_id',
+                select: 'name'
+              }).lean();
+      
+              // Fetch Payment for the current order
+              const payment = await Payment.findOne({ order_id: order._id }).lean();
+      
+              // Return the order with populated items and payment details
+              return {
+                ...order,
+                items,   // Attach items array to the order
+                payment, // Attach payment details to the order
+              };
+            })
+          );
+          console.log("Current Order with items Rider:")
+          console.log(ordersWithDetails);
+          return ordersWithDetails;
+         
+         
+        } catch (error) {
+          console.error("Error fetching current orders:", error);
+          throw new Error("Failed to fetch current orders.");
+        }
+      },
       getCompletedOrdersRider: async (_, { rider_id }) => {
         try {
-          const orders = await Order.find({ rider_id, status: "Completed" })
-            .populate("customer_id", "first_name last_name address_line_1 city province")
-            .populate("items.product_id", "name")
-            .populate("payment");
-          return orders;
+          // Fetch all orders with status not equal to "Completed"
+          const orders = await Order.find({ status: "Completed",rider_id: rider_id })
+            .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
+            .populate('chef_id', 'specialty_cuisines type_of_meals')
+            .populate('rider_id', 'vehicle_type vehicle_registration_number')
+            .lean();
+          // For each order, find the associated OrderItems
+          const ordersWithDetails = await Promise.all(
+            orders.map(async (order) => {
+              // Fetch OrderItems for the current order
+              const items = await OrderItem.find({ order_id: order._id })
+              .populate({
+                path: 'product_id',
+                select: 'name'
+              }).lean();
+      
+              // Fetch Payment for the current order
+              const payment = await Payment.findOne({ order_id: order._id }).lean();
+      
+              // Return the order with populated items and payment details
+              return {
+                ...order,
+                items,   // Attach items array to the order
+                payment, // Attach payment details to the order
+              };
+            })
+          );
+          console.log("Completed Order with items Rider:")
+          console.log(ordersWithDetails);
+          return ordersWithDetails;
+         
+         
         } catch (error) {
-          console.error("Error fetching completed orders for rider:", error);
-          throw new Error("Failed to fetch completed orders.");
+          console.error("Error fetching current orders:", error);
+          throw new Error("Failed to fetch current orders.");
         }
       },
       
