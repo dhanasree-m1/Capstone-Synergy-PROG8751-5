@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const ProfileView = () => {
   const [userInfo, setUserInfo] = useState({});
-  const [chefInfo, setChefInfo] = useState({});
+  const [RiderInfo, setRiderInfo] = useState({});
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const location = useLocation();
   const successMessage = location.state?.successMessage;  
@@ -24,15 +24,18 @@ const ProfileView = () => {
       body: JSON.stringify({
         query: `
           query {
-            getUserProfile {
+            getUserProfileRider {
               user {
                 first_name last_name email mobile_number gender
                 address_line_1 address_line_2 city province postal_code
                 country nearby_landmark role profile_image
               }
-              chef {
-                specialty_cuisines type_of_meals cooking_experience
-                max_orders_per_day preferred_working_days
+              rider {
+               vehicle_type vehicle_registration_number vehicle_insurance_number
+                insurance_expiry_date driver_license_number license_expiry_date
+                preferred_delivery_radius preferred_working_days preferred_start_time
+                preferred_end_time long_distance_preference
+              
               }
             }
           }
@@ -41,11 +44,11 @@ const ProfileView = () => {
     });
 
     const data = await response.json();
-    const { user, chef } = data.data.getUserProfile;
+    const { user, rider } = data.data.getUserProfileRider;
 
     setUserInfo(user || {});
     setProfileImageUrl(user?.profile_image);
-    setChefInfo(chef || {});
+    setRiderInfo(rider || {});
   };
 
   useEffect(() => {
@@ -66,7 +69,7 @@ const ProfileView = () => {
         </Row>
         <Row>
           <Col>
-            <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
+            <Link className="btn-link  mb-3" to="/rider/orders">Dashboard</Link><span className="material-icons">
               arrow_forward
             </span><span>Profile Details</span>
           </Col>
@@ -76,7 +79,7 @@ const ProfileView = () => {
             <h5>Profile Details</h5>
           </div>
           <div className='col-12 col-md-6 text-start text-md-end '>
-            <Button variant='secondary' className='small' onClick={() => navigate('/chef/profile/edit')} >Edit</Button>
+            <Button variant='secondary' className='small' onClick={() => navigate('/rider/profile/edit')} >Edit</Button>
           </div>
           <div className='col-12 pt-3'>
             <hr className="mt-0" />
@@ -126,24 +129,47 @@ const ProfileView = () => {
           <div className='col-12 mt-5'>
             <div className='card'>
               <div className='card-body'>
-                <h5 class="card-title">Chef Information</h5>
+                <h5 class="card-title">Rider Information</h5>
                 <hr />
                 <div className='row'>
 
 
-                  {chefInfo && (
+                  {RiderInfo && (
                     <>
                       <div className='col-md-4'>
-                        <p><small>Specialty Cuisines</small><br /> {chefInfo.specialty_cuisines?.join(', ')}</p>
-                      </div><div className='col-md-4'>
-                        <p><small>Type of Meals</small><br /> {chefInfo.type_of_meals?.join(', ')}</p>
-                      </div><div className='col-md-4'>
-                        <p><small>Cooking Experience</small><br /> {chefInfo.cooking_experience}</p>
-                      </div><div className='col-md-4'>
-                        <p><small>Max Orders Per Day</small><br /> {chefInfo.max_orders_per_day}</p>
-                      </div><div className='col-md-4'>
-                        <p><small>Preferred Working Days</small><br /> {chefInfo.preferred_working_days?.join(', ')}</p>
-                      </div>
+    <p><small>Vehicle Type</small><br /> {RiderInfo.vehicle_type}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>Vehicle Registration Number</small><br /> {RiderInfo.vehicle_registration_number}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>Vehicle Insurance Number</small><br /> {RiderInfo.vehicle_insurance_number}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>Insurance Expiry Date</small><br /> {RiderInfo.insurance_expiry_date}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>Driver License Number</small><br /> {RiderInfo.driver_license_number}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>License Expiry Date</small><br /> {RiderInfo.license_expiry_date}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>Preferred Delivery Radius</small><br /> {RiderInfo.preferred_delivery_radius}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>Preferred Working Days</small><br /> {RiderInfo.preferred_working_days?.join(', ')}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>Preferred Start Time</small><br /> {RiderInfo.preferred_start_time}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>Preferred End Time</small><br /> {RiderInfo.preferred_end_time}</p>
+</div>
+<div className='col-md-4'>
+    <p><small>Long Distance Preference</small><br /> {RiderInfo.long_distance_preference}</p>
+</div>
+
                     </>
                   )}
 

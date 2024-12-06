@@ -182,7 +182,7 @@ const Profile = () => {
           chefInput: chefData,
         },
       });
-      navigate("/chef/profile", { state: { successMessage: "Profile updated successfully!" } });
+      navigate("/rider/profile", { state: { successMessage: "Profile updated successfully!" } });
       setMessage("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -190,7 +190,7 @@ const Profile = () => {
     }
   };
   const handleCancel = () => {
-    navigate("/chef/profile"); // Redirect to ProfileView.js
+    navigate("/rider/profile"); // Redirect to ProfileView.js
   };
 
   return (
@@ -198,10 +198,10 @@ const Profile = () => {
       <Container fluid className="orders-page mt-3 bt-1">
         <Row>
           <Col>
-            <Link className="btn-link  mb-3" to="/chef/orders">Dashboard</Link><span className="material-icons">
+            <Link className="btn-link  mb-3" to="/rider/orders">Dashboard</Link><span className="material-icons">
               arrow_forward
             </span>
-            <Link className="btn-link  mb-3" to="/chef/profile">Profile Details</Link><span className="material-icons">
+            <Link className="btn-link  mb-3" to="/rider/profile">Profile Details</Link><span className="material-icons">
               arrow_forward
             </span><span>Edit Details</span>
           </Col>

@@ -1,6 +1,7 @@
 // resolvers.js
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { MongoClient, ObjectId } from 'mongodb';
 import { User } from '../../src/models/users.js';
 import  {Rider} from '../../src/models/riders.js';
 import { Chef } from '../../src/models/chefs.js';
@@ -222,11 +223,26 @@ const resolvers = {
           
         };
       },
-      getCurrentOrdersRider: async (_, { rider_id }) => {
+      getUserProfileRider: async (_, __, { user }) => {
+      
+
+        // Fetch user, chef, and rider details based on authenticated user ID
+        const userProfile = await User.findById(user.id);
+        const riderProfile = await Rider.findOne({ user_id: user.id });
+        
+        console.log("userprofile : ",userProfile)
+  
+        return {
+          user: userProfile,
+          rider: riderProfile,
+          
+        };
+      },
+      getCurrentOrdersRider: async (_, __, { user }) => {
         
         try {
           // Fetch all orders with status not equal to "Completed"
-          const orders = await Order.find({ status: { $ne: 'Completed' },rider_id: rider_id })
+          const orders = await Order.find({ status: "Waiting Pickup" })
             .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
             .populate('chef_id', 'specialty_cuisines type_of_meals')
             .populate('rider_id', 'vehicle_type vehicle_registration_number')
@@ -265,7 +281,7 @@ const resolvers = {
       getInprogressOrdersRider: async (_, { rider_id }) => {
         
         try {
-          // Fetch all orders with status not equal to "Completed"
+          // Fetch all orders with status  equal to "InProgress"
           const orders = await Order.find({ status:  'In-Progress' ,rider_id: rider_id })
             .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
             .populate('chef_id', 'specialty_cuisines type_of_meals')
@@ -341,6 +357,94 @@ const resolvers = {
           throw new Error("Failed to fetch current orders.");
         }
       },
+      getChefStats: async (_, { chef_id }) => {
+        try {
+            const now = new Date();
+            const startOfDayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    
+            // Fetch all orders for the chef
+            const orders = await Order.find({ chef_id });
+    
+            // Initialize stats
+            let totalOrders = 0;
+            let todaysOrders = 0;
+            let totalEarnings = 0;
+            let todaysEarnings = 0;
+    
+            orders.forEach((order) => {
+                // Increment total orders
+                totalOrders++;
+    
+                // Add to total earnings
+                totalEarnings += order.total_amount;
+    
+                // Check if the order is from today (use UTC comparison)
+                const orderDate = new Date(order.created_at);
+                if (orderDate >= startOfDayUTC && orderDate < new Date(startOfDayUTC.getTime() + 24 * 60 * 60 * 1000)) {
+                    todaysOrders++;
+                    todaysEarnings += order.total_amount;
+                }
+            });
+    console.log("totalOrders:",totalOrders)
+    console.log("todaysOrders:",todaysOrders)
+    console.log("totalEarnings:",totalEarnings)
+    console.log("todaysEarnings:",todaysEarnings)
+            return {
+                totalOrders: totalOrders, // Return as integer
+                todaysOrders: todaysOrders, // Return as integer
+                totalEarnings: totalEarnings.toFixed(2), // Fixed decimal
+                todaysEarnings: todaysEarnings.toFixed(2), // Fixed decimal
+            };
+        } catch (error) {
+            console.error("Error fetching chef stats:", error);
+            throw new Error("Failed to fetch chef stats.");
+        }
+    },
+    getRiderStats: async (_, { rider_id }) => {
+      try {
+          const now = new Date();
+          const startOfDayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  
+          // Fetch all orders for the chef
+          const orders = await Order.find({ rider_id });
+  
+          // Initialize stats
+          let totalOrders = 0;
+          let todaysOrders = 0;
+          let totalEarnings = 0;
+          let todaysEarnings = 0;
+  
+          orders.forEach((order) => {
+              // Increment total orders
+              totalOrders++;
+  
+              // Add to total earnings
+              totalEarnings += order.total_amount;
+  
+              // Check if the order is from today (use UTC comparison)
+              const orderDate = new Date(order.created_at);
+              if (orderDate >= startOfDayUTC && orderDate < new Date(startOfDayUTC.getTime() + 24 * 60 * 60 * 1000)) {
+                  todaysOrders++;
+                  todaysEarnings += order.total_amount;
+              }
+          });
+  console.log("totalOrders:",totalOrders)
+  console.log("todaysOrders:",todaysOrders)
+  console.log("totalEarnings:",totalEarnings)
+  console.log("todaysEarnings:",todaysEarnings)
+          return {
+              totalOrders: totalOrders, // Return as integer
+              todaysOrders: todaysOrders, // Return as integer
+              totalEarnings: totalEarnings.toFixed(2), // Fixed decimal
+              todaysEarnings: todaysEarnings.toFixed(2), // Fixed decimal
+          };
+      } catch (error) {
+          console.error("Error fetching chef stats:", error);
+          throw new Error("Failed to fetch chef stats.");
+      }
+  },
+    
+      
       
   },
 
@@ -466,6 +570,8 @@ const resolvers = {
         user, // include user data to populate the non-nullable field
       };
     },
+    
+    
     updateUser: async (_, { id, input }) => {
       return await User.findByIdAndUpdate(id, input, { new: true });
     },
@@ -483,6 +589,22 @@ const resolvers = {
           throw new Error("Order not found");
         }
         order.status = status;
+        await order.save();
+        return { success: true, message: "Order status updated successfully" };
+      } catch (error) {
+        console.error("Error updating order status:", error);
+        return { success: false, message: "Failed to update order status" };
+      }
+    },
+    updateOrderStatusRider: async (_, { orderId, status,rider_id }) => {
+      try {
+        const order = await Order.findById(orderId);
+        if (!order) {
+          throw new Error("Order not found");
+        }
+        console.log("rider id order update:",rider_id)
+        order.status = status;
+        order.rider_id = new ObjectId(rider_id)
         await order.save();
         return { success: true, message: "Order status updated successfully" };
       } catch (error) {
