@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col,Alert } from "react-bootstrap";
+import { Container, Row, Col, Alert } from "react-bootstrap";
 import Button from "../../Components/Button/Button";
-import { Link,useLocation } from 'react-router-dom';
-
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const ProfileView = () => {
   const [userInfo, setUserInfo] = useState({});
   const [RiderInfo, setRiderInfo] = useState({});
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const location = useLocation();
-  const successMessage = location.state?.successMessage;  
+  const successMessage = location.state?.successMessage;
   const navigate = useNavigate();
 
   const fetchData = async () => {
@@ -31,11 +29,10 @@ const ProfileView = () => {
                 country nearby_landmark role profile_image
               }
               rider {
-               vehicle_type vehicle_registration_number vehicle_insurance_number
+                vehicle_type vehicle_registration_number vehicle_insurance_number
                 insurance_expiry_date driver_license_number license_expiry_date
                 preferred_delivery_radius preferred_working_days preferred_start_time
                 preferred_end_time long_distance_preference
-              
               }
             }
           }
@@ -48,6 +45,11 @@ const ProfileView = () => {
 
     setUserInfo(user || {});
     setProfileImageUrl(user?.profile_image);
+    // Convert timestamps to readable dates
+    if (rider) {
+      rider.insurance_expiry_date = convertToReadableDate(rider.insurance_expiry_date);
+      rider.license_expiry_date = convertToReadableDate(rider.license_expiry_date);
+    }
     setRiderInfo(rider || {});
   };
 
@@ -55,10 +57,21 @@ const ProfileView = () => {
     fetchData();
   }, []);
 
+  // Helper function to convert timestamp to readable date
+  const convertToReadableDate = (timestamp) => {
+    if (!timestamp) return "N/A";
+    const date = new Date(parseInt(timestamp, 10));
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <>
       <Container fluid className="orders-page mt-3 bt-1">
-      <Row>
+        <Row>
           {successMessage && (
             <Col md={12}>
               <Alert variant="success" className="my-3">
@@ -69,7 +82,7 @@ const ProfileView = () => {
         </Row>
         <Row>
           <Col>
-            <Link className="btn-link  mb-3" to="/rider/orders">Dashboard</Link><span className="material-icons">
+            <Link className="btn-link mb-3" to="/rider/orders">Dashboard</Link><span className="material-icons">
               arrow_forward
             </span><span>Profile Details</span>
           </Col>
@@ -96,30 +109,24 @@ const ProfileView = () => {
                     {profileImageUrl && (
                       <img src={profileImageUrl} alt="Profile" className="img-fluid profile-img" style={{ maxWidth: "150px" }} />
                     )}
-                    <h5 class="mb-1 mt-3">{userInfo.first_name} {userInfo.last_name}</h5>
+                    <h5 className="mb-1 mt-3">{userInfo.first_name} {userInfo.last_name}</h5>
                   </div>
-                  <div class="col-md-8 mt-md-4 pb-3">
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="clearfix"></div>
-                        <p class="mb-0 text-muted"><span class="material-icons me-2">email</span>{userInfo.email}</p>
-                        <div class="clearfix"></div>
-                        <p class="mb-0 text-muted mt-3"><span class="material-icons me-2">call</span>{userInfo.mobile_number}</p>
-                        <div class="clearfix"></div>
-                        <p class="mb-0 text-muted mt-3"><span class="material-icons me-2">wc</span>{userInfo.gender}</p>
-                        <div class="clearfix"></div>
-                        <div class="d-flex text-muted  mt-3">
-                          <span class="material-icons me-2">map</span>
-                          <div class="flex-grow-1">
-                            <p class="mb-0 text-muted">{userInfo.address_line_1}</p>
-                            <p class="mb-0 text-muted">{userInfo.address_line_2}</p>
-                            <p class="mb-0 text-muted">{userInfo.city}</p>
-                            <p class="mb-0 text-muted">{userInfo.province}, {userInfo.country} - {userInfo.postal_code}</p>
-                            <p class="mb-0 text-muted mt-2">Nearby landmark - {userInfo.nearby_landmark}</p>
+                  <div className="col-md-8 mt-md-4 pb-3">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <p className="mb-0 text-muted"><span className="material-icons me-2">email</span>{userInfo.email}</p>
+                        <p className="mb-0 text-muted mt-3"><span className="material-icons me-2">call</span>{userInfo.mobile_number}</p>
+                        <p className="mb-0 text-muted mt-3"><span className="material-icons me-2">wc</span>{userInfo.gender}</p>
+                        <div className="d-flex text-muted mt-3">
+                          <span className="material-icons me-2">map</span>
+                          <div className="flex-grow-1">
+                            <p className="mb-0 text-muted">{userInfo.address_line_1}</p>
+                            <p className="mb-0 text-muted">{userInfo.city}</p>
+                            <p className="mb-0 text-muted">{userInfo.province}, {userInfo.country} - {userInfo.postal_code}</p>
+                            <p className="mb-0 text-muted mt-2">Nearby landmark - {userInfo.nearby_landmark}</p>
                           </div>
                         </div>
                       </div>
-
                     </div>
                   </div>
                 </div>
@@ -129,51 +136,46 @@ const ProfileView = () => {
           <div className='col-12 mt-5'>
             <div className='card'>
               <div className='card-body'>
-                <h5 class="card-title">Rider Information</h5>
+                <h5 className="card-title">Rider Information</h5>
                 <hr />
                 <div className='row'>
-
-
                   {RiderInfo && (
                     <>
                       <div className='col-md-4'>
-    <p><small>Vehicle Type</small><br /> {RiderInfo.vehicle_type}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>Vehicle Registration Number</small><br /> {RiderInfo.vehicle_registration_number}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>Vehicle Insurance Number</small><br /> {RiderInfo.vehicle_insurance_number}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>Insurance Expiry Date</small><br /> {RiderInfo.insurance_expiry_date}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>Driver License Number</small><br /> {RiderInfo.driver_license_number}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>License Expiry Date</small><br /> {RiderInfo.license_expiry_date}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>Preferred Delivery Radius</small><br /> {RiderInfo.preferred_delivery_radius}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>Preferred Working Days</small><br /> {RiderInfo.preferred_working_days?.join(', ')}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>Preferred Start Time</small><br /> {RiderInfo.preferred_start_time}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>Preferred End Time</small><br /> {RiderInfo.preferred_end_time}</p>
-</div>
-<div className='col-md-4'>
-    <p><small>Long Distance Preference</small><br /> {RiderInfo.long_distance_preference}</p>
-</div>
-
+                        <p><small>Vehicle Type</small><br /> {RiderInfo.vehicle_type}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>Vehicle Registration Number</small><br /> {RiderInfo.vehicle_registration_number}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>Vehicle Insurance Number</small><br /> {RiderInfo.vehicle_insurance_number}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>Insurance Expiry Date</small><br /> {RiderInfo.insurance_expiry_date}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>Driver License Number</small><br /> {RiderInfo.driver_license_number}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>License Expiry Date</small><br /> {RiderInfo.license_expiry_date}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>Preferred Delivery Radius</small><br /> {RiderInfo.preferred_delivery_radius}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>Preferred Working Days</small><br /> {RiderInfo.preferred_working_days?.join(', ')}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>Preferred Start Time</small><br /> {RiderInfo.preferred_start_time}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>Preferred End Time</small><br /> {RiderInfo.preferred_end_time}</p>
+                      </div>
+                      <div className='col-md-4'>
+                        <p><small>Long Distance Preference</small><br /> {RiderInfo.long_distance_preference}</p>
+                      </div>
                     </>
                   )}
-
-
                 </div>
               </div>
             </div>

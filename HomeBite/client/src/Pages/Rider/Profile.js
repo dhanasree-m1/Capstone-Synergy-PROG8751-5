@@ -30,12 +30,18 @@ const Profile = () => {
     password_hash: '',
   });
 
-  const [chefInfo, setChefInfo] = useState({
-    specialty_cuisines: [],
-    type_of_meals: [],
-    cooking_experience: '',
-    max_orders_per_day: '',
-    preferred_working_days: [],
+  const [riderInfo, setRiderInfo] = useState({
+    vehicle_registration_number: '',
+    vehicle_type: '',
+    vehicle_insurance_number: '',
+    driver_license_number: '',
+    preferred_working_days: '',
+    license_expiry_date:'',
+    preferred_delivery_radius:'',
+    preferred_start_time:'',
+    preferred_end_time:'',
+    long_distance_preference:''
+
   });
 
   const [profileImageUrl, setProfileImageUrl] = useState(null);
@@ -54,15 +60,17 @@ const Profile = () => {
       body: JSON.stringify({
         query: `
           query {
-            getUserProfile {
+            getUserProfileRider {
               user {
                 first_name last_name email mobile_number gender
                 address_line_1 address_line_2 city province postal_code
                 country nearby_landmark role profile_image
               }
-              chef {
-                specialty_cuisines type_of_meals cooking_experience
-                max_orders_per_day preferred_working_days
+              rider {
+                vehicle_type vehicle_registration_number vehicle_insurance_number
+                insurance_expiry_date driver_license_number license_expiry_date
+                preferred_delivery_radius preferred_working_days preferred_start_time
+                preferred_end_time long_distance_preference
               }
             }
           }
@@ -71,11 +79,11 @@ const Profile = () => {
     });
 
     const data = await response.json();
-    const { user, chef } = data.data.getUserProfile;
+    const { user, rider } = data.data.getUserProfileRider;
 
     setUserInfo(user || {});
     setProfileImageUrl(user?.profile_image);
-    setChefInfo(chef || {});
+    setRiderInfo(rider || {});
   };
 
   useEffect(() => {
@@ -104,8 +112,11 @@ const Profile = () => {
     if (userInfo.postal_code && !postalCodeRegex.test(userInfo.postal_code)) {
       errors.push("Postal code can only contain letters, numbers, and dashes.");
     }
-    if (!chefInfo.cooking_experience) {
-      errors.push("Cooking experience is required for chefs.");
+    if (!riderInfo.vehicle_registration_number) {
+      errors.push("Vehicle Reg. Number is required for riders.");
+    }
+    if (!riderInfo.driver_license_number) {
+      errors.push("Driver License Number is required for riders.");
     }
 
     if (errors.length > 0) {
@@ -127,19 +138,11 @@ const Profile = () => {
     setProfileImageUrl(imageUrl);
   };
 
-  const handleCuisineChange = (e) => {
-    const { value, checked } = e.target;
-    setChefInfo((prev) => ({
-      ...prev,
-      specialty_cuisines: checked
-        ? [...prev.specialty_cuisines, value]
-        : prev.specialty_cuisines.filter((cuisine) => cuisine !== value),
-    }));
-  };
+
 
   const handleWorkingDaysChange = (e) => {
     const { value, checked } = e.target;
-    setChefInfo((prev) => {
+    setRiderInfo((prev) => {
       const updatedDays = checked
         ? [...prev.preferred_working_days, value]
         : prev.preferred_working_days.filter((day) => day !== value);
@@ -147,15 +150,6 @@ const Profile = () => {
     });
   };
 
-  const handleMealChange = (e) => {
-    const { value, checked } = e.target;
-    setChefInfo((prev) => ({
-      ...prev,
-      type_of_meals: checked
-        ? [...prev.type_of_meals, value]
-        : prev.type_of_meals.filter((meal) => meal !== value),
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -164,9 +158,9 @@ const Profile = () => {
       return;
     }
 
-    const chefData = {
-      ...chefInfo,
-      max_orders_per_day: parseInt(chefInfo.max_orders_per_day, 10) || 0,
+    const riderData = {
+      ...riderInfo,
+      max_orders_per_day: parseInt(riderInfo.max_orders_per_day, 10) || 0,
     };
 
     try {
@@ -179,7 +173,7 @@ const Profile = () => {
             password_hash: userInfo.password_hash|| "",
             //role: userInfo.role ? userInfo.role[0] : undefined,
           },
-          chefInput: chefData,
+          riderInput: riderData,
         },
       });
       navigate("/rider/profile", { state: { successMessage: "Profile updated successfully!" } });
@@ -188,6 +182,27 @@ const Profile = () => {
       console.error("Error updating profile:", error);
       setMessage("Error updating profile. Please try again.");
     }
+  };
+  const handleChange = (e) => {
+    //const { name, value } = e.target;
+    const { name, value, multiple, options } = e.target;
+    if (multiple) {
+      // For multi-selects, collect all selected options
+      const selectedOptions = Array.from(options)
+        .filter((option) => option.selected)
+        .map((option) => option.value);
+
+      setRiderInfo((prevData) => ({
+        ...prevData,
+        [name]: selectedOptions, // Set the array of selected values
+      }));
+    } else {
+      setRiderInfo((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+    setMessage("");
   };
   const handleCancel = () => {
     navigate("/rider/profile"); // Redirect to ProfileView.js
@@ -265,25 +280,75 @@ const Profile = () => {
 
           <div className='row mt-3'>
             <div className='col-12'>
-              <h4>Chef Information</h4>
+              <h4>Rider Information</h4>
             </div>
 
-            <Col md={12} className='mb-3'>
-              <SpecialtyCuisinesOptions cuisines={chefInfo.specialty_cuisines} onCuisineChange={handleCuisineChange} />
-            </Col>
-            <Col md={12} className='mb-3'>
-              <TypeOfMealsOptions meals={chefInfo.type_of_meals} onMealChange={handleMealChange} />
-            </Col>
             <Col md={6}>
-              <InputField label="Cooking Experience" name="cooking_experience" value={chefInfo.cooking_experience || ''} onChange={(e) => handleInputChange(e, setChefInfo)} />
-            </Col>
-            <Col md={6}>
-              <InputField label="Max Orders Per Day" name="max_orders_per_day" value={chefInfo.max_orders_per_day || ''} onChange={(e) => handleInputChange(e, setChefInfo)} />
+              <InputField label="Max Orders Per Day" name="vehicle_registration_number" value={riderInfo.vehicle_registration_number || ''} onChange={(e) => handleInputChange(e, setRiderInfo)} />
             </Col>
             <Col md={12}>
-              <AvailabilityOptions selectedDays={chefInfo.preferred_working_days} onDayChange={handleWorkingDaysChange} />
+                      <h5 className="mt-3 mb-3"><b>Vehicle Information</b></h5>
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Vehicle Type"
+                        name="vehicle_type"
+                        type="select" // Assuming InputField can handle a select type
+                        value={riderInfo.vehicle_type}
+                        onChange={handleChange}
+                        options={[
+                          { value: "", label: "Select Vehicle Type" },
+                          { value: "Bike", label: "Bike" },
+                          { value: "Scooter", label: "Scooter" },
+                          { value: "Motorcycle", label: "Motorcycle" },
+                          { value: "Car", label: "Car" },
+                          { value: "Other", label: "Other" },
+                        ]}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Vehicle Registration Number"
+                        name="vehicleRegNumber"
+                        placeholder="Vehicle Registration Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Vehicle Insurance Number"
+                        name="vehicleInsuranceNumber"
+                        placeholder="Vehicle Insurance Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Insurance Expiry Date"
+                        type="date"
+                        name="insuranceExpiryDate"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="Driver's License Number"
+                        name="driverLicenseNumber"
+                        placeholder="Driver's License Number"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <InputField
+                        label="License Expiry Date"
+                        type="date"
+                        name="licenseExpiryDate"
+                        onChange={handleChange}
+                      />
+                    </Col>
+            <Col md={12}>
+              <AvailabilityOptions selectedDays={riderInfo.preferred_working_days} onDayChange={handleWorkingDaysChange} />
             </Col>
-
             <Col md={12} className="mb-3">
             <hr />
             <Button variant='secondary' type="button" onClick={handleCancel}>Cancel</Button>
