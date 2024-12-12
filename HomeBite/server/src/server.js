@@ -24,7 +24,7 @@ app.use('/uploads', express.static(path.resolve('uploads')));
 // Your other routes and logic will go here...
 
 // Connect to MongoDB  
-mongoose.connect('mongodb+srv://dhanasree01:Mongo123@cluster0.umw1frd.mongodb.net/HomeBite?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://HomeBite:Homebite123@homebite.1dasn.mongodb.net/HomeBite?retryWrites=true&w=majority', {
 
   useNewUrlParser: true,
   useUnifiedTopology: true,

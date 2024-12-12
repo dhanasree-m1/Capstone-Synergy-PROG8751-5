@@ -101,17 +101,17 @@ export default function Header({
                       
                     </Nav.Link>
                   )}
-                  {urole.includes("rider") && (
+                  {/* {urole.includes("rider") && (
                     <Nav.Link
-                      href="/rider/orders"
+                      href="/rider/dashboard"
                       className={` ${
-                        isActive("/rider/orders") ? "active" : ""
+                        isActive("/rider/dashboard") ? "active" : ""
                       }`}
                       onClick={() => onRoleSelect("rider")}
                     >
-                      Rider Dashboard
+                      Rider
                     </Nav.Link>
-                  )}
+                  )} */}
                 </>
               )}
 

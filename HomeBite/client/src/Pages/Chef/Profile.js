@@ -101,7 +101,9 @@ const Profile = () => {
     if (!userInfo.mobile_number || !phoneRegex.test(userInfo.mobile_number)) {
       errors.push("A valid 10-digit mobile number is required.");
     }
-    
+    if (userInfo.postal_code && !postalCodeRegex.test(userInfo.postal_code)) {
+      errors.push("Postal code can only contain letters, numbers, and dashes.");
+    }
     if (!chefInfo.cooking_experience) {
       errors.push("Cooking experience is required for chefs.");
     }
@@ -154,15 +156,7 @@ const Profile = () => {
         : prev.type_of_meals.filter((meal) => meal !== value),
     }));
   };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
 
-    setChefInfo((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    
-  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -176,14 +170,13 @@ const Profile = () => {
     };
 
     try {
-      // console.log("userInfo:",userInfo);
       const result = await updateUserProfile({
         variables: {
           id: localStorage.getItem("user_id"),
           userInput: {
             ...userInfo,
             profile_image: profileImageUrl,
-            password_hash: userInfo.password_hash,
+            password_hash: userInfo.password_hash|| "",
             //role: userInfo.role ? userInfo.role[0] : undefined,
           },
           chefInput: chefData,
@@ -263,7 +256,7 @@ const Profile = () => {
   name="password_hash"
   type="password"
   placeholder="Enter new password"
-  value={userInfo.password_hash }
+  value={userInfo.password_hash || ''}
   onChange={(e) => handleInputChange(e, setUserInfo)}
 />
             </Col>
@@ -281,27 +274,8 @@ const Profile = () => {
             <Col md={12} className='mb-3'>
               <TypeOfMealsOptions meals={chefInfo.type_of_meals} onMealChange={handleMealChange} />
             </Col>
-            {/* <Col md={6}>
+            <Col md={6}>
               <InputField label="Cooking Experience" name="cooking_experience" value={chefInfo.cooking_experience || ''} onChange={(e) => handleInputChange(e, setChefInfo)} />
-            </Col> */}
-             <Col md={6}>
-              <label>Cooking Experience</label>
-              <select
-                name="cooking_experience"
-                className="form-control"
-                value={chefInfo.cooking_experience || ''}
-                onChange={handleChange}
-              >
-                <option value="" disabled>
-                            Select your experience
-                          </option>
-                          <option value="Less than 1 year">
-                            Less than 1 year
-                          </option>
-                          <option value="1-3 years">1-3 years</option>
-                          <option value="3-5 years">3-5 years</option>
-                          <option value="5+ years">5+ years</option>
-              </select>
             </Col>
             <Col md={6}>
               <InputField label="Max Orders Per Day" name="max_orders_per_day" value={chefInfo.max_orders_per_day || ''} onChange={(e) => handleInputChange(e, setChefInfo)} />
