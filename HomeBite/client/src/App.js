@@ -15,7 +15,13 @@ import Profile from "./Pages/Chef/ProfileView";
 import EditProfile from "./Pages/Chef/Profile";
 import ProductDetails from "./Pages/Customer/ProductDetails";
 import ChefDetails from "./Pages/Customer/ChefDetails";
-import OrderDetails from "./Pages/Customer/OrderDetails"
+import OrderDetails from "./Pages/Customer/OrderDetails";
+import RiderDash from "./Pages/Rider/Dashboard";
+import CurrentOrdersRider from "./Pages/Rider/CurrentOrders";
+import CompletedOrdersRider from "./Pages/Rider/OrderCompleted";
+import InprogressOrders from "./Pages/Rider/InprogressOrders";
+import ProfileRider from "./Pages/Rider/ProfileView";
+import EditProfileRider from "./Pages/Rider/Profile";
 import "./App.scss";
 
 function App() {
@@ -41,6 +47,14 @@ function App() {
         <Route path="product/edit/:id" element={<EditProduct />} />
         <Route path="profile" element={<Profile />} />
         <Route path="profile/edit" element={<EditProfile />} />
+      </Route>
+       {/* Rider Dashboard Layout with Nested Routes */}
+       <Route path="/rider" element={<RiderDash />}>
+        <Route path="orders" element={<CurrentOrdersRider />} />
+        <Route path="orders/completed" element={<CompletedOrdersRider />} />
+        <Route path="orders/in-progress" element={<InprogressOrders />} />
+        <Route path="profile" element={<ProfileRider />} />
+        <Route path="profile/edit" element={<EditProfileRider />} />
       </Route>
     </Routes>
   );
