@@ -128,7 +128,13 @@ export default function Header({
                 </div>
                  <span className="d-inline-block d-lg-none">Cart ({totalItems})</span>
               </Nav.Link>
-
+              {/* Order */}
+              <Nav.Link
+                href="/Customer/OrderDetails"
+                className={` ${isActive("/Customer/OrderDetails") ? "active" : ""}`}
+              >
+                Order Details
+              </Nav.Link>
               {/* Login/Logout */}
               <Nav.Link onClick={handleLoginLogout} className="">
                 {isLoggedIn ? "Logout" : "Login"}

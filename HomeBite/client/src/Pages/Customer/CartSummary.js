@@ -69,7 +69,7 @@ const handleCheckout = async () => {
         variables: {
           orderInput: {
             products,
-            successUrl: "http://localhost:3000/OrderDetails",
+            successUrl: "http://localhost:3000/Customer/OrderDetails",
             cancelUrl: "http://localhost:3000/",
             customerId: userId,
             chefId, // Pass the derived chef ID

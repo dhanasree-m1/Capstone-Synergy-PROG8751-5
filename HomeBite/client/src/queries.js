@@ -297,3 +297,35 @@ export const GET_CHEF_DETAILS = gql`
     }
   }
 `;
+export const GET_LATEST_ORDER = gql`
+ query GetLatestOrder($customerId: ID!) {
+  getLatestOrder(customerId: $customerId) {
+    _id
+    order_no
+    customer_id {
+      first_name
+      last_name
+      email
+    }
+    chef_id {
+      user {
+        first_name
+        last_name
+        address_line_1
+      }
+    }
+    items {
+      product_id {
+        name
+        description
+        image_url
+      }
+      quantity
+      unit_price
+    }
+    total_amount
+    status
+    created_at
+  }
+}
+`;

@@ -288,7 +288,50 @@ const resolvers = {
         console.error('Error fetching product details:', error.message);
         throw new Error('Failed to fetch product details');
       }
+    },
+    async getLatestOrder(_, { customerId }) {
+      try {
+        if (!mongoose.Types.ObjectId.isValid(customerId)) {
+          throw new Error("Invalid customer ID");
+        }
+    
+        const latestOrder = await Order.findOne({ customer_id: customerId })
+          .sort({ created_at: -1 })
+          .lean();
+    
+        if (!latestOrder) {
+          throw new Error("No orders found for the customer");
+        }
+    
+        const customer = await User.findById(latestOrder.customer_id)
+          .select("first_name last_name email")
+          .lean();
+    
+    // Fetch chef and populate user details
+    let chef = null;
+    if (latestOrder.chef_id) {
+      chef = await User.findById(latestOrder.chef_id).lean();
     }
+        const orderItems = await OrderItem.find({ order_id: latestOrder._id })
+          .populate({
+            path: "product_id",
+            select: "name description image_url",
+          })
+          .lean();
+          console.log("Latest Order:", latestOrder);
+          console.log("Customer Data:", customer);
+          console.log("Chef Data:", chef);
+        return {
+          ...latestOrder,
+          customer_id: customer || null,
+          chef_id: chef || null,
+          items: orderItems || [],
+        };
+      } catch (error) {
+        console.error("Error fetching latest order:", error.message);
+        throw new Error("Failed to fetch the latest order");
+      }
+    }          
   },
 
   Mutation: {
@@ -537,7 +580,7 @@ const resolvers = {
         throw new Error('Failed to create checkout session');
       }
     },
-    
+
     updateUserProfile: async (_, { id, userInput, chefInput }) => {
       if (!id) {
         throw new Error("User not authenticated");

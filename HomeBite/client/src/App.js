@@ -15,6 +15,7 @@ import Profile from "./Pages/Chef/ProfileView";
 import EditProfile from "./Pages/Chef/Profile";
 import ProductDetails from "./Pages/Customer/ProductDetails";
 import ChefDetails from "./Pages/Customer/ChefDetails";
+import OrderDetails from "./Pages/Customer/OrderDetails"
 import "./App.scss";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
       <Route path="/" element={<Dashboard />} />
       <Route path="/Customer/ProductDetails/:productId" element={<ProductDetails />} />
       <Route path="/Customer/ChefDetails//:chefId" element={<ChefDetails />} />
+      <Route path="/Customer/OrderDetails" element={<OrderDetails />} />
       {/* <Route path="/Home" element={<Home />} /> */}
       <Route path="/Login" element={<Login />} />
       <Route path="/register" element={<Register />} />

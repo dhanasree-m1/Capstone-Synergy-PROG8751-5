@@ -21,7 +21,26 @@ const typeDefs = gql`
     nearby_landmark: String
     created_at: String
   }
-
+  type Users {
+    id: ID
+    first_name: String!
+    last_name: String!
+    email: String!
+    password_hash: String
+    mobile_number: String!
+    role: [String!]
+    gender: String
+    profile_image: String
+    status: String
+    address_line_1: String
+    address_line_2: String
+    city: String
+    province: String
+    postal_code: String
+    country: String
+    nearby_landmark: String
+    created_at: String
+  }
   type Rider {
     id: ID!
     user: User!
@@ -316,6 +335,7 @@ const typeDefs = gql`
 
   type Query {
     getUserProfile: UserProfile
+    getLatestOrder(customerId: ID!): LatestOrder!
   }
     
   type Mutation {
@@ -334,6 +354,15 @@ input OrderInput {
   sessionId: String!
   url: String!
 }
-`;
+type LatestOrder {
+  _id: ID!
+  order_no: Int!
+  customer_id: Users!
+  chef_id: Chef # Allow chef_id to be nullable
+  items: [OrderItem!]!
+  total_amount: Float!
+  status: String!
+  created_at: String!
+}`;
 
 export default typeDefs;
