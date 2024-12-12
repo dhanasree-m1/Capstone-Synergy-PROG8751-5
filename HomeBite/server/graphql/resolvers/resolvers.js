@@ -1,26 +1,21 @@
 // resolvers.js
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { User } from "../../src/models/users.js";
-import { Rider } from "../../src/models/riders.js";
-import { Chef } from "../../src/models/chefs.js";
-import { PaymentInfo } from "../../src/models/payment_info.js";
-import { Order } from "../../src/models/orders.js";
-import { OrderItem } from "../../src/models/order_items.js";
-import { sendResetEmail } from "../../utils/emailService.js";
-import { Payment } from "../../src/models/payments.js";
-import { Product } from "../../src/models/products.js";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import Stripe from 'stripe';
-import mongoose from "mongoose";
-import dotenv from 'dotenv';
-dotenv.config();
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { MongoClient, ObjectId } from 'mongodb';
+import { User } from '../../src/models/users.js';
+import  {Rider} from '../../src/models/riders.js';
+import { Chef } from '../../src/models/chefs.js';
+import { PaymentInfo } from '../../src/models/payment_info.js';
+import { Order } from '../../src/models/orders.js'; 
+import { OrderItem } from '../../src/models/order_items.js';
+import { sendResetEmail } from '../../utils/emailService.js';
+import { Payment } from '../../src/models/payments.js'; 
+import { Product } from '../../src/models/products.js'; 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-console.log("Stripe Secret Key:", stripe);
 // import { sendResetEmail } from "../utils/emailService.js";
 // Define the generateToken function
 const __filename = fileURLToPath(import.meta.url);
@@ -178,160 +173,279 @@ const resolvers = {
             // Fetch OrderItems for the current order
             const items = await OrderItem.find({ order_id: order._id })
               .populate({
-                path: "product_id",
-                select: "name",
-              })
-              .lean();
+                path: 'product_id',
+                select: 'name'
+              }).lean();
+      
+              // Fetch Payment for the current order
+              const payment = await Payment.findOne({ order_id: order._id }).lean();
+      
+              // Return the order with populated items and payment details
+              return {
+                ...order,
+                items,   // Attach items array to the order
+                payment, // Attach payment details to the order
+              };
+            })
+          );
+          console.log("Order with items")
+          console.log(ordersWithDetails);
+          return ordersWithDetails;
+         
+         
+        } catch (error) {
+          console.error("Error fetching current orders:", error);
+          throw new Error("Failed to fetch current orders.");
+        }
+      },
+      getProduct: async (_, { id }) => {
+        try {
+          // Find the product by ID and populate the chef_id field
+          const product = await Product.findById(id).populate("chef_id");
+          if (!product) {
+            throw new Error("Product not found");
+          }
+          return product;
+        } catch (error) {
+          throw new Error(`Error fetching product: ${error.message}`);
+        }
+      },
+      getUserProfile: async (_, __, { user }) => {
+      
 
-            // Fetch Payment for the current order
-            const payment = await Payment.findOne({
-              order_id: order._id,
-            }).lean();
+        // Fetch user, chef, and rider details based on authenticated user ID
+        const userProfile = await User.findById(user.id);
+        const chefProfile = await Chef.findOne({ user_id: user.id });
+        
+        console.log("userprofile : ",userProfile)
+  
+        return {
+          user: userProfile,
+          chef: chefProfile,
+          
+        };
+      },
+      getUserProfileRider: async (_, __, { user }) => {
+      
 
-            // Return the order with populated items and payment details
+        // Fetch user, chef, and rider details based on authenticated user ID
+        const userProfile = await User.findById(user.id);
+        const riderProfile = await Rider.findOne({ user_id: user.id });
+        
+        console.log("userprofile : ",userProfile)
+  
+        return {
+          user: userProfile,
+          rider: riderProfile,
+          
+        };
+      },
+      getCurrentOrdersRider: async (_, __, { user }) => {
+        
+        try {
+          // Fetch all orders with status not equal to "Completed"
+          const orders = await Order.find({ status: "Waiting Pickup" })
+            .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
+            .populate('chef_id', 'specialty_cuisines type_of_meals')
+            .populate('rider_id', 'vehicle_type vehicle_registration_number')
+            .lean();
+          // For each order, find the associated OrderItems
+          const ordersWithDetails = await Promise.all(
+            orders.map(async (order) => {
+              // Fetch OrderItems for the current order
+              const items = await OrderItem.find({ order_id: order._id })
+              .populate({
+                path: 'product_id',
+                select: 'name'
+              }).lean();
+      
+              // Fetch Payment for the current order
+              const payment = await Payment.findOne({ order_id: order._id }).lean();
+      
+              // Return the order with populated items and payment details
+              return {
+                ...order,
+                items,   // Attach items array to the order
+                payment, // Attach payment details to the order
+              };
+            })
+          );
+          console.log("Current Order with items Rider:")
+          console.log(ordersWithDetails);
+          return ordersWithDetails;
+         
+         
+        } catch (error) {
+          console.error("Error fetching current orders:", error);
+          throw new Error("Failed to fetch current orders.");
+        }
+      },
+      getInprogressOrdersRider: async (_, { rider_id }) => {
+        
+        try {
+          // Fetch all orders with status  equal to "InProgress"
+          const orders = await Order.find({ status:  'In-Progress' ,rider_id: rider_id })
+            .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
+            .populate('chef_id', 'specialty_cuisines type_of_meals')
+            .populate('rider_id', 'vehicle_type vehicle_registration_number')
+            .lean();
+          // For each order, find the associated OrderItems
+          const ordersWithDetails = await Promise.all(
+            orders.map(async (order) => {
+              // Fetch OrderItems for the current order
+              const items = await OrderItem.find({ order_id: order._id })
+              .populate({
+                path: 'product_id',
+                select: 'name'
+              }).lean();
+      
+              // Fetch Payment for the current order
+              const payment = await Payment.findOne({ order_id: order._id }).lean();
+      
+              // Return the order with populated items and payment details
+              return {
+                ...order,
+                items,   // Attach items array to the order
+                payment, // Attach payment details to the order
+              };
+            })
+          );
+          console.log("Current Order with items Rider:")
+          console.log(ordersWithDetails);
+          return ordersWithDetails;
+         
+         
+        } catch (error) {
+          console.error("Error fetching current orders:", error);
+          throw new Error("Failed to fetch current orders.");
+        }
+      },
+      getCompletedOrdersRider: async (_, { rider_id }) => {
+        try {
+          // Fetch all orders with status not equal to "Completed"
+          const orders = await Order.find({ status: "Completed",rider_id: rider_id })
+            .populate('customer_id', 'first_name last_name email address_line_1 address_line_2 city province postal_code country')
+            .populate('chef_id', 'specialty_cuisines type_of_meals')
+            .populate('rider_id', 'vehicle_type vehicle_registration_number')
+            .lean();
+          // For each order, find the associated OrderItems
+          const ordersWithDetails = await Promise.all(
+            orders.map(async (order) => {
+              // Fetch OrderItems for the current order
+              const items = await OrderItem.find({ order_id: order._id })
+              .populate({
+                path: 'product_id',
+                select: 'name'
+              }).lean();
+      
+              // Fetch Payment for the current order
+              const payment = await Payment.findOne({ order_id: order._id }).lean();
+      
+              // Return the order with populated items and payment details
+              return {
+                ...order,
+                items,   // Attach items array to the order
+                payment, // Attach payment details to the order
+              };
+            })
+          );
+          console.log("Completed Order with items Rider:")
+          console.log(ordersWithDetails);
+          return ordersWithDetails;
+         
+         
+        } catch (error) {
+          console.error("Error fetching current orders:", error);
+          throw new Error("Failed to fetch current orders.");
+        }
+      },
+      getChefStats: async (_, { chef_id }) => {
+        try {
+            const now = new Date();
+            const startOfDayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    
+            // Fetch all orders for the chef
+            const orders = await Order.find({ chef_id });
+    
+            // Initialize stats
+            let totalOrders = 0;
+            let todaysOrders = 0;
+            let totalEarnings = 0;
+            let todaysEarnings = 0;
+    
+            orders.forEach((order) => {
+                // Increment total orders
+                totalOrders++;
+    
+                // Add to total earnings
+                totalEarnings += order.total_amount;
+    
+                // Check if the order is from today (use UTC comparison)
+                const orderDate = new Date(order.created_at);
+                if (orderDate >= startOfDayUTC && orderDate < new Date(startOfDayUTC.getTime() + 24 * 60 * 60 * 1000)) {
+                    todaysOrders++;
+                    todaysEarnings += order.total_amount;
+                }
+            });
+    console.log("totalOrders:",totalOrders)
+    console.log("todaysOrders:",todaysOrders)
+    console.log("totalEarnings:",totalEarnings)
+    console.log("todaysEarnings:",todaysEarnings)
             return {
-              ...order,
-              items, // Attach items array to the order
-              payment, // Attach payment details to the order
+                totalOrders: totalOrders, // Return as integer
+                todaysOrders: todaysOrders, // Return as integer
+                totalEarnings: totalEarnings.toFixed(2), // Fixed decimal
+                todaysEarnings: todaysEarnings.toFixed(2), // Fixed decimal
             };
-          })
-        );
-        console.log("Order with items");
-        console.log(ordersWithDetails);
-        return ordersWithDetails;
-      } catch (error) {
-        console.error("Error fetching current orders:", error);
-        throw new Error("Failed to fetch current orders.");
-      }
+        } catch (error) {
+            console.error("Error fetching chef stats:", error);
+            throw new Error("Failed to fetch chef stats.");
+        }
     },
-    getProduct: async (_, { id }) => {
+    getRiderStats: async (_, { rider_id }) => {
       try {
-        // Find the product by ID and populate the chef_id field
-        const product = await Product.findById(id).populate("chef_id");
-        if (!product) {
-          throw new Error("Product not found");
-        }
-        return product;
-      } catch (error) {
-        throw new Error(`Error fetching product: ${error.message}`);
-      }
-    },
-    getUserProfile: async (_, __, { user }) => {
-      // Fetch user, chef, and rider details based on authenticated user ID
-      const userProfile = await User.findById(user.id);
-      const chefProfile = await Chef.findOne({ user_id: user.id });
-
-      console.log("userprofile : ", userProfile);
-
-      return {
-        user: userProfile,
-        chef: chefProfile,
-      };
-    },
-    getProductById: async (_, { id }) => {
-      try {
-        // Validate the product ID
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-          throw new Error('Invalid Product ID format');
-        }
-    
-        // Step 1: Fetch the product by ID
-        const product = await Product.findById(id);
-        console.log('product Data:', product);
-        if (!product) {
-          throw new Error('Product not found');
-        }
-    
-        // Step 2: Find the Chef where user_id matches the product.chef_id
-        const chef = await Chef.findOne({ user_id: product.chef_id }).populate('user_id');
-    
-        // Debugging: Log chef and user data
-        console.log('Chef Data:', chef);
-    
-        // Step 3: Construct and return the product details
-        return {
-          id: product._id.toString(),
-          chef_id: product.chef_id,
-          name: product.name,
-          description: product.description || '',
-          price: product.price,
-          image_url: product.image_url || '',
-          dietary: product.dietary || '',
-          is_available: product.is_available,
-          chef: chef
-            ? {
-                id: chef._id.toString(),
-                specialty_cuisines: chef.specialty_cuisines || [],
-                type_of_meals: chef.type_of_meals || [],
-                cooking_experience: chef.cooking_experience || '',
-                max_orders_per_day: chef.max_orders_per_day || 0,
-                preferred_working_days: chef.preferred_working_days || [],
-                preferred_start_time: chef.preferred_start_time || '',
-                preferred_end_time: chef.preferred_end_time || '',
-                user: chef.user_id
-                  ? {
-                      first_name: chef.user_id.first_name || '',
-                      last_name: chef.user_id.last_name || '',
-                      address_line_1: chef.user_id.address_line_1 || '',
-                      address_line_2: chef.user_id.address_line_2 || '',
-                      city: chef.user_id.city || '',
-                      province: chef.user_id.province || '',
-                      postal_code: chef.user_id.postal_code || '',
-                      country: chef.user_id.country || '',
-                      profile_image: chef.user_id.profile_image || '',
-                    }
-                  : null,
+          const now = new Date();
+          const startOfDayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  
+          // Fetch all orders for the chef
+          const orders = await Order.find({ rider_id });
+  
+          // Initialize stats
+          let totalOrders = 0;
+          let todaysOrders = 0;
+          let totalEarnings = 0;
+          let todaysEarnings = 0;
+  
+          orders.forEach((order) => {
+              // Increment total orders
+              totalOrders++;
+  
+              // Add to total earnings
+              totalEarnings += order.total_amount;
+  
+              // Check if the order is from today (use UTC comparison)
+              const orderDate = new Date(order.created_at);
+              if (orderDate >= startOfDayUTC && orderDate < new Date(startOfDayUTC.getTime() + 24 * 60 * 60 * 1000)) {
+                  todaysOrders++;
+                  todaysEarnings += order.total_amount;
               }
-            : null,
-        };
+          });
+  console.log("totalOrders:",totalOrders)
+  console.log("todaysOrders:",todaysOrders)
+  console.log("totalEarnings:",totalEarnings)
+  console.log("todaysEarnings:",todaysEarnings)
+          return {
+              totalOrders: totalOrders, // Return as integer
+              todaysOrders: todaysOrders, // Return as integer
+              totalEarnings: totalEarnings.toFixed(2), // Fixed decimal
+              todaysEarnings: todaysEarnings.toFixed(2), // Fixed decimal
+          };
       } catch (error) {
-        console.error('Error fetching product details:', error.message);
-        throw new Error('Failed to fetch product details');
+          console.error("Error fetching chef stats:", error);
+          throw new Error("Failed to fetch chef stats.");
       }
-    },
-    async getLatestOrder(_, { customerId }) {
-      try {
-        if (!mongoose.Types.ObjectId.isValid(customerId)) {
-          throw new Error("Invalid customer ID");
-        }
+  },
     
-        const latestOrder = await Order.findOne({ customer_id: customerId })
-          .sort({ created_at: -1 })
-          .lean();
-    
-        if (!latestOrder) {
-          throw new Error("No orders found for the customer");
-        }
-    
-        const customer = await User.findById(latestOrder.customer_id)
-          .select("first_name last_name email")
-          .lean();
-    
-    // Fetch chef and populate user details
-    let chef = null;
-    if (latestOrder.chef_id) {
-      chef = await User.findById(latestOrder.chef_id).lean();
-    }
-        const orderItems = await OrderItem.find({ order_id: latestOrder._id })
-          .populate({
-            path: "product_id",
-            select: "name description image_url",
-          })
-          .lean();
-          console.log("Latest Order:", latestOrder);
-          console.log("Customer Data:", customer);
-          console.log("Chef Data:", chef);
-        return {
-          ...latestOrder,
-          customer_id: customer || null,
-          chef_id: chef || null,
-          items: orderItems || [],
-        };
-      } catch (error) {
-        console.error("Error fetching latest order:", error.message);
-        throw new Error("Failed to fetch the latest order");
-      }
-    }          
   },
 
   Mutation: {
@@ -463,6 +577,8 @@ const resolvers = {
         user, // include user data to populate the non-nullable field
       };
     },
+    
+    
     updateUser: async (_, { id, input }) => {
       return await User.findByIdAndUpdate(id, input, { new: true });
     },
@@ -480,6 +596,22 @@ const resolvers = {
           throw new Error("Order not found");
         }
         order.status = status;
+        await order.save();
+        return { success: true, message: "Order status updated successfully" };
+      } catch (error) {
+        console.error("Error updating order status:", error);
+        return { success: false, message: "Failed to update order status" };
+      }
+    },
+    updateOrderStatusRider: async (_, { orderId, status,rider_id }) => {
+      try {
+        const order = await Order.findById(orderId);
+        if (!order) {
+          throw new Error("Order not found");
+        }
+        console.log("rider id order update:",rider_id)
+        order.status = status;
+        order.rider_id = new ObjectId(rider_id)
         await order.save();
         return { success: true, message: "Order status updated successfully" };
       } catch (error) {

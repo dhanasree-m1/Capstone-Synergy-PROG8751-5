@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Container, Table, Button } from "react-bootstrap";
 import { Form, Row, Col, Alert } from "react-bootstrap";
+import StatsCard from "../../Components/StatusCard/StatusCard";
 import { Link } from 'react-router-dom';
 import "./OrderCompleted.scss";
 
 const OrderCompleted = () => {
   const [orders, setOrders] = useState([]);
-
+  const [stats, setStats] = useState({
+    todaysOrders: 0,
+    todaysEarnings: 0,
+    totalOrders: 0,
+    totalEarnings: 0,
+  });
   useEffect(() => {
     fetchOrders();
+    fetchStats();
   }, []);
 
   const fetchOrders = async () => {
@@ -68,14 +75,56 @@ const OrderCompleted = () => {
       console.error("Error fetching orders:", error);
     }
   };
+  const fetchStats = async () => {
+    const chef_id = localStorage.getItem("user_id");
+    try {
+        const response = await fetch("http://localhost:5000/graphql", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query: `
+                  query {
+                    getChefStats(chef_id: "${chef_id}") {
+                      todaysOrders
+                      todaysEarnings
+                      totalOrders
+                      totalEarnings
+                    }
+                  }
+                `,
+            }),
+        });
+        const json = await response.json();
+        if (json.errors) {
+            throw new Error(json.errors[0].message);
+        }
 
+        // Ensure data is handled properly
+        const stats = json.data.getChefStats;
+
+        setStats({
+            todaysOrders: parseInt(stats.todaysOrders, 10) || 0, // Convert to integer
+            todaysEarnings: stats.todaysEarnings ? parseFloat(stats.todaysEarnings) : 0.0, // Convert to float
+            totalOrders: parseInt(stats.totalOrders, 10) || 0, // Convert to integer
+            totalEarnings: stats.totalEarnings ? parseFloat(stats.totalEarnings) : 0.0, // Convert to float
+        });
+    } catch (error) {
+        console.error("Error fetching stats:", error);
+    }
+};
   return (
     <Row>
       <div className='col-12 mb-3 mt-3'>
         <h2>Welcome back, {localStorage.getItem('uname')}</h2>
         <h6>Track, manage and forecast your customers and orders.</h6>
       </div>
-      <div className='col-12 col-lg-6 col-xl-3'>
+      <StatsCard title="Today's Orders" value={stats.todaysOrders} variant="primary" />
+      <StatsCard title="Today's Earnings" value={stats.todaysEarnings} variant="success" />
+      <StatsCard title="Total Orders" value={stats.totalOrders} variant="warning" />
+      <StatsCard title="Total Earnings" value={stats.totalEarnings} variant="danger" />
+      {/* <div className='col-12 col-lg-6 col-xl-3'>
         <div className='card alert alert-primary'>
           <div className='card-body'>
             <h5>Today's orders</h5>
@@ -106,13 +155,13 @@ const OrderCompleted = () => {
             <h3>$ 1,210</h3>
           </div>
         </div>
-      </div>
+      </div> */}
       {/* <Header /> */}
       <div className="col-12 mt-2">
         <h2>Orders</h2>
         <div className="tab-selector">
           <Link to="/chef/orders" className="tab ">Current Orders</Link>
-          <Link to="/chef/orders/Completed" className="tab active">Order Completed</Link>
+          <Link to="/chef/orders/completed" className="tab active">Order Completed</Link>
         </div>
       </div>
       <div className="col-12">

@@ -213,6 +213,9 @@ const typeDefs = gql`
     getChef(id: ID!): Chef
     getCurrentOrders(chef_id: ID!): [Order]
     getCompletedOrders(chef_id: ID!): [Order]
+    getCurrentOrdersRider: [Order]
+    getInprogressOrdersRider(rider_id: ID!): [Order]
+    getCompletedOrdersRider(rider_id: ID!): [Order]
     isEmailUnique(email: String!): Boolean!
   }
 
@@ -226,7 +229,8 @@ const typeDefs = gql`
     forgotPassword(email: String!): ForgotPasswordResponse
     createPaymentInfo(input: CreatePaymentInfoInput!): PaymentInfo
     resetPassword(token: String!, newPassword: String!): ResetPasswordResponse
-    updateOrderStatus(orderId: ID!, status: String!): Response
+    updateOrderStatus(orderId: ID!, status: String!): Response 
+    updateOrderStatusRider(orderId: ID!, status: String!, rider_id: ID!): Response
   }
   type Response {
     success: Boolean!
@@ -287,7 +291,10 @@ const typeDefs = gql`
     user: User
     chef: Chef
   }
-
+  type UserProfileRider {
+    user: User
+    rider: Rider
+  }
   input UserInput {
     first_name: String!
     last_name: String!
@@ -332,9 +339,16 @@ const typeDefs = gql`
       chefInput: ChefInput
     ): UserProfile
   }
-
+  type Mutation {
+    updateUserProfileRider(
+      id: ID!
+      userInput: UserInput
+      riderInput: RiderInput
+    ): UserProfileRider
+  }
   type Query {
     getUserProfile: UserProfile
+    getUserProfileRider: UserProfileRider
     getLatestOrder(customerId: ID!): LatestOrder!
   }
     
@@ -363,6 +377,26 @@ type LatestOrder {
   total_amount: Float!
   status: String!
   created_at: String!
-}`;
+}
+    type ChefStats {
+  todaysOrders: Int
+  todaysEarnings: Float
+  totalOrders: Int
+  totalEarnings: Float
+} 
+  extend type Query {
+  getChefStats(chef_id: ID!): ChefStats
+}
+type RiderStats {
+  todaysOrders: Int
+  todaysEarnings: Float
+  totalOrders: Int
+  totalEarnings: Float
+}
+
+extend type Query {
+  getRiderStats(rider_id: ID!): RiderStats
+}
+`;
 
 export default typeDefs;
