@@ -9,16 +9,16 @@ const Footer = () => {
     <footer className="bg-dark text-white">
       <Container>
         <Row className="justify-content-between">
-          <Col md={4}>
+          <Col md={5}>
             <h5>About Us</h5>
             <p>
-              We connect you with the best chefs to deliver home-cooked meals at your doorstep.
+              We connect you with the best chefs to deliver home cooked meals at your doorstep.
             </p>
             <p className="mb-0">
               &copy; {new Date().getFullYear()} HomeBite. All Rights Reserved.
             </p>
           </Col>
-          <Col md={4} >
+          <Col md={3} >
             <h5>Contact</h5>
             <p>Email: homebitecuisines@gmail.com</p>
             {/* <p>Phone: +1 234 567 890</p> */}
