@@ -3,7 +3,7 @@ import { Card } from "react-bootstrap";
 import "./ChefCard.scss";
 import { useNavigate } from 'react-router-dom';
 import defaultChefImage from "../../assets/images/chef.jpg";
-import { useNavigate } from 'react-router-dom';
+
 export default function ChefCard({ chef }) {
   const navigate = useNavigate();
   // Check for null or undefined `chef` or `chef.user`

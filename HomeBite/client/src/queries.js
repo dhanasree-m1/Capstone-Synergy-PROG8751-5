@@ -208,46 +208,7 @@ export const UPDATE_USER_PROFILES = gql`
     }
   }
 `;
-export const UPDATE_USER_PROFILES_RIDER = gql`
-  mutation updateUserProfileRider(
-    $id: ID!
-    $userInput: UserInput!
-    $riderInput: RiderInput!
-  ) {
-    updateUserProfileRider(id: $id, userInput: $userInput, riderInput: $riderInput) {
-      user {
-        id
-        first_name
-        last_name
-        email
-        mobile_number
-        password_hash
-        role
-        gender
-        profile_image
-        status
-        address_line_1
-        address_line_2
-        city
-        province
-        postal_code
-        country
-        nearby_landmark
-      }
-      rider {
-        vehicle_type
-    vehicle_registration_number
-    vehicle_insurance_number
-    insurance_expiry_date
-    driver_license_number
-    license_expiry_date
-    preferred_delivery_radius
-    preferred_working_days
-    long_distance_preference
-      }
-    }
-  }
-`;
+
 export const GET_CHEFS_AND_PRODUCTS = gql`
   query GetChefsAndProducts($campus: String) {
     getAllChefs {
