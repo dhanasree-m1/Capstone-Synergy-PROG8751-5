@@ -84,7 +84,10 @@ export default function PastOrders() {
       <Container className="mt-5">
         <Row>
           <div className="tab-selector">
-            <Button variant="link" onClick={() => navigate("/Customer/OrderDetails")}>
+            <Button
+              variant="link"
+              onClick={() => navigate("/Customer/OrderDetails")}
+            >
               Current Orders
             </Button>
             <Button variant="link" className="active">
@@ -97,16 +100,17 @@ export default function PastOrders() {
             <Col md={12}>
               <h1>No Completed Orders</h1>
               <p>
-                You haven't placed any completed orders yet. Explore our menu and start placing orders!
+                You haven't placed any completed orders yet. Explore our menu
+                and start placing orders!
               </p>
-              <Button variant="primary" onClick={() => navigate("/")}>
+              {/* <Button variant="primary" onClick={() => navigate("/")}>
                 Order Now
-              </Button>
+              </Button> */}
             </Col>
           </Row>
         ) : (
           orders.map((order) => (
-            <div key={order._id} className="card mb-4">
+            <div key={order._id} className="card mt-4 mb-4">
               <div className="card-body">
                 <Row>
                   <Col md={12}>
@@ -142,7 +146,8 @@ export default function PastOrders() {
                     </Col>
                     <Col md={10}>
                       <p>
-                        <strong>{item.product_id.name}</strong> x {item.quantity}
+                        <strong>{item.product_id.name}</strong> x{" "}
+                        {item.quantity}
                       </p>
                     </Col>
                   </Row>
@@ -166,6 +171,10 @@ export default function PastOrders() {
             </div>
           ))
         )}
+
+        <Button variant="primary mb-4" onClick={() => navigate("/")}>
+          Order Now
+        </Button>
       </Container>
     </>
   );

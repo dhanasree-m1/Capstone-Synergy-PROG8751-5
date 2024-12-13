@@ -77,7 +77,7 @@ export default function OrderDetails() {
             </Button>
           </div>
         </Row>
-        <div className="card mt-4">
+        <div className="card mt-4 mb-4">
           <div className="card-body">
             <Row>
               <Col md={12}>
