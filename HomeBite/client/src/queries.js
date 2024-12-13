@@ -251,6 +251,7 @@ export const GET_PRODUCT_DETAILS = gql`
       price
       image_url
       dietary
+      quantity
       is_available
       chef {
         id

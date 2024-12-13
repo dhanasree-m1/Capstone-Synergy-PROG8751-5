@@ -151,8 +151,9 @@ export default function ProductDetails() {
                     <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons">room_service</span>{`${product.chef?.user?.first_name} ${product.chef?.user?.last_name}` || "Unknown"}</li>
                     <li class="list-group-item bg-transparent border-0 ps-0 campus-name">
                     {`${product.dietary}` || "Unknown"}</li>
-                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name">
-                    Quantity Remaining {`${product.quantity}` || "Unknown"}</li>
+                    <li className="list-group-item bg-transparent border-0 ps-0 campus-name">
+  Quantity Remaining: {product.quantity !== null ? product.quantity : "Not Available"}
+</li>
                   </ul>
                   <div className="d-md-flex justify-content-between align-center">
 

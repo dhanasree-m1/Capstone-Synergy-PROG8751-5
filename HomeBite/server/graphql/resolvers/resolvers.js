@@ -241,7 +241,7 @@ const resolvers = {
         if (!product) {
           throw new Error("Product not found");
         }
-   
+        console.log("Product Data:", product);
         // Fetch the Chef where user_id matches product.chef_id
         const chef = await Chef.findOne({ user_id: product.chef_id }).populate("user_id");
    
@@ -256,6 +256,7 @@ const resolvers = {
           name: product.name,
           description: product.description || "",
           price: product.price,
+          quantity: product.quantity || 0,
           image_url: product.image_url || "",
           dietary: product.dietary || "",
           is_available: product.is_available,
