@@ -121,26 +121,61 @@ export default function ChefDetails() {
   return (
     <>
       <MainLayout cart={cart} handleShowCart={() => setShowCart(true)} />
-      <Container className="my-5">
+      <Container  className="my-5">
         <Row>
-          <Col md={4}>
-            <Card>
-              <Card.Img variant="top" src={chef.user?.profile_image || "default-profile.jpg"} />
-              <Card.Body>
-                <h3>{chefName}</h3>
-                <p>{chef.bio || "No bio available."}</p>
-                <p className="text-secondary">
-                  Located at: {chef.user?.address_line_1 || "No address available"}
-                </p>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col md={8}>
-            <h4>Dishes by {chefName}</h4>
+          <div className="col-12 mb-3">
+            <a className="btn-link" variant="link" onClick={() => navigate("/")}>
+              Home
+            </a> <span className="material-icons">chevron_right</span> {chefName}'s Details
+          </div>
+          <div className="col-12 mb-5">
+            <div className="card">
+              <div className="card-body pt-0 pb-0">
+                <div className="row">
+                  <div className='col-md-4 text-center bg-light p-5'>
+                    <img src={chef.user?.profile_image || "default-profile.jpg"} alt="Profile" className="img-fluid profile-img" style={{ maxWidth: "150px" }} />
+                    <h5 className="mb-1 mt-3">{chefName}</h5>
+                  </div>
+                  <div className="col-md-8 mt-md-4 pb-3">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <p>{chef.bio || "No bio available."}</p>
+                        <div className="d-flex text-muted  mt-3 mb-3">
+                          <span className="material-icons me-2">map</span>
+                          <div className="flex-grow-1">
+                            <p className="mb-0 text-muted">{chef.user?.address_line_1}</p>
+                            <p className="mb-0 text-muted">{chef.user?.address_line_2}</p>
+                            <p className="mb-0 text-muted">{chef.user?.city}</p>
+                            <p className="mb-0 text-muted">{chef.user?.province}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+
+
+                      {chef && (
+                        <>
+                          <div className='col-md-4'>
+                            <p><small>Specialty Cuisines</small><br /> {chef.specialty_cuisines?.join(', ')}</p>
+                          </div>
+                          <div className='col-md-4'>
+                            <p><small>Type of Meals</small><br /> {chef.type_of_meals?.join(', ')}</p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Col md={12}>
+
             <Row>
               {Array.isArray(chef.products) && chef.products.length > 0 ? (
                 chef.products.map((product) => (
-                  <Col md={6} key={product.id}>
+                  <Col md={3} key={product.id}>
                     <Card className="mb-3">
                       <Card.Img variant="top" src={product.image_url || "default-image.jpg"} />
                       <Card.Body>
@@ -174,9 +209,7 @@ export default function ChefDetails() {
               ) : (
                 <Alert variant="warning">No products found!</Alert>
               )}
-                                <Button variant="secondary mb-2 mt-3 " onClick={() => navigate("/")}>
-          Order More
-        </Button>
+
             </Row>
           </Col>
         </Row>
