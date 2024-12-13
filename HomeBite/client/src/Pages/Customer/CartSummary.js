@@ -12,10 +12,14 @@ export default function CartSummary({
 }) {
 
     const navigate = useNavigate();
-  const cartItems = Object.entries(cart).map(([productId, quantity]) => {
-    const product = products.find((p) => p.id === productId);
-    return { ...product, quantity };
-  });
+    const cartItems = Object.entries(cart).map(([productId, quantity]) => {
+      const product = products.find((p) => p.id === productId);
+      return { 
+        ...product, 
+        quantity, 
+        chef_id: product?.chef_id // Ensure chef_id is included
+      };
+    });
 
   const subtotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
