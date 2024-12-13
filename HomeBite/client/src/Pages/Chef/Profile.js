@@ -101,9 +101,9 @@ const Profile = () => {
     if (!userInfo.mobile_number || !phoneRegex.test(userInfo.mobile_number)) {
       errors.push("A valid 10-digit mobile number is required.");
     }
-    if (userInfo.postal_code && !postalCodeRegex.test(userInfo.postal_code)) {
-      errors.push("Postal code can only contain letters, numbers, and dashes.");
-    }
+    // if (userInfo.postal_code && !postalCodeRegex.test(userInfo.postal_code)) {
+    //   errors.push("Postal code can only contain letters, numbers, and dashes.");
+    // }
     if (!chefInfo.cooking_experience) {
       errors.push("Cooking experience is required for chefs.");
     }

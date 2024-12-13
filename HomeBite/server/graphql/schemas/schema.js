@@ -70,7 +70,19 @@ const typeDefs = gql`
     preferred_end_time: String
     created_at: String
   }
-
+  type Cheff {
+    id: ID!
+    bio: String
+    specialty_cuisines: [String]
+    type_of_meals: [String]
+    cooking_experience: String
+    max_orders_per_day: Int
+    preferred_working_days: [String]
+    preferred_start_time: String
+    preferred_end_time: String
+    user: User
+    products: [Product]
+  }
   type PaymentInfo {
     id: ID!
     user: User!
@@ -259,6 +271,7 @@ const typeDefs = gql`
     image_url: String
     dietary: String
     is_available: String
+    chef_id:ID
   }
 
   type ProductDetails {
@@ -280,6 +293,7 @@ const typeDefs = gql`
     getAllProducts(campus: String): [Product]
     getAllChefs: [Chef]
     getProductById(id: ID!): ProductDetails
+    getChefById(id: ID!): Cheff
     getProduct(id: ID!): Product
   }
   type Mutation {
@@ -323,14 +337,16 @@ const typeDefs = gql`
   }
 
   input RiderInput {
+    vehicle_type:String!
     vehicle_registration_number: String
     vehicle_insurance_number: String
     insurance_expiry_date: String
     driver_license_number: String
     license_expiry_date: String
     document_upload_path: String
-    preferred_delivery_radius: Int
+    preferred_delivery_radius: String
     preferred_working_days: [String]
+    long_distance_preference: Boolean
   }
   type Mutation {
     updateUserProfile(
