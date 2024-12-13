@@ -826,7 +826,7 @@ const resolvers = {
     },
     async createCheckoutSession(_, { orderInput }) {
       try {
-        const { products, successUrl, cancelUrl, customerId, chefId } =
+        const { products, successUrl, cancelUrl, customerId, chefId, paymentMethod } =
           orderInput;
 
         // Build line items for Stripe
@@ -868,7 +868,17 @@ const resolvers = {
           unit_price: product.price / 100, // Convert back to dollars
         }));
         await OrderItem.insertMany(orderItems);
-
+        
+    // Save payment details
+    const payments = new Payment({
+      order_id: savedOrder._id,
+      payment_method: paymentMethod || 'credit_card', // Default to credit card if not provided
+      transaction_id: session.id,
+      amount: products.reduce((total, p) => total + p.price * p.quantity, 0) / 100,
+      payment_status: 'successful', // Pending until confirmation
+    });
+    await payments.save();
+    
         return {
           sessionId: session.id,
           url: session.url,

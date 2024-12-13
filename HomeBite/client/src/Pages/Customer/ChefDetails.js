@@ -4,8 +4,11 @@ import { Container, Row, Col, Card, Alert } from "react-bootstrap";
 import Loader from "../../Components/Loader/Loader";
 import ProductCard from "../../Components/ProductCard/ProductCard";
 import MainLayout from "../../Components/Layouts/MainLayout";
+import { useNavigate } from "react-router-dom";
+import CartSummary from "../Customer/CartSummary";
 
 export default function ChefDetails() {
+  const navigate = useNavigate();
   const { chefId } = useParams(); // Extract chefId from the URL
   const [chef, setChef] = useState(null);
   const [loading, setLoading] = useState(true);

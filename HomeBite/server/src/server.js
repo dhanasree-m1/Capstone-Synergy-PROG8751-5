@@ -11,6 +11,9 @@ import { ApolloServer } from 'apollo-server-express';
 import typeDefs from '../graphql/schemas/schema.js'; // Import GraphQL schema
 import resolvers from '../graphql/resolvers/resolvers.js'; // Import GraphQL resolvers
 import path from 'path';
+import { Payment } from './models/payments.js';
+import { Order } from './models/orders.js';
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -100,7 +103,11 @@ app.post(
 
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
-
+      // Find the payment and update the status to successful
+      await Payment.findOneAndUpdate(
+        { transaction_id: session.id },
+        { payment_status: 'successful', payment_date: new Date() }
+      );
         // Update order status to "In Progress" or "Completed"
         const order = await Order.findOne({ order_no: session.client_reference_id });
         if (order) {
