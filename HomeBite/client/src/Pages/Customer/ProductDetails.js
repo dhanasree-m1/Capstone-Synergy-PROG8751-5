@@ -147,14 +147,19 @@ export default function ProductDetails() {
   return (
     <>
       <MainLayout cart={cart} handleShowCart={() => setShowCart(true)} />
-      <Container fluid className="my-5">
+      <Container className="my-5">
+      <div className="col-12 mb-3">
+            <a className="btn-link" variant="link" onClick={() => navigate("/")}>
+              Home
+            </a> <span className="material-icons">chevron_right</span> {product.name}
+          </div>
         {product ? (
           <Row>
             <Col md={4}>
               <img src={product.image_url || "default-image.jpg"} class="w-100" alt={product.name || "Product Image"} />
             </Col>
             <Col md={8}>
-              <div class="product-card card ">
+              <div class="product-card card ht-100">
                 <h5 class="card-title cursor-default">{product.name} {dietaryIcon && (
                   <img
                     className="align-bottom"
@@ -168,10 +173,10 @@ export default function ProductDetails() {
                 <div class="card-body">
                   <ul class="list-group list-group-flush border-0">
                     <li class="list-group-item bg-transparent border-0 ps-0"><p class="card-text">{product.description || "No description available."}</p></li>
-                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons">location_on</span>{`${product.chef?.user?.address_line_1}` || "Unknown"}</li>
-                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons">room_service</span>{`${product.chef?.user?.first_name} ${product.chef?.user?.last_name}` || "Unknown"}</li>
+                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons me-2">location_on</span>{`${product.chef?.user?.address_line_1}` || "Unknown"}</li>
+                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons me-2">room_service</span>{`${product.chef?.user?.first_name} ${product.chef?.user?.last_name}` || "Unknown"}</li>
                     <li className="list-group-item bg-transparent border-0 ps-0 campus-name">
-                      Quantity Remaining: {product.quantity !== null ? product.quantity : "Not Available"}
+                    <span className="material-icons me-2">production_quantity_limits</span>Quantity Remaining: {product.quantity !== null ? product.quantity : "Not Available"}
                     </li>
                   </ul>
                   <div className="d-md-flex justify-content-between align-center">
@@ -202,9 +207,6 @@ export default function ProductDetails() {
                     )}
 
                   </div>
-                  <Button variant="secondary mb-2 mt-3 " onClick={() => navigate("/")}>
-                    Order More
-                  </Button>
                 </div>
 
               </div>

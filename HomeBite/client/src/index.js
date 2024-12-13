@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import App from './App';
+import Footer from './Components/footer/footer'; // Adjust the import path if necessary
 
 const client = new ApolloClient({
   uri: 'http://localhost:5000/graphql', // Replace with your GraphQL server URI
@@ -15,7 +16,12 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ApolloProvider client={client}>
     <BrowserRouter>
-      <App />
+      <div className="main-layout">
+        <div className="main-content">
+          <App />
+        </div>
+        <Footer />
+      </div>
     </BrowserRouter>
   </ApolloProvider>
 );

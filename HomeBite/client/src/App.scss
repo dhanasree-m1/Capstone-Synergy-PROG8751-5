@@ -295,3 +295,38 @@ select.form-control{
     margin-top: 2em;
   }
 }
+div#root{
+  position: relative;
+}
+footer{
+  padding: 50px;
+}
+.tab-selector {
+  display: flex;
+  margin-bottom: 20px;
+  padding: 0;
+  border-bottom: 2px solid $link-color;
+
+  .tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    transition: color 0.3s ease;
+    text-decoration: none;
+
+    &:hover {
+      color: $link-color;
+      text-decoration: none !important;
+    }
+
+    &.active {
+      color: $link-color;
+      border-bottom: 3px solid $link-color;
+      text-decoration: none;
+    }
+  }
+}

@@ -87,7 +87,7 @@ const ProfileView = () => {
         <div className='row'>
           <div className='col-12'>
             <div className='card'>
-              <div className='card-body pt-0 pb-0'>
+              <div className='card-body'>
                 <div className='row'>
                   <div className='col-md-4 text-center bg-light p-5'>
                     {profileImageUrl && (
