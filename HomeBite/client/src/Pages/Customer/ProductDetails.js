@@ -138,16 +138,59 @@ export default function ProductDetails() {
       <Container className="my-5">
         {product ? (
           <Row>
-            <Col md={6}>
-              <Card>
+            <Col md={12}>
+              <div class="product-card card mx-auto d-block d-md-flex flex-row col-12 col-md-8">
+                <img src={product.image_url || "default-image.jpg"} class="card-img-top product-details-img" alt={product.name || "Product Image"} />
+                <div class="card-body">
+                  <div className="d-md-flex justify-content-between"><h5 class="card-title cursor-default">{product.name}</h5><p className="price mb-0">${product.price?.toFixed(2)}</p></div>
+                  <ul class="list-group list-group-flush border-0">
+                    <li class="list-group-item bg-transparent border-0 ps-0"><p class="card-text">{product.description || "No description available."}</p></li>
+                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons">location_on</span>{`${product.chef?.user?.address_line_1}` || "Unknown"}</li>
+                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons">room_service</span>{`${product.chef?.user?.first_name} ${product.chef?.user?.last_name}` || "Unknown"}</li>
+                  </ul>
+                  <div className="d-md-flex justify-content-between align-center">
+
+                    {cartQuantity > 0 ? (
+                      <div className="cart-controls justify-content-start mt-3">
+                        <Button
+                          variant="secondary small"
+                          onClick={() => decrementQuantity(product.id)}
+                        >
+                          -
+                        </Button>
+                        <span>{cartQuantity}</span>
+                        <Button
+                          variant="secondary small"
+                          onClick={() => incrementQuantity(product.id)}
+                        >
+                          +
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="secondary small"
+                        onClick={() => addToCart(product.id)}
+                      >
+                        Add
+                      </Button>
+                    )}
+
+                  </div>
+                  <Button variant="secondary mb-2 mt-3 " onClick={() => navigate("/")}>
+          Order More
+        </Button>
+                </div>
+
+              </div>
+              {/* <Card>
                 <Card.Img
                   variant="top"
                   src={product.image_url || "default-image.jpg"}
                   alt={product.name || "Product Image"}
                 />
-              </Card>
+              </Card> */}
             </Col>
-            <Col md={6}>
+            {/* <Col md={6}>
               <h2>{product.name}</h2>
               <p className="text-secondary">{product.description || "No description available."}</p>
               <h4>Unit Price: ${product.price?.toFixed(2)}</h4>
@@ -178,11 +221,12 @@ export default function ProductDetails() {
                   Add to Cart
                 </Button>
               )}
-            </Col>
+            </Col> */}
           </Row>
         ) : (
           <Alert variant="warning">Product not found!</Alert>
         )}
+        
       </Container>
       <CartSummary
         show={showCart}
@@ -192,9 +236,7 @@ export default function ProductDetails() {
         incrementQuantity={incrementQuantity}
         decrementQuantity={decrementQuantity}
       />
-              <Button variant="btn btn-primary mb-2" onClick={() => navigate("/")}>
-          Order More
-        </Button>
+
     </>
   );
 }
