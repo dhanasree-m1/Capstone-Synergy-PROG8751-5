@@ -44,7 +44,7 @@ export default function ChefCard({ chef }) {
         }}
       />
       <Card.Body className="pb-0">
-        <Card.Title>
+        <Card.Title onClick={() => navigate(`/Customer/ChefDetails/${chef.id}`)}>
           {chef.user.first_name || "New"} {chef.user.last_name || "Chef"}
         </Card.Title>
         <Card.Text>
@@ -56,9 +56,7 @@ export default function ChefCard({ chef }) {
           <span className="material-icons">location_on</span>
           {chef.user.address_line_1 || "Address"}
         </Card.Text>
-        <Card.Text >
-        <a onClick={() => navigate(`/Customer/ChefDetails/${chef.id}`)} >Chef Details</a>
-        </Card.Text>
+       
       </Card.Body>
     </Card>
   );

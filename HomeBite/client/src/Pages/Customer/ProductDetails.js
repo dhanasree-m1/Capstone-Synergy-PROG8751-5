@@ -5,6 +5,8 @@ import CartSummary from "../Customer/CartSummary";
 import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap";
 import Loader from "../../Components/Loader/Loader";
 import { useNavigate } from "react-router-dom";
+import veg from "../../assets/images/veg.svg";
+import nonveg from "../../assets/images/non-veg.svg";
 
 
 export default function ProductDetails() {
@@ -128,6 +130,14 @@ export default function ProductDetails() {
       return updatedCart;
     });
   };
+  const dietaryIcon =
+    product?.dietary === "Veg"
+      ? veg
+      : product?.dietary === "Non Veg"
+        ? nonveg
+        : null;
+
+
 
   if (loading) return <Loader />;
   if (error) return <Alert variant="danger">{error}</Alert>;
@@ -137,23 +147,32 @@ export default function ProductDetails() {
   return (
     <>
       <MainLayout cart={cart} handleShowCart={() => setShowCart(true)} />
-      <Container className="my-5">
+      <Container fluid className="my-5">
         {product ? (
           <Row>
-            <Col md={12}>
-              <div class="product-card card mx-auto d-block d-md-flex flex-row col-12 col-md-8">
-                <img src={product.image_url || "default-image.jpg"} class="card-img-top product-details-img" alt={product.name || "Product Image"} />
+            <Col md={4}>
+              <img src={product.image_url || "default-image.jpg"} class="w-100" alt={product.name || "Product Image"} />
+            </Col>
+            <Col md={8}>
+              <div class="product-card card ">
+                <h5 class="card-title cursor-default">{product.name} {dietaryIcon && (
+                  <img
+                    className="align-bottom"
+                    src={dietaryIcon}
+                    alt={product?.dietary || "Unknown"}
+                    title={product?.dietary || "Unknown"}
+                  />
+                )}</h5>
+                <p className="price mb-0">${product.price?.toFixed(2)}</p>
+                <hr />
                 <div class="card-body">
-                  <div className="d-md-flex justify-content-between"><h5 class="card-title cursor-default">{product.name}</h5><p className="price mb-0">${product.price?.toFixed(2)}</p></div>
                   <ul class="list-group list-group-flush border-0">
                     <li class="list-group-item bg-transparent border-0 ps-0"><p class="card-text">{product.description || "No description available."}</p></li>
                     <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons">location_on</span>{`${product.chef?.user?.address_line_1}` || "Unknown"}</li>
                     <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons">room_service</span>{`${product.chef?.user?.first_name} ${product.chef?.user?.last_name}` || "Unknown"}</li>
-                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name">
-                    {`${product.dietary}` || "Unknown"}</li>
                     <li className="list-group-item bg-transparent border-0 ps-0 campus-name">
-  Quantity Remaining: {product.quantity !== null ? product.quantity : "Not Available"}
-</li>
+                      Quantity Remaining: {product.quantity !== null ? product.quantity : "Not Available"}
+                    </li>
                   </ul>
                   <div className="d-md-flex justify-content-between align-center">
 
@@ -184,8 +203,8 @@ export default function ProductDetails() {
 
                   </div>
                   <Button variant="secondary mb-2 mt-3 " onClick={() => navigate("/")}>
-          Order More
-        </Button>
+                    Order More
+                  </Button>
                 </div>
 
               </div>
@@ -233,7 +252,7 @@ export default function ProductDetails() {
         ) : (
           <Alert variant="warning">Product not found!</Alert>
         )}
-        
+
       </Container>
       <CartSummary
         show={showCart}
