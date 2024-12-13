@@ -235,20 +235,20 @@ const resolvers = {
         if (!mongoose.Types.ObjectId.isValid(id)) {
           throw new Error("Invalid Product ID format");
         }
-    
+   
         // Fetch the product by ID
         const product = await Product.findById(id);
         if (!product) {
           throw new Error("Product not found");
         }
-    
+   
         // Fetch the Chef where user_id matches product.chef_id
         const chef = await Chef.findOne({ user_id: product.chef_id }).populate("user_id");
-    
+   
         if (!chef) {
           throw new Error("Chef not found for the given product");
         }
-    
+   
         // Return product details with chef's user info
         return {
           id: product._id.toString(),
@@ -283,7 +283,7 @@ const resolvers = {
         if (!mongoose.Types.ObjectId.isValid(id)) {
           throw new Error("Invalid Chef ID format");
         }
-    
+   
         // Step 1: Fetch the chef by ID
         const chef = await Chef.findById(id).populate("user_id");
         if (!chef) {
@@ -292,7 +292,7 @@ const resolvers = {
     console.log("chefuserid:",chef.user_id._id)
         // Step 2: Fetch products associated with this chef
         const products = await Product.find({ chef_id: chef.user_id._id });
-    
+   
         // Step 3: Construct and return the chef details
         return {
           id: chef._id.toString(),
@@ -368,6 +368,7 @@ const resolvers = {
         throw new Error("Failed to fetch the latest order");
       }
     },
+  
     getUserProfileRider: async (_, __, { user }) => {
       // Fetch user, chef, and rider details based on authenticated user ID
       const userProfile = await User.findById(user.id);
@@ -949,7 +950,7 @@ const resolvers = {
         const updatedUser = await User.findByIdAndUpdate(id, updatedUserData, {
           new: true,
         });
-
+ 
         // Update Chef Information (if the user is a chef)
         let updatedRider=null;
         if (riderInput) {
@@ -977,7 +978,7 @@ const resolvers = {
         //     { new: true, upsert: true }
         //   );
         // }
-
+ 
         return {
           user: updatedUser,
           chef: updatedRider,

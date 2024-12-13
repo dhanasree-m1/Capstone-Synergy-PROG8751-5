@@ -146,7 +146,7 @@ const CurrentOrders = () => {
   return (
     <Row>
       <div className='col-12 mb-3 mt-3'>
-        <h2>Welcome back,Chef {localStorage.getItem('uname')}</h2>
+        <h2>Welcome back, Chef {localStorage.getItem('uname')}</h2>
         <h6>Track, manage and forecast your customers and orders.</h6>
       </div>
         {/* Render StatsCard components */}
@@ -269,4 +269,4 @@ const CurrentOrders = () => {
   );
 };
 
-export default CurrentOrders;
+export default CurrentOrders; 

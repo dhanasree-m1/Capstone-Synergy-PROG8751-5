@@ -105,11 +105,12 @@ export default function Header({
                     <Nav.Link
                       href="/rider/orders"
                       className={` ${
-                        isActive("/rider/orders") ? "active" : ""
+                        isActive("/rider/orders") && location.pathname !== "/" ? "active" : ""
                       }`}
                       onClick={() => onRoleSelect("rider")}
-                    >
-                      Rider
+                    >Rider Dashboard<div className="position-relative header-icon d-none d-lg-inline-block">
+                      <span className="material-icons align-middle ">two_wheeler</span>
+                      </div>
                     </Nav.Link>
                   )}
                 </>
