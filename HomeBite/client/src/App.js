@@ -22,6 +22,7 @@ import CompletedOrdersRider from "./Pages/Rider/OrderCompleted";
 import InprogressOrders from "./Pages/Rider/InprogressOrders";
 import ProfileRider from "./Pages/Rider/ProfileView";
 import EditProfileRider from "./Pages/Rider/Profile";
+import PastOrders from "./Pages/Customer/PastOrders";
 import "./App.scss";
 
 function App() {
@@ -29,8 +30,9 @@ function App() {
     <Routes>
       <Route path="/" element={<Dashboard />} />
       <Route path="/Customer/ProductDetails/:productId" element={<ProductDetails />} />
-      <Route path="/Customer/ChefDetails//:chefId" element={<ChefDetails />} />
+      <Route path="/Customer/ChefDetails/:chefId" element={<ChefDetails />} />
       <Route path="/Customer/OrderDetails" element={<OrderDetails />} />
+      <Route path="/Customer/PastOrders" element={<PastOrders />} />
       {/* <Route path="/Home" element={<Home />} /> */}
       <Route path="/Login" element={<Login />} />
       <Route path="/register" element={<Register />} />

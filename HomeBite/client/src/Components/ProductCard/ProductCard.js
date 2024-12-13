@@ -1,59 +1,81 @@
 import React from "react";
-import { Card, Button } from "react-bootstrap";
+import { Card, Button, Alert } from "react-bootstrap";
 import "./ProductCard.scss";
 import defaultProductImage from "../../assets/images/product.jpg";
 import veg from "../../assets/images/veg.svg";
 import nonveg from "../../assets/images/non-veg.svg";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 export default function ProductCard({
   product,
-  cart,
-  addToCart,
-  incrementQuantity,
-  decrementQuantity,
+  cart = {}, // Default to an empty cart object
+  addToCart = () => {},
+  incrementQuantity = () => {},
+  decrementQuantity = () => {},
 }) {
-  console.log("Product passed to ProductCard:", product);
+  const navigate = useNavigate(); // Always call hooks at the top level
+
+  // Check if product is invalid and render an error message
+  if (!product || !product.id) {
+    return (
+      <Alert variant="danger" className="m-3">
+        Product data is missing or incomplete!
+      </Alert>
+    );
+  }
+
   const dietaryIcon =
     product.dietary === "Veg"
       ? veg
       : product.dietary === "Non Veg"
       ? nonveg
       : null;
+
   const campusName =
-    product.user?.address_line_1 || "Campus information unavailable";
+    product?.user?.address_line_1 || "Campus information unavailable";
+
   const quantity = cart[product.id] || 0;
-  const navigate = useNavigate();
+
   return (
     <Card className="product-card mb-3">
       <Card.Img
         variant="top"
         src={product.image_url || defaultProductImage} // Fallback image if image_url is missing
-        alt={product.name}
+        alt={product.name || "Product Image"}
       />
       <Card.Body className="pb-0">
         <Card.Title className="justify-content-between d-flex">
-          {product.name}
+          {product.name || "Unnamed Product"}
           {dietaryIcon && (
             <img
               className="align-bottom"
               src={dietaryIcon}
-              alt={product.dietary}
-              title={product.dietary}
+              alt={product.dietary || "Unknown"}
+              title={product.dietary || "Unknown"}
             />
           )}
         </Card.Title>
-        <Card.Text className="text-truncate">{product.description}</Card.Text>
+        <Card.Text className="text-truncate">
+          {product.description || "No description available."}
+        </Card.Text>
 
         <Card.Text className="campus-name">
           <span className="material-icons">location_on</span> {campusName}
         </Card.Text>
-        <Card.Text >
-        <a onClick={() => navigate(`/Customer/ProductDetails/${product.id}`)} >Product Details</a>
+        <Card.Text>
+          <a
+            onClick={() =>
+              navigate(`/Customer/ProductDetails/${product.id}`)
+            }
+          >
+            Product Details
+          </a>
         </Card.Text>
         <hr />
         <div className="d-flex justify-content-between align-center">
-          <p className="price mb-0">${product.price.toFixed(2)}</p>
+          <p className="price mb-0">
+            ${product.price ? product.price.toFixed(2) : "0.00"}
+          </p>
           {quantity > 0 ? (
             <div className="cart-controls">
               <Button

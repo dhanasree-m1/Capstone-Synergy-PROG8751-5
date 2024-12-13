@@ -4,13 +4,10 @@ import InputField from '../../Components/InputField/InputField';
 import ImageUpload from '../../Components/ImageUpload/ImageUpload';
 import Button from "../../Components/Button/Button";
 import RadioButton from "../../Components/RadioButton/RadioButton";
-import SpecialtyCuisinesOptions from "../../Components/SpecialtyCuisinesOptions/SpecialtyCuisinesOptions";
-import TypeOfMealsOptions from "../../Components/TypeOfMealsOptions/TypeOfMealsOptions";
 import AvailabilityOptions from "../../Components/AvailabilityOptions/AvailabilityOptions";
-import { UPDATE_USER_PROFILES } from "../../queries";
+import { UPDATE_USER_PROFILES_RIDER } from "../../queries";
 import { useMutation } from "@apollo/client";
 import { Link,useNavigate } from 'react-router-dom';
-
 
 const Profile = () => {
   const [userInfo, setUserInfo] = useState({
@@ -34,12 +31,11 @@ const Profile = () => {
     vehicle_registration_number: '',
     vehicle_type: '',
     vehicle_insurance_number: '',
+    insurance_expiry_date:'',
     driver_license_number: '',
     preferred_working_days: '',
     license_expiry_date:'',
     preferred_delivery_radius:'',
-    preferred_start_time:'',
-    preferred_end_time:'',
     long_distance_preference:''
 
   });
@@ -47,7 +43,7 @@ const Profile = () => {
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [message, setMessage] = useState(""); // State to store feedback messages
   const navigate = useNavigate();
-  const [updateUserProfile] = useMutation(UPDATE_USER_PROFILES);
+  const [updateUserProfileRider] = useMutation(UPDATE_USER_PROFILES_RIDER);
 
   const fetchData = async () => {
     const token = localStorage.getItem("token");
@@ -69,8 +65,8 @@ const Profile = () => {
               rider {
                 vehicle_type vehicle_registration_number vehicle_insurance_number
                 insurance_expiry_date driver_license_number license_expiry_date
-                preferred_delivery_radius preferred_working_days preferred_start_time
-                preferred_end_time long_distance_preference
+                preferred_delivery_radius preferred_working_days 
+                 long_distance_preference
               }
             }
           }
@@ -80,10 +76,20 @@ const Profile = () => {
 
     const data = await response.json();
     const { user, rider } = data.data.getUserProfileRider;
-
+console.log("UserRider:",data)
     setUserInfo(user || {});
     setProfileImageUrl(user?.profile_image);
-    setRiderInfo(rider || {});
+    
+    setRiderInfo({
+      ...rider,
+      insurance_expiry_date: rider?.insurance_expiry_date 
+        ? new Date(parseInt(rider.insurance_expiry_date)).toISOString().split('T')[0] 
+        : '',
+      license_expiry_date: rider?.license_expiry_date 
+        ? new Date(parseInt(rider.license_expiry_date)).toISOString().split('T')[0] 
+        : '',
+    });
+  //  setRiderInfo(rider || {});
   };
 
   useEffect(() => {
@@ -96,7 +102,11 @@ const Profile = () => {
     const emailRegex = /^(?!.*\.\.)(?!.*@.*@)(?!.*\s)(?!.*[,'`])([a-zA-Z0-9._%+-]+)@[a-zA-Z0-9.-]+\.(com|org|net|gov|edu|mil|info|biz|name|us|uk|ca|au|in|de|fr|cn|jp|br|ru|za|mx|nl|es|it|app|blog|shop|online|site|tech|io|ai|co|xyz|photography|travel|museum|jobs|health)$/;
     const phoneRegex = /^[0-9]{10}$/;
     const postalCodeRegex = /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/;
-
+     // Regular expressions for formats
+     const regNumberPattern = /^[A-Z0-9-]{5,10}$/; // Example pattern for a vehicle registration number
+     const licensePattern = /^[A-Z0-9-]{5,15}$/;   // Example pattern for a driver's license number
+     const insurancePattern = /^[a-zA-Z0-9]{8,}$/; // At least 8 alphanumeric characters for insurance number
+     const validateFutureDate = (date) => new Date(date) >= new Date();
     if (!userInfo.first_name || !nameRegex.test(userInfo.first_name)) {
       errors.push("First name is required and must contain only letters.");
     }
@@ -109,16 +119,36 @@ const Profile = () => {
     if (!userInfo.mobile_number || !phoneRegex.test(userInfo.mobile_number)) {
       errors.push("A valid 10-digit mobile number is required.");
     }
-    if (userInfo.postal_code && !postalCodeRegex.test(userInfo.postal_code)) {
-      errors.push("Postal code can only contain letters, numbers, and dashes.");
-    }
+    // if (userInfo.postal_code && !postalCodeRegex.test(userInfo.postal_code)) {
+    //   errors.push("Postal code can only contain letters, numbers, and dashes.");
+    // }
     if (!riderInfo.vehicle_registration_number) {
       errors.push("Vehicle Reg. Number is required for riders.");
     }
     if (!riderInfo.driver_license_number) {
       errors.push("Driver License Number is required for riders.");
     }
-
+    if (!regNumberPattern.test(riderInfo.vehicle_registration_number)) {
+      errors.push("Please enter a valid vehicle registration number.");
+     
+    }
+        // Validate driver’s license number
+    if (!licensePattern.test(riderInfo.driver_license_number)) {
+      errors.push("Please enter a valid driver's license number.");
+      
+    }
+    if (!insurancePattern.test(riderInfo.vehicle_insurance_number)) {
+      errors.push("Vehicle insurance number must be alphanumeric and at least 8 characters long.");
+     
+    }
+    if (riderInfo.insurance_expiry_date && !validateFutureDate(riderInfo.insurance_expiry_date)) {
+      errors.push("Insurance expiry date cannot be in the past.");
+      
+    }
+    if (riderInfo.license_expiry_date && !validateFutureDate(riderInfo.license_expiry_date)) {
+      errors.push("License expiry date cannot be in the past.");
+      
+    }
     if (errors.length > 0) {
       setMessage(errors.join(" "));
       return false;
@@ -157,14 +187,19 @@ const Profile = () => {
     if (!validateInputs()) {
       return;
     }
-
-    const riderData = {
+    const formattedRiderData = {
       ...riderInfo,
-      max_orders_per_day: parseInt(riderInfo.max_orders_per_day, 10) || 0,
+      insurance_expiry_date: riderInfo.insurance_expiry_date
+        ? new Date(riderInfo.insurance_expiry_date).toISOString()
+        : null,
+      license_expiry_date: riderInfo.license_expiry_date
+        ? new Date(riderInfo.license_expiry_date).toISOString()
+        : null,
     };
+    
 
     try {
-      const result = await updateUserProfile({
+      const result = await updateUserProfileRider({
         variables: {
           id: localStorage.getItem("user_id"),
           userInput: {
@@ -173,7 +208,7 @@ const Profile = () => {
             password_hash: userInfo.password_hash|| "",
             //role: userInfo.role ? userInfo.role[0] : undefined,
           },
-          riderInput: riderData,
+          riderInput: formattedRiderData,
         },
       });
       navigate("/rider/profile", { state: { successMessage: "Profile updated successfully!" } });
@@ -283,9 +318,7 @@ const Profile = () => {
               <h4>Rider Information</h4>
             </div>
 
-            <Col md={6}>
-              <InputField label="Max Orders Per Day" name="vehicle_registration_number" value={riderInfo.vehicle_registration_number || ''} onChange={(e) => handleInputChange(e, setRiderInfo)} />
-            </Col>
+            
             <Col md={12}>
                       <h5 className="mt-3 mb-3"><b>Vehicle Information</b></h5>
                     </Col>
@@ -309,7 +342,8 @@ const Profile = () => {
                     <Col md={6}>
                       <InputField
                         label="Vehicle Registration Number"
-                        name="vehicleRegNumber"
+                        name="vehicle_registration_number"
+                        value={riderInfo.vehicle_registration_number}
                         placeholder="Vehicle Registration Number"
                         onChange={handleChange}
                       />
@@ -317,7 +351,8 @@ const Profile = () => {
                     <Col md={6}>
                       <InputField
                         label="Vehicle Insurance Number"
-                        name="vehicleInsuranceNumber"
+                        name="vehicle_insurance_number"
+                        value={riderInfo.vehicle_insurance_number}
                         placeholder="Vehicle Insurance Number"
                         onChange={handleChange}
                       />
@@ -326,14 +361,16 @@ const Profile = () => {
                       <InputField
                         label="Insurance Expiry Date"
                         type="date"
-                        name="insuranceExpiryDate"
+                        value={riderInfo.insurance_expiry_date}
+                        name="insurance_expiry_date"
                         onChange={handleChange}
                       />
                     </Col>
                     <Col md={6}>
                       <InputField
                         label="Driver's License Number"
-                        name="driverLicenseNumber"
+                        name="driver_license_number"
+                        value={riderInfo.driver_license_number}
                         placeholder="Driver's License Number"
                         onChange={handleChange}
                       />
@@ -342,7 +379,8 @@ const Profile = () => {
                       <InputField
                         label="License Expiry Date"
                         type="date"
-                        name="licenseExpiryDate"
+                        value={riderInfo.license_expiry_date}
+                        name="license_expiry_date"
                         onChange={handleChange}
                       />
                     </Col>

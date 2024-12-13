@@ -1,9 +1,11 @@
 import React from "react";
 import { Card } from "react-bootstrap";
 import "./ChefCard.scss";
+import { useNavigate } from 'react-router-dom';
 import defaultChefImage from "../../assets/images/chef.jpg";
 
 export default function ChefCard({ chef }) {
+  const navigate = useNavigate();
   // Check for null or undefined `chef` or `chef.user`
   if (!chef || !chef.user) {
     console.error("Chef data or user data is null or undefined:", chef);
@@ -53,6 +55,9 @@ export default function ChefCard({ chef }) {
         <Card.Text>
           <span className="material-icons">location_on</span>
           {chef.user.address_line_1 || "Address"}
+        </Card.Text>
+        <Card.Text >
+        <a onClick={() => navigate(`/Customer/ChefDetails/${chef.id}`)} >Chef Details</a>
         </Card.Text>
       </Card.Body>
     </Card>

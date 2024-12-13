@@ -71,6 +71,20 @@ const typeDefs = gql`
     created_at: String
   }
 
+  type Cheff {
+    id: ID!
+    bio: String
+    specialty_cuisines: [String]
+    type_of_meals: [String]
+    cooking_experience: String
+    max_orders_per_day: Int
+    preferred_working_days: [String]
+    preferred_start_time: String
+    preferred_end_time: String
+    user: User
+    products: [Product]
+  }
+
   type PaymentInfo {
     id: ID!
     user: User!
@@ -230,7 +244,11 @@ const typeDefs = gql`
     createPaymentInfo(input: CreatePaymentInfoInput!): PaymentInfo
     resetPassword(token: String!, newPassword: String!): ResetPasswordResponse
     updateOrderStatus(orderId: ID!, status: String!): Response
-    updateOrderStatusRider(orderId: ID!, status: String!, rider_id: ID!): Response
+    updateOrderStatusRider(
+      orderId: ID!
+      status: String!
+      rider_id: ID!
+    ): Response
   }
   type Response {
     success: Boolean!
@@ -259,19 +277,20 @@ const typeDefs = gql`
     image_url: String
     dietary: String
     is_available: String
+    chef_id:ID
   }
 
   type ProductDetails {
-  id: ID!
-  chef_id:ID
-  name: String!
-  description: String
-  price: Float!
-  image_url: String
-  dietary: String
-  is_available: String
-  chef: Chef
-}
+    id: ID!
+    chef_id: ID
+    name: String!
+    description: String
+    price: Float!
+    image_url: String
+    dietary: String
+    is_available: String
+    chef: Chef
+  }
 
   type Query {
     getProductsByChef(chef_id: ID!): [Product]
@@ -280,6 +299,7 @@ const typeDefs = gql`
     getAllProducts(campus: String): [Product]
     getAllChefs: [Chef]
     getProductById(id: ID!): ProductDetails
+    getChefById(id: ID!): Cheff
     getProduct(id: ID!): Product
   }
   type Mutation {
@@ -308,9 +328,8 @@ const typeDefs = gql`
     nearby_landmark: String
     role: [String!]
     profile_image: String
- 
   }
- type UserProfileRider {
+  type UserProfileRider {
     user: User
     rider: Rider
   }
@@ -323,14 +342,16 @@ const typeDefs = gql`
   }
 
   input RiderInput {
+    vehicle_type:String!
     vehicle_registration_number: String
     vehicle_insurance_number: String
     insurance_expiry_date: String
     driver_license_number: String
     license_expiry_date: String
     document_upload_path: String
-    preferred_delivery_radius: Int
+    preferred_delivery_radius: String
     preferred_working_days: [String]
+    long_distance_preference: Boolean
   }
   type Mutation {
     updateUserProfile(
@@ -338,67 +359,67 @@ const typeDefs = gql`
       userInput: UserInput
       chefInput: ChefInput
     ): UserProfile
-}
-     type Mutation {
+  }
+  type Mutation {
     updateUserProfileRider(
       id: ID!
       userInput: UserInput
       riderInput: RiderInput
     ): UserProfileRider
-
-}
+  }
 
   type Query {
     getUserProfile: UserProfile
     getLatestOrder(customerId: ID!): LatestOrder!
     getUserProfileRider: UserProfileRider
   }
-    
-  type Mutation {
-  createCheckoutSession(orderInput: OrderInput!): CheckoutSessionResponse!
-}
 
-input OrderInput {
-  products: [ProductInput!]!
-  successUrl: String!
-  cancelUrl: String!
-  customerId: ID!
-  chefId: ID
-}
+  type Mutation {
+    createCheckoutSession(orderInput: OrderInput!): CheckoutSessionResponse!
+  }
+
+  input OrderInput {
+    products: [ProductInput!]!
+    successUrl: String!
+    cancelUrl: String!
+    customerId: ID!
+    chefId: ID
+  }
 
   type CheckoutSessionResponse {
-  sessionId: String!
-  url: String!
-}
-type LatestOrder {
-  _id: ID!
-  order_no: Int!
-  customer_id: Users!
-  chef_id: Chef # Allow chef_id to be nullable
-  items: [OrderItem!]!
-  total_amount: Float!
-  status: String!
-  created_at: String!
-}
-   type ChefStats {
-  todaysOrders: Int
-  todaysEarnings: Float
-  totalOrders: Int
-  totalEarnings: Float
-}
- 
-extend type Query {
-  getChefStats(chef_id: ID!): ChefStats
-}
-type RiderStats {
-  todaysOrders: Int
-  todaysEarnings: Float
-  totalOrders: Int
-  totalEarnings: Float
-}
- 
-extend type Query {
-  getRiderStats(rider_id: ID!): RiderStats
-}`;
+    sessionId: String!
+    url: String!
+  }
+  type LatestOrder {
+    _id: ID!
+    order_no: Int!
+    customer_id: Users!
+    chef_id: Chef # Allow chef_id to be nullable
+    items: [OrderItem!]!
+    total_amount: Float!
+    status: String!
+    created_at: String!
+  }
+  type ChefStats {
+    todaysOrders: Int
+    todaysEarnings: Float
+    totalOrders: Int
+    totalEarnings: Float
+  }
+
+  extend type Query {
+    getChefStats(chef_id: ID!): ChefStats
+  }
+  type RiderStats {
+    todaysOrders: Int
+    todaysEarnings: Float
+    totalOrders: Int
+    totalEarnings: Float
+  }
+
+  extend type Query {
+    getRiderStats(rider_id: ID!): RiderStats
+  }
+`;
 
 export default typeDefs;

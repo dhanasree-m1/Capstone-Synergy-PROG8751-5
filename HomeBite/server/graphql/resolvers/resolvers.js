@@ -235,23 +235,21 @@ const resolvers = {
         if (!mongoose.Types.ObjectId.isValid(id)) {
           throw new Error("Invalid Product ID format");
         }
-
-        // Step 1: Fetch the product by ID
+   
+        // Fetch the product by ID
         const product = await Product.findById(id);
-        console.log("product Data:", product);
         if (!product) {
           throw new Error("Product not found");
         }
-
-        // Step 2: Find the Chef where user_id matches the product.chef_id
-        const chef = await Chef.findOne({ user_id: product.chef_id }).populate(
-          "user_id"
-        );
-
-        // Debugging: Log chef and user data
-        console.log("Chef Data:", chef);
-
-        // Step 3: Construct and return the product details
+   
+        // Fetch the Chef where user_id matches product.chef_id
+        const chef = await Chef.findOne({ user_id: product.chef_id }).populate("user_id");
+   
+        if (!chef) {
+          throw new Error("Chef not found for the given product");
+        }
+   
+        // Return product details with chef's user info
         return {
           id: product._id.toString(),
           chef_id: product.chef_id,
@@ -261,35 +259,69 @@ const resolvers = {
           image_url: product.image_url || "",
           dietary: product.dietary || "",
           is_available: product.is_available,
-          chef: chef
-            ? {
-                id: chef._id.toString(),
-                specialty_cuisines: chef.specialty_cuisines || [],
-                type_of_meals: chef.type_of_meals || [],
-                cooking_experience: chef.cooking_experience || "",
-                max_orders_per_day: chef.max_orders_per_day || 0,
-                preferred_working_days: chef.preferred_working_days || [],
-                preferred_start_time: chef.preferred_start_time || "",
-                preferred_end_time: chef.preferred_end_time || "",
-                user: chef.user_id
-                  ? {
-                      first_name: chef.user_id.first_name || "",
-                      last_name: chef.user_id.last_name || "",
-                      address_line_1: chef.user_id.address_line_1 || "",
-                      address_line_2: chef.user_id.address_line_2 || "",
-                      city: chef.user_id.city || "",
-                      province: chef.user_id.province || "",
-                      postal_code: chef.user_id.postal_code || "",
-                      country: chef.user_id.country || "",
-                      profile_image: chef.user_id.profile_image || "",
-                    }
-                  : null,
-              }
-            : null,
+          chef: {
+            id: chef._id.toString(),
+            user_id:chef.user_id,
+            specialty_cuisines: chef.specialty_cuisines || [],
+            type_of_meals: chef.type_of_meals || [],
+            user: {
+              first_name: chef.user_id?.first_name || "",
+              last_name: chef.user_id?.last_name || "",
+              address_line_1: chef.user_id?.address_line_1 || "",
+              address_line_2: chef.user_id?.address_line_2 || "",
+            },
+          },
         };
       } catch (error) {
         console.error("Error fetching product details:", error.message);
         throw new Error("Failed to fetch product details");
+      }
+    },
+    getChefById: async (_, { id }) => {
+      try {
+        // Validate the chef ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          throw new Error("Invalid Chef ID format");
+        }
+   
+        // Step 1: Fetch the chef by ID
+        const chef = await Chef.findById(id).populate("user_id");
+        if (!chef) {
+          throw new Error("Chef not found");
+        }
+    console.log("chefuserid:",chef.user_id._id)
+        // Step 2: Fetch products associated with this chef
+        const products = await Product.find({ chef_id: chef.user_id._id });
+   
+        // Step 3: Construct and return the chef details
+        return {
+          id: chef._id.toString(),
+          bio: chef.bio || "",
+          specialty_cuisines: chef.specialty_cuisines || [],
+          type_of_meals: chef.type_of_meals || [],
+          user: chef.user_id
+            ? {
+                first_name: chef.user_id.first_name || "",
+                last_name: chef.user_id.last_name || "",
+                profile_image: chef.user_id.profile_image || "",
+                address_line_1: chef.user_id.address_line_1 || "",
+                address_line_2: chef.user_id.address_line_2 || "",
+                city: chef.user_id.city || "",
+                province: chef.user_id.province || "",
+              }
+            : null,
+          products: products.map((product) => ({
+            id: product._id.toString(),
+            name: product.name || "",
+            description: product.description || "",
+            price: product.price,
+            image_url: product.image_url || "",
+            dietary: product.dietary || "",
+          })),
+        };
+      } catch (error) {
+        console.error("Error fetching chef details:", error.message);
+        throw new Error("Failed to fetch chef details");
       }
     },
     async getLatestOrder(_, { customerId }) {
@@ -335,6 +367,7 @@ const resolvers = {
         throw new Error("Failed to fetch the latest order");
       }
     },
+  
     getUserProfileRider: async (_, __, { user }) => {
       // Fetch user, chef, and rider details based on authenticated user ID
       const userProfile = await User.findById(user.id);
@@ -894,6 +927,60 @@ const resolvers = {
         return {
           user: updatedUser,
           chef: updatedChef,
+        };
+      } catch (error) {
+        console.error("Error in updateUserProfile resolver:", error);
+        throw new Error("Failed to update profile");
+      }
+    },
+    updateUserProfileRider: async (_, { id, userInput, riderInput }) => {
+      if (!id) {
+        throw new Error("User not authenticated");
+      }
+      console.log("userrrr:", id);
+      try {
+        const updatedUserData = {
+          ...userInput,
+          ...(userInput.password_hash && {
+            password_hash: await bcrypt.hash(userInput.password_hash, 10),
+          }),
+        };
+        // Update User Information
+        const updatedUser = await User.findByIdAndUpdate(id, updatedUserData, {
+          new: true,
+        });
+ 
+        // Update Chef Information (if the user is a chef)
+        let updatedRider=null;
+        if (riderInput) {
+          updatedRider = await Rider.findOneAndUpdate(
+            { user_id: id },
+            riderInput,
+            { new: true, upsert: true }
+          );
+        }
+        // Update Rider Information (if the user is a rider)
+        // let updatedRider = null;
+        // if (riderInput) {
+        //   updatedRider = await Rider.findOneAndUpdate(
+        //     { user_id: user.id },
+        //     {
+        //       vehicle_registration_number: riderInput.vehicle_registration_number,
+        //       vehicle_insurance_number: riderInput.vehicle_insurance_number,
+        //       insurance_expiry_date: riderInput.insurance_expiry_date,
+        //       driver_license_number: riderInput.driver_license_number,
+        //       license_expiry_date: riderInput.license_expiry_date,
+        //       document_upload_path: riderInput.document_upload_path,
+        //       preferred_delivery_radius: riderInput.preferred_delivery_radius,
+        //       preferred_working_days: riderInput.preferred_working_days,
+        //     },
+        //     { new: true, upsert: true }
+        //   );
+        // }
+ 
+        return {
+          user: updatedUser,
+          chef: updatedRider,
         };
       } catch (error) {
         console.error("Error in updateUserProfile resolver:", error);
