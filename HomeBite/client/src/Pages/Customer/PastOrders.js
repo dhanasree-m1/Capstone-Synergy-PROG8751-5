@@ -19,59 +19,63 @@ export default function PastOrders() {
       return;
     }
 
+  
     const fetchPastOrders = async () => {
+      const customer_id=localStorage.getItem("user_id")
       try {
-        console.log("Fetching past orders...");
-        const response = await fetch("/graphql", {
+        const response = await fetch("http://localhost:5000/graphql", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             query: `
-              query GetPastOrders($customerId: ID!) {
-                getPastOrders(customerId: $customerId) {
+              query {
+                getPastOrdersCustomer(customer_id: "${customer_id}") {
                   _id
                   order_no
+                  status
+                  total_amount
+                  created_at
                   customer_id {
                     first_name
                     last_name
+                    email
                     address_line_1
+                    address_line_2
                     city
                     province
+                    postal_code
+                    country
                   }
                   items {
                     product_id {
                       name
-                      image_url
                     }
                     quantity
+                    special_request
+                    unit_price
                   }
-                  total_amount
-                  created_at
+                  payment {
+                    payment_method
+                    amount
+                    payment_status
+                  }
                 }
               }
             `,
-            variables: { customerId },
           }),
         });
-
-        const result = await response.json();
-        console.log("Response from getPastOrders:", result);
-
-        if (result.errors) {
-          throw new Error(result.errors[0].message);
+        const json = await response.json();
+        console.log("GraphQL response:", json); // Log the response for debugging
+        if (json.errors) {
+          throw new Error(json.errors[0].message);
         }
-
-        setOrders(result.data.getPastOrders || []);
-      } catch (err) {
-        console.error("Error fetching past orders:", err.message);
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        setOrders(json.data.getCurrentOrdersCustomer);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
       }
     };
-
     fetchPastOrders();
   }, [customerId, navigate]);
 

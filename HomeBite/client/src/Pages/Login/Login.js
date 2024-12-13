@@ -76,9 +76,11 @@ const Login = () => {
         if(urole.includes("chef")){
           navigate("/chef/orders");
 
-        }else{
+        }else if(urole.includes("rider")){
           navigate("/rider/orders");
 
+        }else{
+          navigate("/");
         }
         
       }

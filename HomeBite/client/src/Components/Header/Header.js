@@ -74,7 +74,7 @@ export default function Header({
               {/* Conditional Dashboard Links */}
               {urole && (
                 <>
-                  {urole === "customer" && (
+                  {/* {urole === "customer" && (
                     <Nav.Link
                       href="/customer/dashboard"
                       className={` ${
@@ -84,7 +84,7 @@ export default function Header({
                     >
                       Customer
                     </Nav.Link>
-                  )}
+                  )} */}
                   {urole.includes("chef") && (
                     <Nav.Link
                       href="/chef/orders"

@@ -310,6 +310,7 @@ const typeDefs = gql`
     getAllProducts(campus: String): [Product]
     getAllChefs: [Chef]
     getProductById(id: ID!): ProductDetails
+    getPastOrdersCustomer(customer_id: ID!): [Order]
     getChefById(id: ID!): Cheff
     getProduct(id: ID!): Product
   }
@@ -381,7 +382,7 @@ const typeDefs = gql`
 
   type Query {
     getUserProfile: UserProfile
-    getLatestOrder(customerId: ID!): LatestOrder!
+    getLatestOrder(customerId: ID!): LatestOrder
     getUserProfileRider: UserProfileRider
   }
 
