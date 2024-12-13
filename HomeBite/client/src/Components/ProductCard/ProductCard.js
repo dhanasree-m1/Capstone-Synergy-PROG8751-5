@@ -44,7 +44,9 @@ export default function ProductCard({
         alt={product.name || "Product Image"}
       />
       <Card.Body className="pb-0">
-        <Card.Title className="justify-content-between d-flex">
+        <Card.Title className="justify-content-between d-flex" onClick={() =>
+              navigate(`/Customer/ProductDetails/${product.id}`)
+            }>
           {product.name || "Unnamed Product"}
           {dietaryIcon && (
             <img
@@ -62,7 +64,7 @@ export default function ProductCard({
         <Card.Text className="campus-name">
           <span className="material-icons">location_on</span> {campusName}
         </Card.Text>
-        <Card.Text>
+        {/* <Card.Text>
           <a
             onClick={() =>
               navigate(`/Customer/ProductDetails/${product.id}`)
@@ -70,7 +72,7 @@ export default function ProductCard({
           >
             Product Details
           </a>
-        </Card.Text>
+        </Card.Text> */}
         <hr />
         <div className="d-flex justify-content-between align-center">
           <p className="price mb-0">
