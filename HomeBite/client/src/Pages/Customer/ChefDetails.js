@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Container, Row, Col, Card, Alert } from "react-bootstrap";
 import Loader from "../../Components/Loader/Loader";
 import ProductCard from "../../Components/ProductCard/ProductCard";
+import MainLayout from "../../Components/Layouts/MainLayout";
 
 export default function ChefDetails() {
   const { chefId } = useParams(); // Extract chefId from the URL
@@ -82,6 +83,8 @@ export default function ChefDetails() {
   const chefName = `${chef.user?.first_name || "Unknown"} ${chef.user?.last_name || ""}`;
 
   return (
+    <>
+    <MainLayout />
     <Container className="my-5">
       <Row>
         <Col md={4}>
@@ -116,5 +119,6 @@ export default function ChefDetails() {
         </Col>
       </Row>
     </Container>
+    </>
   );
 }
