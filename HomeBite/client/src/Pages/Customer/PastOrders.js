@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Alert } from "react-bootstrap";
+import { Container, Row, Col, Alert, Button, Card } from "react-bootstrap";
 import MainLayout from "../../Components/Layouts/MainLayout";
 
 export default function PastOrders() {
-  const [customerId, setCustomerId] = useState(
-    localStorage.getItem("user_id") || null
-  );
+  const customerId = localStorage.getItem("user_id"); // Retrieve the customerId from localStorage
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,9 +17,7 @@ export default function PastOrders() {
       return;
     }
 
-  
     const fetchPastOrders = async () => {
-      const customer_id=localStorage.getItem("user_id")
       try {
         const response = await fetch("http://localhost:5000/graphql", {
           method: "POST",
@@ -30,8 +26,8 @@ export default function PastOrders() {
           },
           body: JSON.stringify({
             query: `
-              query {
-                getPastOrdersCustomer(customer_id: "${customer_id}") {
+              query GetPastOrders($customer_id: ID!) {
+                getPastOrdersCustomer(customer_id: $customer_id) {
                   _id
                   order_no
                   status
@@ -40,21 +36,13 @@ export default function PastOrders() {
                   customer_id {
                     first_name
                     last_name
-                    email
-                    address_line_1
-                    address_line_2
-                    city
-                    province
-                    postal_code
-                    country
                   }
                   items {
                     product_id {
                       name
+                      image_url
                     }
                     quantity
-                    special_request
-                    unit_price
                   }
                   payment {
                     payment_method
@@ -64,18 +52,26 @@ export default function PastOrders() {
                 }
               }
             `,
+            variables: { customer_id: customerId }, // Use the correct variable key
           }),
         });
+
         const json = await response.json();
-        console.log("GraphQL response:", json); // Log the response for debugging
+        console.log("GraphQL Response:", json); // Debugging log
+
         if (json.errors) {
           throw new Error(json.errors[0].message);
         }
-        setOrders(json.data.getCurrentOrdersCustomer);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
+
+        setOrders(json.data.getPastOrdersCustomer || []);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching past orders:", err);
+        setError(err.message);
+        setLoading(false);
       }
     };
+
     fetchPastOrders();
   }, [customerId, navigate]);
 
@@ -86,26 +82,89 @@ export default function PastOrders() {
     <>
       <MainLayout />
       <Container className="mt-5">
-        {orders.length > 0 ? (
+        <Row>
+          <div className="tab-selector">
+            <Button variant="link" onClick={() => navigate("/Customer/OrderDetails")}>
+              Current Orders
+            </Button>
+            <Button variant="link" className="active">
+              Past Orders
+            </Button>
+          </div>
+        </Row>
+        {orders.length === 0 ? (
+          <Row>
+            <Col md={12}>
+              <h1>No Completed Orders</h1>
+              <p>
+                You haven't placed any completed orders yet. Explore our menu and start placing orders!
+              </p>
+              <Button variant="primary" onClick={() => navigate("/")}>
+                Order Now
+              </Button>
+            </Col>
+          </Row>
+        ) : (
           orders.map((order) => (
-            <div key={order._id} className="card mb-3">
+            <div key={order._id} className="card mb-4">
               <div className="card-body">
-                <h5>Order #{order.order_no}</h5>
-                <p>
-                  Total: ${order.total_amount.toFixed(2)} | Date:{" "}
-                  {new Date(order.created_at).toLocaleString()}
-                </p>
+                <Row>
+                  <Col md={12}>
+                    <h5>Order #{order.order_no}</h5>
+                  </Col>
+                  <Col md={4}>
+                    <h6>Status:</h6>
+                    <p>{order.status}</p>
+                  </Col>
+                  <Col md={4}>
+                    <h6>Total Amount:</h6>
+                    <p>${order.total_amount.toFixed(2)}</p>
+                  </Col>
+                  <Col md={4}>
+                    <h6>Date:</h6>
+                    <p>{new Date(order.created_at).toLocaleString()}</p>
+                  </Col>
+                </Row>
+                <hr />
+                <h6>Order Items:</h6>
                 {order.items.map((item, index) => (
-                  <div key={index}>
-                    <img src={item.product_id.image_url} alt={item.product_id.name} />
-                    <p>{item.product_id.name} x {item.quantity}</p>
-                  </div>
+                  <Row key={index} className="mb-2">
+                    <Col md={2}>
+                      <img
+                        src={item.product_id.image_url}
+                        alt={item.product_id.name}
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </Col>
+                    <Col md={10}>
+                      <p>
+                        <strong>{item.product_id.name}</strong> x {item.quantity}
+                      </p>
+                    </Col>
+                  </Row>
                 ))}
+                <hr />
+                <Row>
+                  <Col md={4}>
+                    <h6>Payment Method:</h6>
+                    <p>{order.payment?.payment_method || "N/A"}</p>
+                  </Col>
+                  <Col md={4}>
+                    <h6>Payment Status:</h6>
+                    <p>{order.payment?.payment_status || "N/A"}</p>
+                  </Col>
+                  <Col md={4}>
+                    <h6>Payment Amount:</h6>
+                    <p>${order.payment?.amount?.toFixed(2) || "0.00"}</p>
+                  </Col>
+                </Row>
               </div>
             </div>
           ))
-        ) : (
-          <p>No past orders available.</p>
         )}
       </Container>
     </>
