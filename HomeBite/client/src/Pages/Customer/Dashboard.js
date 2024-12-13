@@ -263,6 +263,42 @@ export default function Dashboard() {
             </Col>
           ) : (
             <>
+
+              <Col md={12} className="mb-5">
+                <div className="d-flex justify-content-between align-items-baseline">
+                  <div>
+                    <h5>Chefs Around You</h5>
+                    <p className="d-none d-lg-block">
+                      Connect with chefs at {selectedCampus || "all campuses"}
+                    </p>
+                  </div>
+                  <a
+                    className="btn-link"
+                    onClick={() => setViewAllChefs(!viewAllChefs)}
+                  >
+                    {viewAllChefs ? "Show Less" : "View All"}
+                  </a>
+                </div>
+                <hr className="mt-0" />
+
+                <div className="row">
+                  {filteredChefs.length > 0 ? (
+                    filteredChefs
+                      .slice(0, viewAllChefs ? filteredChefs.length : 4)
+                      .map((chef) => (
+                        <div className="col-md-3">
+                          <ChefCard key={chef.id} chef={chef}/>
+                        </div>
+                      ))
+                  ) : (
+                    <div className="col-12">
+                      <div className="alert alert-warning" role="alert">
+                        No chefs available for the selected campus.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Col>
               <Col md={12} className="mb-5">
                 <div className="d-flex justify-content-between align-items-baseline">
                   <div>
@@ -299,41 +335,6 @@ export default function Dashboard() {
                     <div className="col-12">
                       <div className="alert alert-warning" role="alert">
                         No products available for the selected campus.
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </Col>
-              <Col md={12} className="mb-5">
-                <div className="d-flex justify-content-between align-items-baseline">
-                  <div>
-                    <h5>Chefs Around You</h5>
-                    <p className="d-none d-lg-block">
-                      Connect with chefs at {selectedCampus || "all campuses"}
-                    </p>
-                  </div>
-                  <a
-                    className="btn-link"
-                    onClick={() => setViewAllChefs(!viewAllChefs)}
-                  >
-                    {viewAllChefs ? "Show Less" : "View All"}
-                  </a>
-                </div>
-                <hr className="mt-0" />
-
-                <div className="row">
-                  {filteredChefs.length > 0 ? (
-                    filteredChefs
-                      .slice(0, viewAllChefs ? filteredChefs.length : 4)
-                      .map((chef) => (
-                        <div className="col-md-3">
-                          <ChefCard key={chef.id} chef={chef}/>
-                        </div>
-                      ))
-                  ) : (
-                    <div className="col-12">
-                      <div className="alert alert-warning" role="alert">
-                        No chefs available for the selected campus.
                       </div>
                     </div>
                   )}

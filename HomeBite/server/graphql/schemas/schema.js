@@ -268,8 +268,18 @@ const typeDefs = gql`
     user: User
   }
 
-  input ProductInput {
+  input ProductInputs {
     id: ID!
+    name: String!
+    description: String
+    price: Float!
+    quantity: Int
+    image_url: String
+    dietary: String
+    is_available: String
+    chef_id:ID
+  }
+  input ProductInput {
     name: String!
     description: String
     price: Float!
@@ -379,7 +389,7 @@ const typeDefs = gql`
   }
 
   input OrderInput {
-    products: [ProductInput!]!
+    products: [ProductInputs!]!
     successUrl: String!
     cancelUrl: String!
     customerId: ID!
