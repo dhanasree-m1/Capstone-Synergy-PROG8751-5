@@ -226,6 +226,7 @@ const typeDefs = gql`
     getRider(id: ID!): Rider
     getChef(id: ID!): Chef
     getCurrentOrders(chef_id: ID!): [Order]
+    getPastOrdersCustomer(customer_id: ID!): [Order]
     getCompletedOrders(chef_id: ID!): [Order]
     getCurrentOrdersRider: [Order]
     getInprogressOrdersRider(rider_id: ID!): [Order]
@@ -430,6 +431,10 @@ const typeDefs = gql`
   extend type Query {
     getRiderStats(rider_id: ID!): RiderStats
   }
+  
+ 
+ 
+ 
 `;
 
 export default typeDefs;

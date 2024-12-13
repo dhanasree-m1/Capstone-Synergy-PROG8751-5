@@ -234,7 +234,7 @@ console.log("stats:",stats)
                       <>
                         <Button
                           variant="success"
-                          onClick={() => handleAction(order._id, "In-Progress")} className="small me-3"
+                          onClick={() => handleAction(order._id, "In Progress")} className="small me-3"
                         >
                           Pickup
                         </Button>

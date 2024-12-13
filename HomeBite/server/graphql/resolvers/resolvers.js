@@ -428,7 +428,7 @@ const resolvers = {
       try {
         // Fetch all orders with status  equal to "InProgress"
         const orders = await Order.find({
-          status: "In-Progress",
+          status: "In Progress",
           rider_id: rider_id,
         })
           .populate(
@@ -612,6 +612,53 @@ const resolvers = {
         throw new Error("Failed to fetch chef stats.");
       }
     },
+   
+    getPastOrdersCustomer: async (_, { customerId }) => {
+      try {
+        // Fetch all orders with status not equal to "Completed"
+        const orders = await Order.find({
+          status: { $ne: "Pending" },
+          customer_id: customerId,
+        })
+          .populate(
+            "customer_id",
+            "first_name last_name email address_line_1 address_line_2 city province postal_code country"
+          )
+          .populate("chef_id", "specialty_cuisines type_of_meals")
+          .populate("rider_id", "vehicle_type vehicle_registration_number")
+          .lean();
+        // For each order, find the associated OrderItems
+        const ordersWithDetails = await Promise.all(
+          orders.map(async (order) => {
+            // Fetch OrderItems for the current order
+            const items = await OrderItem.find({ order_id: order._id })
+              .populate({
+                path: "product_id",
+                select: "name",
+              })
+              .lean();
+
+            // Fetch Payment for the current order
+            const payment = await Payment.findOne({
+              order_id: order._id,
+            }).lean();
+
+            // Return the order with populated items and payment details
+            return {
+              ...order,
+              items, // Attach items array to the order
+              payment, // Attach payment details to the order
+            };
+          })
+        );
+        console.log("Order with items customer");
+        console.log(ordersWithDetails);
+        return ordersWithDetails;
+      } catch (error) {
+        console.error("Error fetching current orders:", error);
+        throw new Error("Failed to fetch current orders.");
+      }
+    },
   },
 
   Mutation: {
@@ -768,6 +815,9 @@ const resolvers = {
       }
     },
     updateOrderStatusRider: async (_, { orderId, status,rider_id }) => {
+      console.log("orderId",orderId)
+      console.log("status",status)
+      console.log("rider_id",rider_id)
       try {
         const order = await Order.findById(orderId);
         if (!order) {

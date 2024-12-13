@@ -230,7 +230,7 @@ console.log("stats:",stats)
                     )}
                   </div>
                   <div className="col-lg-6 text-lg-end">
-                    {order.status === "In-Progress" ? (
+                    {order.status === "In Progress" ? (
                       <>
                         <Button
                           variant="success"
