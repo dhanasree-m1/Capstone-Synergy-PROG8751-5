@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Container, Row, Col, Card, Alert } from "react-bootstrap";
+import { useParams, useNavigate } from "react-router-dom";
+import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap";
 import Loader from "../../Components/Loader/Loader";
-import ProductCard from "../../Components/ProductCard/ProductCard";
-import MainLayout from "../../Components/Layouts/MainLayout";
-import { useNavigate } from "react-router-dom";
 import CartSummary from "../Customer/CartSummary";
+import MainLayout from "../../Components/Layouts/MainLayout";
 
 export default function ChefDetails() {
   const navigate = useNavigate();
@@ -13,6 +11,11 @@ export default function ChefDetails() {
   const [chef, setChef] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : {};
+  });
+  const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
     const fetchChefDetails = async () => {
@@ -72,6 +75,36 @@ export default function ChefDetails() {
     fetchChefDetails();
   }, [chefId]);
 
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  const addToCart = (productId) => {
+    setCart((prevCart) => ({
+      ...prevCart,
+      [productId]: (prevCart[productId] || 0) + 1,
+    }));
+  };
+
+  const incrementQuantity = (productId) => {
+    setCart((prevCart) => ({
+      ...prevCart,
+      [productId]: prevCart[productId] + 1,
+    }));
+  };
+
+  const decrementQuantity = (productId) => {
+    setCart((prevCart) => {
+      const updatedCart = { ...prevCart };
+      if (updatedCart[productId] > 1) {
+        updatedCart[productId] -= 1;
+      } else {
+        delete updatedCart[productId];
+      }
+      return updatedCart;
+    });
+  };
+
   if (loading) return <Loader />;
   if (error) return <Alert variant="danger">{error}</Alert>;
 
@@ -87,41 +120,75 @@ export default function ChefDetails() {
 
   return (
     <>
-    <MainLayout />
-    <Container className="my-5">
-      <Row>
-        <Col md={4}>
-          <Card>
-            <Card.Img variant="top" src={chef.user?.profile_image || "default-profile.jpg"} />
-            <Card.Body>
-              <h3>{chefName}</h3>
-              <p>{chef.bio || "No bio available."}</p>
-              <p className="text-secondary">
-                Located at: {chef.user?.address_line_1 || "No address available"}
-              </p>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={8}>
-          <h4>Dishes by {chefName}</h4>
-          <Row>
-            {Array.isArray(chef.products) && chef.products.length > 0 ? (
-              chef.products.map((product, index) => (
-                <Col md={6} key={product.id || index}>
-                  {product?.id ? (
-                    <ProductCard product={product} />
-                  ) : (
-                    <Alert variant="warning">Product data is incomplete!</Alert>
-                  )}
-                </Col>
-              ))
-            ) : (
-              <Alert variant="warning">No products found!</Alert>
-            )}
-          </Row>
-        </Col>
-      </Row>
-    </Container>
+      <MainLayout cart={cart} handleShowCart={() => setShowCart(true)} />
+      <Container className="my-5">
+        <Row>
+          <Col md={4}>
+            <Card>
+              <Card.Img variant="top" src={chef.user?.profile_image || "default-profile.jpg"} />
+              <Card.Body>
+                <h3>{chefName}</h3>
+                <p>{chef.bio || "No bio available."}</p>
+                <p className="text-secondary">
+                  Located at: {chef.user?.address_line_1 || "No address available"}
+                </p>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={8}>
+            <h4>Dishes by {chefName}</h4>
+            <Row>
+              {Array.isArray(chef.products) && chef.products.length > 0 ? (
+                chef.products.map((product) => (
+                  <Col md={6} key={product.id}>
+                    <Card className="mb-3">
+                      <Card.Img variant="top" src={product.image_url || "default-image.jpg"} />
+                      <Card.Body>
+                        <h5>{product.name}</h5>
+                        <p>${product.price?.toFixed(2)}</p>
+                        {cart[product.id] > 0 ? (
+                          <div className="cart-controls d-flex align-items-center">
+                            <Button
+                              variant="outline-secondary"
+                              onClick={() => decrementQuantity(product.id)}
+                            >
+                              -
+                            </Button>
+                            <span className="mx-2">{cart[product.id]}</span>
+                            <Button
+                              variant="outline-secondary"
+                              onClick={() => incrementQuantity(product.id)}
+                            >
+                              +
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button variant="primary" onClick={() => addToCart(product.id)}>
+                            Add to Cart
+                          </Button>
+                        )}
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                ))
+              ) : (
+                <Alert variant="warning">No products found!</Alert>
+              )}
+                                <Button variant="secondary mb-2 mt-3 " onClick={() => navigate("/")}>
+          Order More
+        </Button>
+            </Row>
+          </Col>
+        </Row>
+      </Container>
+      <CartSummary
+        show={showCart}
+        handleClose={() => setShowCart(false)}
+        cart={cart}
+        products={chef.products || []} // Pass chef's products to CartSummary
+        incrementQuantity={incrementQuantity}
+        decrementQuantity={decrementQuantity}
+      />
     </>
   );
 }

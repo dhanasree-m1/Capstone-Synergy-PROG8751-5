@@ -297,6 +297,7 @@ const typeDefs = gql`
     description: String
     price: Float!
     image_url: String
+    quantity: Int
     dietary: String
     is_available: String
     chef: Chef

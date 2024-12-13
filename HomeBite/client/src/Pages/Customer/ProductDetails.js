@@ -46,7 +46,9 @@ export default function ProductDetails() {
                   name
                   description
                   price
+                  quantity
                   image_url
+                  dietary
                   chef {
                     id
                     user {
@@ -147,6 +149,10 @@ export default function ProductDetails() {
                     <li class="list-group-item bg-transparent border-0 ps-0"><p class="card-text">{product.description || "No description available."}</p></li>
                     <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons">location_on</span>{`${product.chef?.user?.address_line_1}` || "Unknown"}</li>
                     <li class="list-group-item bg-transparent border-0 ps-0 campus-name"><span className="material-icons">room_service</span>{`${product.chef?.user?.first_name} ${product.chef?.user?.last_name}` || "Unknown"}</li>
+                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name">
+                    {`${product.dietary}` || "Unknown"}</li>
+                    <li class="list-group-item bg-transparent border-0 ps-0 campus-name">
+                    Quantity Remaining {`${product.quantity}` || "Unknown"}</li>
                   </ul>
                   <div className="d-md-flex justify-content-between align-center">
 
