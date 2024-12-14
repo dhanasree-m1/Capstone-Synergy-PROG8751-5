@@ -945,10 +945,7 @@ const resolvers = {
       console.log("userrrr:", id);
       try {
         const updatedUserData = {
-          ...userInput,
-          ...(userInput.password_hash && {
-            password_hash: await bcrypt.hash(userInput.password_hash, 10),
-          }),
+          ...userInput
         };
         // Update User Information
         const updatedUser = await User.findByIdAndUpdate(id, updatedUserData, {
@@ -999,10 +996,7 @@ const resolvers = {
       console.log("userrrr:", id);
       try {
         const updatedUserData = {
-          ...userInput,
-          ...(userInput.password_hash && {
-            password_hash: await bcrypt.hash(userInput.password_hash, 10),
-          }),
+          ...userInput
         };
         // Update User Information
         const updatedUser = await User.findByIdAndUpdate(id, updatedUserData, {

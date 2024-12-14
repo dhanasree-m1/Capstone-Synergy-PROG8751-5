@@ -27,29 +27,6 @@ export default function OrderDetails() {
   if (loading) return <p>Loading...</p>;
   if (error) return <Alert variant="danger">{error.message}</Alert>;
 
-  // Handle case where no orders are found
-  if (!data || !data.getLatestOrder) {
-    return (
-      <>
-        <MainLayout />
-        <Container className="mt-5">
-          <Row>
-            <Col md={12}>
-              <h1>No Orders Found</h1>
-              <p>
-                You haven't placed any orders yet. Start exploring our menu and
-                order your favorite dishes!
-              </p>
-              <Button variant="primary" onClick={() => navigate("/")}>
-                Order Now
-              </Button>
-            </Col>
-          </Row>
-        </Container>
-      </>
-    );
-  }
-
   const {
     order_no,
     customer_id,
@@ -60,10 +37,12 @@ export default function OrderDetails() {
     created_at,
   } = data.getLatestOrder;
 
-  return (
-    <>
-      <MainLayout />
-      <Container className="mt-5">
+  // Handle case where no orders are found
+ 
+    return (
+      <>
+        <MainLayout />
+        <Container className="mt-5">
         <Row>
           <div className="tab-selector">
             <Button variant="link" className="active">
@@ -77,6 +56,20 @@ export default function OrderDetails() {
             </Button>
           </div>
         </Row>
+        {data.getLatestOrder.length === 0 ? (
+          <Row>
+            <Col md={12}>
+              <h1>No Orders Found</h1>
+              <p>
+                You haven't placed any orders yet. Start exploring our menu and
+                order your favorite dishes!
+              </p>
+              <Button variant="primary" onClick={() => navigate("/")}>
+                Order Now
+              </Button>
+            </Col>
+          </Row>
+        ) : (
         <div className="card mt-4 mb-4">
           <div className="card-body">
             <Row>
@@ -151,6 +144,7 @@ export default function OrderDetails() {
             </Button>
           </div>
         </div>
+)}
       </Container>
     </>
   );
