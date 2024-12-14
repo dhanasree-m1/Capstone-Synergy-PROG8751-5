@@ -100,23 +100,24 @@ export default function OrderDetails() {
             <hr />
             <Row>
               <Col md={6}>
+                <h6>Rider Details:</h6>
+                
+                  <p>
+                    Jayalekshmi <br />
+                    jayalekshmivj08@gmail.com<br />
+                    2268999385<br />
+                    Doon Campus
+                  </p>
+                
+              </Col>
+               {/*<Col md={6}>
                 <h6>Customer Details:</h6>
                 <p>
                   {customer_id.first_name} {customer_id.last_name} <br />
                   {customer_id.email}
-                </p>
-              </Col>
-              <Col md={6}>
-                <h6>Chef Details:</h6>
-                {chef_id ? (
-                  <p>
-                    {chef_id.first_name} {chef_id.last_name} <br />
-                    {chef_id.address_line_1 || "Address not available"}
-                  </p>
-                ) : (
-                  <p>N/A</p>
-                )}
-              </Col>
+                </p> 
+              </Col>*/}
+              
             </Row>
             <hr />
             <h6>Order Items:</h6>

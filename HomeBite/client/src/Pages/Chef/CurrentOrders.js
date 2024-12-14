@@ -24,7 +24,7 @@ const CurrentOrders = () => {
   const fetchOrders = async () => {
     const chef_id=localStorage.getItem("user_id")
     try {
-      const response = await fetch("http://localhost:5000/graphql", {
+      const response = await fetch("https://homebite-app-c680d0ee15d5.herokuapp.com/graphql", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +80,7 @@ const CurrentOrders = () => {
   const fetchStats = async () => {
     const chef_id = localStorage.getItem("user_id");
     try {
-        const response = await fetch("http://localhost:5000/graphql", {
+        const response = await fetch("https://homebite-app-c680d0ee15d5.herokuapp.com/graphql", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -120,7 +120,7 @@ const CurrentOrders = () => {
 
   const handleAction = async (orderId, action) => {
     try {
-      await fetch("http://localhost:5000/graphql", {
+      await fetch("https://homebite-app-c680d0ee15d5.herokuapp.com/graphql", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

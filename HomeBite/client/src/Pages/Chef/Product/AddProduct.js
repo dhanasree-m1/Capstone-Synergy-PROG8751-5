@@ -101,7 +101,7 @@ const AddProduct = () => {
 
     console.log("Product:", product);
 
-    await fetch('http://localhost:5000/graphql', {
+    await fetch('https://homebite-app-c680d0ee15d5.herokuapp.com/graphql', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

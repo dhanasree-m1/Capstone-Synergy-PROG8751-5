@@ -8,7 +8,7 @@ import App from './App';
 import Footer from './Components/footer/footer'; // Adjust the import path if necessary
 
 const client = new ApolloClient({
-  uri: 'http://localhost:5000/graphql', // Replace with your GraphQL server URI
+  uri: 'https://homebite-app-c680d0ee15d5.herokuapp.com/graphql', // Replace with your GraphQL server URI
   cache: new InMemoryCache(),
 });
 

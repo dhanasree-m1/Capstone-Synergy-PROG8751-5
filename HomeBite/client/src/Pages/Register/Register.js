@@ -21,7 +21,7 @@ import { CREATE_PAYMENT_INFO } from "../../queries";
 
 
 const client = new ApolloClient({
-  uri: 'http://localhost:5000/graphql',
+  uri: 'https://homebite-app-c680d0ee15d5.herokuapp.com/graphql',
   cache: new InMemoryCache(),
 });
 

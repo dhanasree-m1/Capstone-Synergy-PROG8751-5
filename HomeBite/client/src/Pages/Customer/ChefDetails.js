@@ -21,7 +21,7 @@ export default function ChefDetails() {
     const fetchChefDetails = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:5000/graphql", {
+        const response = await fetch("https://homebite-app-c680d0ee15d5.herokuapp.com/graphql", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

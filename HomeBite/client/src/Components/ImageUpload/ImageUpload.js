@@ -40,7 +40,7 @@ const ImageUpload = ({ label, currentImageUrl, onImageUpload }) => {
 
     try {
       // Send the image to the backend
-      const response = await fetch('http://localhost:5000/upload', {
+      const response = await fetch('https://homebite-app-c680d0ee15d5.herokuapp.com/upload', {
         method: 'POST',
         body: formData,
       });

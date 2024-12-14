@@ -25,7 +25,9 @@ app.use(cors());
 app.use(express.json()); // Parse JSON payloads
 app.use('/uploads', express.static(path.resolve('uploads')));
 // Your other routes and logic will go here...
-
+app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
 // Connect to MongoDB  
 mongoose.connect('mongodb+srv://HomeBite:Homebite123@homebite.1dasn.mongodb.net/HomeBite?retryWrites=true&w=majority', {
 

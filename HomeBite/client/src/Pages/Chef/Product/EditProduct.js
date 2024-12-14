@@ -29,7 +29,7 @@ const EditProduct = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await fetch('http://localhost:5000/graphql', {
+      const response = await fetch('https://homebite-app-c680d0ee15d5.herokuapp.com/graphql', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -132,7 +132,7 @@ const EditProduct = () => {
     const imageUrl = newImageUrl || product.image_url; // Use new image URL if uploaded, otherwise use the original
 
     try {
-      await fetch('http://localhost:5000/graphql', {
+      await fetch('https://homebite-app-c680d0ee15d5.herokuapp.com/graphql', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

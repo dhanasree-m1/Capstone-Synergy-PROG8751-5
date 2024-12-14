@@ -9,7 +9,10 @@
     "start:server": "cd server && npm start",
     "install:client": "cd client && npm install",
     "install:server": "cd server && npm install",
-    "installall": "npm install && npm run install:client &&  npm run install:server"
+    "installall": "npm install && npm run install:client &&  npm run install:server",
+"build": "cd client && npm run build",
+  "test": "cd client && react-scripts test",
+  "eject": "cd client && react-scripts eject"
   },
   "author": "",
   "license": "ISC",

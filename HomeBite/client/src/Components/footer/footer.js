@@ -10,10 +10,10 @@ const Footer = () => {
       <Container>
         <Row className="justify-content-between">
           <Col md={5}>
-            <h5>About Us</h5>
+            {/* <h5>About Us</h5>
             <p>
               We connect you with the best chefs to deliver home cooked meals at your doorstep.
-            </p>
+            </p> */}
             <p className="mb-0">
               &copy; {new Date().getFullYear()} HomeBite. All Rights Reserved.
             </p>

@@ -19,7 +19,7 @@ export default function PastOrders() {
 
     const fetchPastOrders = async () => {
       try {
-        const response = await fetch("http://localhost:5000/graphql", {
+        const response = await fetch("https://homebite-app-c680d0ee15d5.herokuapp.com/graphql", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function PastOrders() {
   return (
     <>
       <MainLayout />
-      <Container className="mt-5">
+      <Container className="mt-5 vh-100">
         <Row>
           <div className="tab-selector">
             <Button
@@ -125,8 +125,8 @@ export default function PastOrders() {
                     <p>${order.total_amount.toFixed(2)}</p>
                   </Col>
                   <Col md={4}>
-                    <h6>Date:</h6>
-                    <p>{new Date(order.created_at).toLocaleString()}</p>
+                    {/* <h6>Date:</h6>
+                    <p>{new Date(order.created_at).toLocaleString()}</p> */}
                   </Col>
                 </Row>
                 <hr />
@@ -173,7 +173,7 @@ export default function PastOrders() {
         )}
 
         <Button variant="primary mb-4" onClick={() => navigate("/")}>
-          Order Now
+          Order More
         </Button>
       </Container>
     </>
